@@ -309,6 +309,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onToggle }) => {
           </ListItemButton>
         </ListItem>
       </List>
+
+      {/* Version frontend */}
+      {!collapsed && (
+        <Box sx={{ textAlign: 'center', py: 1, opacity: 0.6 }}>
+          <Typography variant="caption">
+            v{process.env.NEXT_PUBLIC_FRONTEND_VERSION}
+          </Typography>
+        </Box>
+      )}
     </Drawer>
   );
 };
