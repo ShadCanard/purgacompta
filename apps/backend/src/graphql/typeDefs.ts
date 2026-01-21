@@ -9,6 +9,18 @@ export const typeDefs = `#graphql
   }
 
 
+
+  # Type Group
+  type Group {
+    id: ID!
+    name: String!
+    tag: String
+    description: String
+    isActive: Boolean!
+    createdAt: String!
+    updatedAt: String!
+  }
+
   # Type Log
   type Log {
     id: ID!
@@ -63,6 +75,11 @@ export const typeDefs = `#graphql
     to: String
   }
 
+    input UpdateGroupIsActiveInput {
+    id: ID!
+    isActive: Boolean!
+  }
+
   # Queries
   type Query {
     # Récupérer l'utilisateur authentifié
@@ -82,6 +99,15 @@ export const typeDefs = `#graphql
 
     # Récupérer les logs (admin only)
     logs(filter: LogFilterInput, skip: Int, take: Int): [Log!]!
+
+    # Récupérer la liste des groupes criminels
+    groups: [Group!]!
+    
+    # Récupérer un groupe criminel par son ID
+    groupById(id: ID!): Group!
+
+    # Récupérer le nombre de groupes criminels
+    groupsCount: Int!
   }
 
   # Mutations
@@ -97,5 +123,11 @@ export const typeDefs = `#graphql
 
     # Supprimer un utilisateur (owner only)
     deleteUser(discordId: String!): Boolean!
+
+    # Créer un groupe criminel
+    createGroup(name: String!, tag: String, description: String): Group!
+
+    # Modifier l'état d'activité d'un groupe
+    updateGroupIsActive(input: UpdateGroupIsActiveInput!): Group!
   }
 `;

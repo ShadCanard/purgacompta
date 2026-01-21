@@ -60,6 +60,7 @@ const menuItems: MenuItem[] = [
   },
   { text: 'Paramètres', icon: <SettingsIcon />, path: '/settings', requiredRole: 'MANAGER', children: [
     { text: 'Utilisateurs', icon: <PeopleIcon />, path: '/settings/users', requiredRole: 'MANAGER' },
+    { text: 'Groupes', icon: <AccountBalanceIcon />, path: '/settings/groups', requiredRole: 'MANAGER' },
     { text: 'Rôles & Permissions', icon: <SettingsIcon />, path: '/settings/roles', requiredRole: 'ADMIN' },
     { text: 'Logs', icon: <AssessmentIcon />, path: '/settings/logs', requiredRole: 'ADMIN' },
   ] },

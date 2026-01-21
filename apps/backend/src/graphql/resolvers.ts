@@ -20,7 +20,26 @@ interface UpdateUserRoleInput {
   role: string;
 }
 
+function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return '';
+  const d = typeof date === 'string' ? new Date(date) : date;
+  if (isNaN(d.getTime())) return '';
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export const resolvers = {
+  Group: {
+    createdAt: (parent: any) => formatDate(parent.createdAt),
+    updatedAt: (parent: any) => formatDate(parent.updatedAt),
+  },
+  User: {
+    createdAt: (parent: any) => formatDate(parent.createdAt),
+    updatedAt: (parent: any) => formatDate(parent.updatedAt),
+  },
+  Log: {
+    createdAt: (parent: any) => formatDate(parent.createdAt),
+  },
   Query: {
     // Récupérer l'utilisateur authentifié
     me: async (_: any, __: any, context: any) => {
@@ -54,6 +73,25 @@ export const resolvers = {
     usersCount: async () => {
       return prisma.user.count();
     },
+    
+    // Récupérer un utilisateur par ID
+    groupById: async (_: any, { id }: { id: string }) => {
+      return prisma.group.findUnique({
+        where: { id },
+      });
+    },
+
+    // Récupérer tous les utilisateurs
+    groups: async () => {
+      return prisma.group.findMany({
+        orderBy: { createdAt: 'desc' },
+      });
+    },
+
+    // Compter les utilisateurs
+    groupsCount: async () => {
+      return prisma.group.count();
+    },
 
     // Récupérer les logs avec filtres/recherche
     logs: async (_: any, { filter, skip = 0, take = 50 }: any) => {
@@ -83,6 +121,8 @@ export const resolvers = {
         include: { user: true },
       });
     },
+
+    // ...existing code...
   },
 
   Mutation: {
@@ -193,6 +233,27 @@ export const resolvers = {
         },
       });
       return true;
+    },
+
+    // Créer un groupe criminel
+    createGroup: async (_: any, { name, tag, description }: { name: string; tag?: string; description?: string }) => {
+      // Vérifie unicité du nom
+      const exists = await prisma.group.findUnique({ where: { name } });
+      if (exists) throw new Error('Un groupe avec ce nom existe déjà');
+      return prisma.group.create({
+        data: {
+          name,
+          tag: tag || null,
+          description: description || null,
+        },
+      });
+    },
+        // Modifier l'état d'activité d'un groupe
+    updateGroupIsActive: async (_: any, { input }: { input: { id: string; isActive: boolean } }) => {
+      return prisma.group.update({
+        where: { id: input.id },
+        data: { isActive: input.isActive },
+      });
     },
   },
 };

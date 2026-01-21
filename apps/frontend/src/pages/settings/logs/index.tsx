@@ -86,7 +86,7 @@ const LogsPage: React.FC = () => {
       { field: 'action', headerName: 'Action', width: 110 },
       { field: 'entity', headerName: 'Entité', width: 120 },
       { field: 'entityId', headerName: 'ID cible', width: 180 },
-      { field: 'user', headerName: 'Utilisateur', width: 160, valueGetter: (params) => params.row.user?.name || '' },
+      { field: 'user', headerName: 'Utilisateur', width: 160, valueGetter: (params) => params.row?.user?.name || '' },
       { field: 'diff', headerName: 'Diff', width: 300, renderCell: (params) => <pre style={{ whiteSpace: 'pre-wrap', fontSize: 12, maxWidth: 280, overflow: 'auto' }}>{params.value}</pre> },
     ],
     []
