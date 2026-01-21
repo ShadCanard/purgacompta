@@ -8,6 +8,18 @@ export const typeDefs = `#graphql
     OWNER
   }
 
+
+  # Type Log
+  type Log {
+    id: ID!
+    action: String!
+    entity: String!
+    entityId: String!
+    user: User!
+    diff: String
+    createdAt: String!
+  }
+
   # Type User
   type User {
     id: ID!
@@ -41,6 +53,16 @@ export const typeDefs = `#graphql
     role: UserRole!
   }
 
+
+  input LogFilterInput {
+    action: String
+    entity: String
+    userId: String
+    search: String
+    from: String
+    to: String
+  }
+
   # Queries
   type Query {
     # Récupérer l'utilisateur authentifié
@@ -57,6 +79,9 @@ export const typeDefs = `#graphql
     
     # Récupérer le nombre d'utilisateurs
     usersCount: Int!
+
+    # Récupérer les logs (admin only)
+    logs(filter: LogFilterInput, skip: Int, take: Int): [Log!]!
   }
 
   # Mutations
