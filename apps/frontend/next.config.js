@@ -3,7 +3,12 @@ const nextConfig = {
   reactStrictMode: true,
   transpilePackages: [],
   images: {
-    domains: ['cdn.discordapp.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.discordapp.com',
+      },
+    ],
   },
 };
 

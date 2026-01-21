@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout';
-import {
-  Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar, Select, MenuItem, CircularProgress
-} from '@mui/material';
+import { Box, Typography, Paper, Avatar, CircularProgress } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams, GridRowId } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { gql, ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
@@ -94,8 +93,9 @@ const UsersPage: React.FC = () => {
     },
   });
 
-  // Gestion de l'édition du nom affiché
-  const [editingName, setEditingName] = useState<{ [discordId: string]: string }>({});
+
+  // Gestion de l'édition du nom affiché (inline DataGrid)
+  const [nameEditRows, setNameEditRows] = useState<{ [id: string]: string }>({});
 
   // Récupère l'utilisateur connecté
   const { user: currentUser } = useUser();
@@ -106,6 +106,78 @@ const UsersPage: React.FC = () => {
     ADMIN: 3,
     OWNER: 4,
   };
+
+  // Colonnes du DataGrid
+  const columns: GridColDef[] = [
+    {
+      field: 'avatar',
+      headerName: 'Avatar',
+      width: 80,
+      renderCell: (params: GridRenderCellParams) => (
+        <Avatar src={params.value} alt={params.row.username} />
+      ),
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+    },
+    { field: 'username', headerName: 'Nom Discord', width: 180 },
+    {
+      field: 'name',
+      headerName: 'Nom affiché',
+      width: 180,
+      editable: true,
+      renderEditCell: (params) => {
+        return (
+          <input
+            type="text"
+            value={nameEditRows[params.id as string] ?? params.value ?? ''}
+            onChange={e => setNameEditRows({ ...nameEditRows, [params.id as string]: e.target.value })}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const newName = nameEditRows[params.id as string];
+                if (newName && newName !== params.value) {
+                  updateUserName({ discordId: params.row.discordId, name: newName });
+                }
+              }
+            }}
+            disabled={isUpdatingName}
+            style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4, border: '1px solid #ccc' }}
+            autoFocus
+          />
+        );
+      },
+    },
+    {
+      field: 'role',
+      headerName: 'Rôle',
+      width: 160,
+      editable: false,
+      renderCell: (params: GridRenderCellParams) => {
+        const user = params.row;
+        const disabled =
+          isUpdatingRole ||
+          !currentUser ||
+          roleHierarchy[currentUser.role] <= roleHierarchy[user.role];
+        return (
+          <select
+            value={user.role}
+            disabled={disabled}
+            onChange={e => updateUserRole({ discordId: user.discordId, role: e.target.value })}
+            style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4 }}
+          >
+            {USER_ROLES.map(role => {
+              const isSuperior = currentUser && roleHierarchy[role.value] > roleHierarchy[currentUser.role];
+              return (
+                <option key={role.value} value={role.value} disabled={isSuperior} style={isSuperior ? { color: '#aaa' } : {}}>
+                  {role.label}
+                </option>
+              );
+            })}
+          </select>
+        );
+      },
+    },
+  ];
 
   return (
     <MainLayout>
@@ -125,71 +197,18 @@ const UsersPage: React.FC = () => {
         ) : error ? (
           <Typography color="error">Erreur lors du chargement des utilisateurs.</Typography>
         ) : (
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Avatar</TableCell>
-                  <TableCell>Nom Discord</TableCell>
-                  <TableCell>Nom affiché</TableCell>
-                  <TableCell>Rôle</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data && data.map((user: any) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <Avatar src={user.avatar} alt={user.username} />
-                    </TableCell>
-                    <TableCell>{user.username}</TableCell>
-                    <TableCell>
-                      <input
-                        type="text"
-                        value={editingName[user.discordId] !== undefined ? editingName[user.discordId] : user.name || ''}
-                        onChange={e => setEditingName({ ...editingName, [user.discordId]: e.target.value })}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') {
-                            const newName = editingName[user.discordId];
-                            if (newName && newName !== user.name) {
-                              updateUserName({ discordId: user.discordId, name: newName });
-                            }
-                          }
-                        }}
-                        disabled={isUpdatingName}
-                        style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4, border: '1px solid #ccc' }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        value={user.role}
-                        size="small"
-                        onChange={e => updateUserRole({ discordId: user.discordId, role: e.target.value })}
-                        disabled={
-                          isUpdatingRole ||
-                          !currentUser ||
-                          roleHierarchy[currentUser.role] <= roleHierarchy[user.role]
-                        }
-                      >
-                        {USER_ROLES.map(role => {
-                          const isSuperior = currentUser && roleHierarchy[role.value] > roleHierarchy[currentUser.role];
-                          return (
-                            <MenuItem
-                              key={role.value}
-                              value={role.value}
-                              disabled={isSuperior}
-                              style={isSuperior ? { color: '#aaa' } : {}}
-                            >
-                              {role.label}
-                            </MenuItem>
-                          );
-                        })}
-                      </Select>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <DataGrid
+            rows={data}
+            columns={columns}
+            getRowId={row => row.id}
+            autoHeight
+            pageSizeOptions={[10, 25, 50]}
+            disableRowSelectionOnClick
+            sx={{ minHeight: 400, background: 'transparent' }}
+            disableColumnMenu
+            hideFooterSelectedRowCount
+            localeText={{ noRowsLabel: 'Aucun utilisateur.' }}
+          />
         )}
       </Paper>
     </MainLayout>
