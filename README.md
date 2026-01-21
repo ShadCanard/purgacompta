@@ -15,11 +15,7 @@ PurgatoryCompta est une application web de gestion financière développée pour
 
 - 🔐 **Authentification Discord** - Connexion sécurisée via OAuth2
 - 👥 **Gestion des rôles** - Système de permissions hiérarchique (GUEST → OWNER)
-- 📊 **Dashboard** - Vue d'ensemble des finances
-- 💸 **Transactions** - Suivi des entrées et sorties d'argent
-- 🏦 **Comptes** - Gestion des comptes bancaires
-- 👤 **Membres** - Administration des membres de l'organisation
-- 📈 **Rapports** - Génération de rapports financiers
+- 📊 **Dashboard** - Vue d'ensemble
 
 ## 🏗️ Architecture
 
@@ -99,16 +95,6 @@ pnpm dev
 | `pnpm db:migrate` | 📊 Applique les migrations |
 | `pnpm db:generate` | ⚙️ Génère le client Prisma |
 | `pnpm db:push` | 📤 Push le schéma vers la DB |
-
-## 👥 Système de Rôles
-
-| Rôle | Niveau | Create | Read | Update | Delete |
-|------|--------|--------|------|--------|--------|
-| 👤 GUEST | 0 | ❌ | ✅ | ❌ | ❌ |
-| 👥 MEMBER | 1 | ✅ | ✅ | ❌ | ❌ |
-| 📋 MANAGER | 2 | ✅ | ✅ | ✅ | ❌ |
-| ⚙️ ADMIN | 3 | ✅ | ✅ | ✅ | ✅ |
-| 👑 OWNER | 4 | ✅ | ✅ | ✅ | ✅ |
 
 ## 🛠️ Technologies
 
