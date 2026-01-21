@@ -1,0 +1,28 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Enum simulé pour SQLite (les enums ne sont pas supportés nativement)
+// Les rôles possibles: GUEST, MEMBER, MANAGER, ADMIN, OWNER
+
+model User {
+  id        String   @id @default(cuid())
+  discordId String   @unique
+  username  String
+  name      String   // Nom à afficher dans le frontend (différent du nom Discord)
+  email     String?
+  avatar    String?
+  role      String   @default("GUEST") // GUEST, MEMBER, MANAGER, ADMIN, OWNER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}

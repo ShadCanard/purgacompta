@@ -1,0 +1,31 @@
+{
+  "name": "purgatory-compta",
+  "version": "1.0.0",
+  "private": true,
+  "description": "🔥 PurgatoryCompta - Comptabilité pour organisation criminelle GTA RP",
+  "scripts": {
+    "dev": "pnpm run --parallel dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "build": "pnpm run --parallel build",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:backend": "pnpm --filter backend build",
+    "studio": "pnpm --filter backend studio",
+    "db:migrate": "pnpm --filter backend db:migrate",
+    "db:generate": "pnpm --filter backend db:generate",
+    "db:push": "pnpm --filter backend db:push",
+    "lint": "pnpm run --parallel lint"
+  },
+  "keywords": [
+    "gta-rp",
+    "comptabilite",
+    "purgatory",
+    "monorepo"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
