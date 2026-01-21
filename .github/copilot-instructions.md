@@ -77,6 +77,11 @@ Le `UserProvider` expose:
 ---
 
 
+## Règle d'affichage des données tabulaires
+
+**IMPORTANT :** Pour tout affichage de données sous forme de tableau, il faut toujours utiliser le composant `Mui-Datagrid` (de `@mui/x-data-grid`) à la place de `Table` (de `@mui/material`). L'utilisation de `Table` est interdite pour les données dynamiques ou administrables.
+
+
 ## Convention de Structure des Pages Next.js
 
 **IMPORTANT :** Toujours utiliser la structure "nested routes" pour les pages Next.js, c'est-à-dire créer un dossier pour chaque page et placer le fichier `index.tsx` à l'intérieur (ex : `settings/index.tsx` pour la page `/settings`). Cela permet d'ajouter facilement des sous-pages et d'assurer une structure claire et évolutive.
