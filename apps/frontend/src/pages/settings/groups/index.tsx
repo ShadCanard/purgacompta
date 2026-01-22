@@ -10,7 +10,7 @@ import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
 import { useUser } from '@/providers/UserProvider';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import GroupActionsMenu from '@/components/groups/GroupActionsMenu';
+import ActionsMenu from '@/components/layout/ActionsMenu';
 
 const GroupsPage: React.FC = () => {
   
@@ -145,7 +145,7 @@ const GroupsPage: React.FC = () => {
       filterable: false,
       disableColumnMenu: true,
       renderCell: (params: GridRenderCellParams) => (
-        <GroupActionsMenu row={params.row} onEdit={params.row.onEdit} onDelete={params.row.onDelete} />
+        <ActionsMenu row={params.row} onEdit={params.row.onEdit} onDelete={params.row.onDelete} />
       ),
     },
   ];

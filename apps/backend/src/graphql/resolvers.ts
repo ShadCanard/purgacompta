@@ -33,6 +33,12 @@ export const resolvers = {
     createdAt: (parent: any) => formatDate(parent.createdAt),
     updatedAt: (parent: any) => formatDate(parent.updatedAt),
   },
+  ItemPrice: {
+    item: (parent: any) => prisma.item.findUnique({ where: { id: parent.itemId } }),
+    group: (parent: any) => prisma.group.findUnique({ where: { id: parent.groupId } }),
+    createdAt: (parent: any) => formatDate(parent.createdAt),
+    updatedAt: (parent: any) => formatDate(parent.updatedAt),
+  },
   User: {
     createdAt: (parent: any) => formatDate(parent.createdAt),
     updatedAt: (parent: any) => formatDate(parent.updatedAt),
@@ -145,6 +151,19 @@ export const resolvers = {
     },
 
     // ...existing code...
+    // ItemPrice CRUD
+    itemPrices: async () => {
+      return prisma.itemPrice.findMany({ orderBy: { createdAt: 'desc' } });
+    },
+    itemPriceById: async (_: any, { id }: { id: string }) => {
+      return prisma.itemPrice.findUnique({ where: { id } });
+    },
+    itemPricesByItem: async (_: any, { itemId }: { itemId: string }) => {
+      return prisma.itemPrice.findMany({ where: { itemId }, orderBy: { createdAt: 'desc' } });
+    },
+    itemPricesByGroup: async (_: any, { groupId }: { groupId: string }) => {
+      return prisma.itemPrice.findMany({ where: { groupId }, orderBy: { createdAt: 'desc' } });
+    },
     // Contacts CRUD
     contacts: async () => {
       return prisma.contact.findMany({ orderBy: { createdAt: 'desc' } });
@@ -382,6 +401,20 @@ export const resolvers = {
       return true;
     },
 
+    // ItemPrice CRUD
+    createItemPrice: async (_: any, { input }: { input: { itemId: string; groupId: string; price: number } }, context: any) => {
+      // Vérifie unicité (un seul prix par item/groupe)
+      const exists = await prisma.itemPrice.findUnique({ where: { itemId_groupId: { itemId: input.itemId, groupId: input.groupId } } });
+      if (exists) throw new Error('Un prix existe déjà pour ce couple item/groupe');
+      return prisma.itemPrice.create({ data: { itemId: input.itemId, groupId: input.groupId, price: input.price } });
+    },
+    updateItemPrice: async (_: any, { input }: { input: { id: string; price?: number } }, context: any) => {
+      return prisma.itemPrice.update({ where: { id: input.id }, data: { price: input.price ?? undefined } });
+    },
+    deleteItemPrice: async (_: any, { id }: { id: string }, context: any) => {
+      await prisma.itemPrice.delete({ where: { id } });
+      return true;
+    },
     importContacts: async (_: any, { input }: { input: Array<{ display: string; number: string }> }, context: any) => {
       // Récupère tous les numéros déjà existants
       const existing = await prisma.contact.findMany({ select: { phone: true } });

@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
-import GroupActionsMenu from '@/components/groups/GroupActionsMenu';
+import ActionsMenu from '@/components/layout/ActionsMenu';
 
 const GET_CONTACTS = gql`
   query Contacts {
@@ -67,7 +67,7 @@ const columns: GridColDef[] = [
     filterable: false,
     disableColumnMenu: true,
     renderCell: (params: any) => (
-      <GroupActionsMenu row={params.row} onEdit={params.row.onEdit} onDelete={params.row.onDelete} />
+      <ActionsMenu row={params.row} onEdit={params.row.onEdit} onDelete={params.row.onDelete} />
     ),
   },
 ];

@@ -126,18 +126,45 @@ export const typeDefs = `#graphql
     to: String
   }
 
-    input UpdateGroupInput {
-      id: ID!
-      name: String
-      tag: String
-      description: String
-      color1: String
-      color2: String
-      isActive: Boolean
-    }
+  input UpdateGroupInput {
+    id: ID!
+    name: String
+    tag: String
+    description: String
+    color1: String
+    color2: String
+    isActive: Boolean
+  }
+  
+  # Type ItemPrice (prix d'un objet pour un groupe)
+  type ItemPrice {
+    id: ID!
+    item: Item!
+    group: Group!
+    price: Float!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  input CreateItemPriceInput {
+    itemId: ID!
+    groupId: ID!
+    price: Float!
+  }
+
+  input UpdateItemPriceInput {
+    id: ID!
+    price: Float
+  }
 
   # Queries
   type Query {
+
+    # ItemPrice CRUD
+    itemPrices: [ItemPrice!]!
+    itemPriceById(id: ID!): ItemPrice
+    itemPricesByItem(itemId: ID!): [ItemPrice!]!
+    itemPricesByGroup(groupId: ID!): [ItemPrice!]!
 
     # Objets CRUD
     items: [Item!]!
@@ -176,6 +203,12 @@ export const typeDefs = `#graphql
 
   # Mutations
   type Mutation {
+
+    # ItemPrice CRUD
+    createItemPrice(input: CreateItemPriceInput!): ItemPrice!
+    updateItemPrice(input: UpdateItemPriceInput!): ItemPrice!
+    deleteItemPrice(id: ID!): Boolean!
+
     # Contacts CRUD
     createContact(input: CreateContactInput!): Contact!
     updateContact(input: UpdateContactInput!): Contact!

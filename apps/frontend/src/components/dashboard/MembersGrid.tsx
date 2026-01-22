@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Avatar, Box, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, CircularProgress, Switch } from '@mui/material';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@/providers/UserProvider';
+import { formatDollar } from '@/lib/utils';
 
 const GET_MEMBERS = gql`
   query Members {
@@ -27,9 +29,6 @@ type Member = {
   role: string;
 };
 
-function formatDollar(val: number) {
-  return '$' + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-}
 
 
 const MembersGrid: React.FC = () => {

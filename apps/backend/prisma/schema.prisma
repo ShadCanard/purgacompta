@@ -54,6 +54,8 @@ model Item {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  itemPrices ItemPrice[]
+
   @@map("items")
 }
 
@@ -69,9 +71,11 @@ model Group {
   isActive  Boolean  @default(true)
 
   contacts Contact[]
+  itemPrices ItemPrice[]
   
   @@map("groups")
 }
+
 
 model Contact {
   id        String   @id @default(cuid())
@@ -84,4 +88,19 @@ model Contact {
   group     Group? @relation(fields: [groupid], references: [id])
 
   @@map("contacts")
+}
+
+model ItemPrice {
+  id        String   @id @default(cuid())
+  itemId    String
+  groupId   String
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  item      Item   @relation(fields: [itemId], references: [id])
+  group     Group  @relation(fields: [groupId], references: [id])
+
+  @@unique([itemId, groupId])
+  @@map("item_prices")
 }
