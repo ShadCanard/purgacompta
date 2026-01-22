@@ -98,7 +98,7 @@ const LogsPage: React.FC = () => {
         <Typography color="error">Accès réservé aux administrateurs.</Typography>
       ) : (
         <Box>
-          <Typography variant="h4" mb={2}>Logs d'activité</Typography>
+          <Typography variant="h4" fontWeight={700} gutterBottom>Logs d'activité</Typography>
           <Paper sx={{ p: 2, mb: 2 }}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField

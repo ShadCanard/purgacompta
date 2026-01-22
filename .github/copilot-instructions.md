@@ -1,3 +1,26 @@
+# Utilisation de ConfirmModal
+
+**IMPORTANT :** Pour toute question nécessitant une confirmation Oui/Non (ex : suppression, action critique), il faut obligatoirement utiliser la modale `/components/layout/ConfirmModal.tsx`.
+# Relecture et Correction Systématique
+
+**IMPORTANT :** Après chaque modification de code effectuée (création, édition, suppression), il est obligatoire de :
+- Relire le code modifié
+- Revérifier la logique, la syntaxe et la cohérence
+- Corriger immédiatement toute erreur ou incohérence détectée
+
+Cette étape doit être systématique pour garantir la stabilité et la qualité du projet.
+
+# Convention d’Organisation des Imports
+
+**IMPORTANT :** Tous les imports doivent toujours être placés dans les toutes premières lignes de chaque fichier, avant toute déclaration de variable, type, fonction ou composant.
+# Relecture et Correction Systématique
+
+**IMPORTANT :** Après chaque modification de code effectuée (création, édition, suppression), il est obligatoire de :
+- Relire le code modifié
+- Revérifier la logique, la syntaxe et la cohérence
+- Corriger immédiatement toute erreur ou incohérence détectée
+
+Cette étape doit être systématique pour garantir la stabilité et la qualité du projet.
 # Copilot Instructions - PurgatoryCompta
 
 ## Contexte du Projet

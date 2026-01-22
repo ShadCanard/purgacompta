@@ -49,6 +49,11 @@ export const resolvers = {
       return prisma.group.findUnique({ where: { id: parent.groupid } });
     },
   },
+
+    Item: {
+    createdAt: (parent: any) => formatDate(parent.createdAt),
+    updatedAt: (parent: any) => formatDate(parent.updatedAt),
+  },
   Query: {
     // Récupérer l'utilisateur authentifié
     me: async (_: any, __: any, context: any) => {
@@ -100,6 +105,14 @@ export const resolvers = {
     // Compter les utilisateurs
     groupsCount: async () => {
       return prisma.group.count();
+    },
+
+    // Objets CRUD
+    items: async () => {
+      return prisma.item.findMany({ orderBy: { createdAt: 'desc' } });
+    },
+    itemById: async (_: any, { id }: { id: string }) => {
+      return prisma.item.findUnique({ where: { id } });
     },
 
     // Récupérer les logs avec filtres/recherche
@@ -272,7 +285,7 @@ export const resolvers = {
     },
 
     // Créer un groupe criminel
-    createGroup: async (_: any, { name, tag, description }: { name: string; tag?: string; description?: string }) => {
+    createGroup: async (_: any, { name, tag, description, color1, color2 }: { name: string; tag?: string; description?: string; color1?: string; color2?: string }) => {
       // Vérifie unicité du nom
       const exists = await prisma.group.findUnique({ where: { name } });
       if (exists) throw new Error('Un groupe avec ce nom existe déjà');
@@ -281,15 +294,30 @@ export const resolvers = {
           name,
           tag: tag || null,
           description: description || null,
+          color1: color1 || null,
+          color2: color2 || null,
         },
       });
     },
-        // Modifier l'état d'activité d'un groupe
-    updateGroupIsActive: async (_: any, { input }: { input: { id: string; isActive: boolean } }) => {
+
+    // Modifier un groupe (tous champs)
+    updateGroup: async (_: any, { input }: { input: { id: string; name?: string; tag?: string; description?: string; color1?: string; color2?: string; isActive?: boolean } }) => {
+      const { id, ...data } = input;
+      console.dir(input);
       return prisma.group.update({
-        where: { id: input.id },
-        data: { isActive: input.isActive },
+        where: { id },
+        data: {
+          ...data,
+          color1: data.color1 ?? undefined,
+          color2: data.color2 ?? undefined,
+        },
       });
+    },
+
+    // Supprimer un groupe criminel
+    deleteGroup: async (_: any, { id }: { id: string }, context: any) => {
+      await prisma.group.delete({ where: { id } });
+      return true;
     },
     // Contacts CRUD
     createContact: async (_: any, { input }: { input: { name: string; phone: string; groupId?: string } }, context: any) => {
@@ -309,12 +337,20 @@ export const resolvers = {
       if (input.phone && !input.phone.startsWith('555-')) {
         throw new Error('Le numéro doit commencer par 555-');
       }
+      let groupid: string | null | undefined = undefined;
+      if (input.hasOwnProperty('groupId')) {
+        groupid = input.groupId === '' ? null : input.groupId;
+        if (groupid) {
+          const groupExists = await prisma.group.findUnique({ where: { id: groupid } });
+          if (!groupExists) throw new Error('Groupe inexistant');
+        }
+      }
       const contact = await prisma.contact.update({
         where: { id: input.id },
         data: {
           name: input.name ?? undefined,
           phone: input.phone ?? undefined,
-          groupid: input.groupId ?? undefined,
+          groupid,
         },
       });
       return contact;
@@ -323,5 +359,48 @@ export const resolvers = {
       await prisma.contact.delete({ where: { id } });
       return true;
     },
+    // Objets CRUD
+    createItem: async (_: any, { input }: { input: { name: string; weight: number } }, context: any) => {
+      return prisma.item.create({
+        data: {
+          name: input.name,
+          weight: input.weight,
+        },
+      });
+    },
+    updateItem: async (_: any, { input }: { input: { id: string; name?: string; weight?: number } }, context: any) => {
+      return prisma.item.update({
+        where: { id: input.id },
+        data: {
+          name: input.name ?? undefined,
+          weight: input.weight ?? undefined,
+        },
+      });
+    },
+    deleteItem: async (_: any, { id }: { id: string }, context: any) => {
+      await prisma.item.delete({ where: { id } });
+      return true;
+    },
+
+    importContacts: async (_: any, { input }: { input: Array<{ display: string; number: string }> }, context: any) => {
+      // Récupère tous les numéros déjà existants
+      const existing = await prisma.contact.findMany({ select: { phone: true } });
+      const existingNumbers = new Set(existing.map(c => c.phone));
+      // Filtre les contacts à importer (uniquement ceux dont le numéro n'existe pas déjà)
+      const toCreate = input.filter(c => !existingNumbers.has(c.number));
+      // Crée les nouveaux contacts
+      const created = await Promise.all(
+        toCreate.map(c =>
+          prisma.contact.create({
+            data: {
+              name: c.display,
+              phone: c.number,
+            },
+          })
+        )
+      );
+      return created;
+    },
+
   },
 };

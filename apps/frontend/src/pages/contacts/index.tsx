@@ -1,13 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box, Typography, Stack, Button } from '@mui/material';
+import { Box, Typography, Stack, Button, Menu, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { MainLayout } from '@/components';
-import CreateContactModal from '@/components/contacts/CreateContactModal';
+import CreateUpdateContactModal from '@/components/contacts/CreateUpdateContactModal';
+import ImportContactModal from '@/components/contacts/ImportContactModal';
+import ConfirmModal from '@/components/layout/ConfirmModal';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
+import GroupActionsMenu from '@/components/groups/GroupActionsMenu';
 
 const GET_CONTACTS = gql`
   query Contacts {
@@ -30,6 +34,22 @@ type Contact = {
   group?: { id: string; name: string } | null;
 };
 
+const ActionsCell: React.FC<{ row: any; onEdit: (row: any) => void; onDelete: (row: any) => void }> = ({ row, onEdit, onDelete }) => {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
+  return (
+    <>
+      <Button size="small" onClick={handleOpen}>⋮</Button>
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <MenuItem onClick={() => { handleClose(); onEdit(row); }}>Modifier</MenuItem>
+        <MenuItem onClick={() => { handleClose(); onDelete(row); }}>Supprimer</MenuItem>
+      </Menu>
+    </>
+  );
+};
+
 const columns: GridColDef[] = [
   { field: 'name', headerName: 'Nom', flex: 1 },
   { field: 'phone', headerName: 'Téléphone', flex: 1 },
@@ -37,19 +57,91 @@ const columns: GridColDef[] = [
     field: 'group',
     headerName: 'Groupe',
     flex: 1,
-    valueGetter: (params: any) => {
-      if (!params || !params.value) return '';
-      if (typeof params.value === 'object' && 'name' in params.value && params.value.name) return params.value.name;
-      return '';
-    },
+    renderCell: (params: any) => params.row.group?.name || '',
+  },
+  {
+    field: 'actions',
+    headerName: '',
+    width: 60,
+    sortable: false,
+    filterable: false,
+    disableColumnMenu: true,
+    renderCell: (params: any) => (
+      <GroupActionsMenu row={params.row} onEdit={params.row.onEdit} onDelete={params.row.onDelete} />
+    ),
   },
 ];
 
 const ContactsPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
+  const [editContact, setEditContact] = useState<any | null>(null);
+  const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; contact: any | null }>({ open: false, contact: null });
+  const [importOpen, setImportOpen] = useState(false);
+  // Mutation GraphQL pour l'import
+  const IMPORT_CONTACTS = gql`
+    mutation ImportContacts($input: [ImportContactInput!]!) {
+      importContacts(input: $input) {
+        id
+        name
+        phone
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+  const importContactsMutation = useMutation({
+    mutationFn: async (contacts: any[]) => {
+      await apolloClient.mutate({
+        mutation: IMPORT_CONTACTS,
+        variables: { input: contacts },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    },
+  });
+
+  // Handler pour l'import JSON
+  const handleImportContacts = (contacts: any[]) => {
+    importContactsMutation.mutate(contacts);
+  };
+  
+  const queryClient = useQueryClient();
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+    const DELETE_CONTACT = gql`
+      mutation DeleteContact($id: ID!) {
+        deleteContact(id: $id)
+      }
+    `;
+    const deleteContactMutation = useMutation({
+      mutationFn: async (id: string) => {
+        setDeleteLoadingId(id);
+        await apolloClient.mutate({
+          mutation: DELETE_CONTACT,
+          variables: { id },
+        });
+      },
+      onSuccess: () => {
+        setDeleteLoadingId(null);
+        queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      },
+      onError: () => {
+        setDeleteLoadingId(null);
+      },
+    });
+
+    const handleEdit = (row: any) => setEditContact(row);
+    const handleDelete = (row: any) => setConfirmDelete({ open: true, contact: row });
+    const handleConfirmDelete = () => {
+      if (confirmDelete.contact) {
+        deleteContactMutation.mutate(confirmDelete.contact.id);
+      }
+      setConfirmDelete({ open: false, contact: null });
+    };
+    const handleCancelDelete = () => setConfirmDelete({ open: false, contact: null });
   const { data, isLoading } = useQuery<Contact[]>({
     queryKey: ['contacts'],
     queryFn: async () => {
@@ -59,25 +151,34 @@ const ContactsPage: React.FC = () => {
     },
   });
 
+  // Injection des handlers dans chaque ligne
   const filteredRows = useMemo(() => {
     if (!data) return [];
-    const lower = search.toLowerCase();
-    return data.filter((row) =>
-      row.name.toLowerCase().includes(lower) ||
-      row.phone.toLowerCase().includes(lower) ||
-      (row.group?.name.toLowerCase().includes(lower) ?? false)
-    );
+    const terms = search.toLowerCase().split(' ').filter(Boolean);
+    return data
+      .filter((row) => {
+        const fields = [row.name, row.phone, row.group?.name || '']
+          .map(f => (f || '').toLowerCase());
+        // Chaque terme doit être présent dans au moins un champ
+        return terms.every(term => fields.some(f => f.includes(term)));
+      })
+      .map((row) => ({ ...row, onEdit: handleEdit, onDelete: handleDelete }));
   }, [search, data]);
 
   return (
     <MainLayout>
-      <Box sx={{ height: 500, width: '100%', p: 2 }}>
+      <Box sx={{ height: 500, width: '100%' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" fontWeight={700} gutterBottom>
             Annuaire des contacts
           </Typography>
           <Stack direction="row" spacing={1}>
-            <Button variant="outlined" startIcon={<UploadFileIcon />}>Import</Button>
+            <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={() => setImportOpen(true)}>Import</Button>
+                    <ImportContactModal
+                      open={importOpen}
+                      onClose={() => setImportOpen(false)}
+                      onImport={handleImportContacts}
+                    />
             <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleOpen}>Nouveau</Button>
           </Stack>
         </Stack>
@@ -105,12 +206,27 @@ const ContactsPage: React.FC = () => {
           columns={columns}
           getRowId={row => row.id}
           pageSizeOptions={[5, 10, 25]}
-          initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
+          initialState={{ pagination: { paginationModel: { pageSize: 10 } }, sorting: { sortModel: [{ field: 'name', sort: 'asc' }] } }}
           autoHeight
           disableRowSelectionOnClick
           loading={isLoading}
         />
-        <CreateContactModal open={open} onClose={handleClose} />
+        <CreateUpdateContactModal open={open} onClose={handleClose} />
+        <CreateUpdateContactModal
+          open={!!editContact}
+          onClose={() => setEditContact(null)}
+          initialData={editContact}
+        />
+        <ConfirmModal
+          open={confirmDelete.open}
+          title="Confirmer la suppression"
+          content={confirmDelete.contact ? `Supprimer le contact "${confirmDelete.contact.name}" ?` : ''}
+          confirmLabel="Supprimer"
+          cancelLabel="Annuler"
+          loading={!!deleteLoadingId}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
       </Box>
     </MainLayout>
   );

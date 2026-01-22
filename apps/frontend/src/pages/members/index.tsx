@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box, Typography } from '@mui/material';
+import { Avatar, Box, Typography } from '@mui/material';
 import { MainLayout } from '@/components';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
@@ -38,14 +38,19 @@ type User = {
     updatedAt: string;
 };
 
+function formatDollar(val: number) {
+  return '$' + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
 const columns: GridColDef[] = [
-  { field: 'username', headerName: 'Pseudo Discord', flex: 1 },
-  { field: 'name', headerName: 'Nom affiché', flex: 1 },
-  { field: 'email', headerName: 'Email', flex: 1 },
-  { field: 'createdAt', headerName: 'Créé le', flex: 1 },
-  { field: 'isOnline', headerName: 'En ligne', flex: 1 },
-  { field: 'balance', headerName: 'Solde', flex: 1 },
-  { field: 'maxBalance', headerName: 'Solde max', flex: 1 },
+  { field: 'avatar', headerName: '', renderCell: (params) => (
+    <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+      <Avatar src={params.value} sx={{ width: 36, height: 36, verticalAlign: 'middle' }} />
+    </Box>)
+  },
+  { field: 'name', headerName: 'Nom', flex: 1  },
+  { field: 'balance', headerName: 'Solde', renderCell: (params) => (formatDollar(params.value)) },
+  { field: 'maxBalance', headerName: 'Solde max', renderCell: (params) => (formatDollar(params.value)) },
 ];
 
 const MembersPage: React.FC = () => {

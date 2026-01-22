@@ -28,6 +28,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   Menu as MenuIcon,
   Contacts as ContactsIcon,
+  CurrencyExchange,
 } from '@mui/icons-material';
 import { signOut, useSession } from 'next-auth/react';
 import { useUser } from '@/providers/UserProvider';
@@ -58,11 +59,13 @@ const menuItems: MenuItem[] = [
     children: [
       { text: 'Membres', icon: <PeopleIcon />, path: '/members', requiredRole: 'MANAGER' },
       { text: 'Rapports', icon: <AssessmentIcon />, path: '/reports', requiredRole: 'MANAGER' },
+      { text: 'Prix', icon: <CurrencyExchange />, path: '/prices', requiredRole: 'MANAGER' },
     ],
   },
   { text: 'Paramètres', icon: <SettingsIcon />, path: '/settings', requiredRole: 'MANAGER', children: [
     { text: 'Utilisateurs', icon: <PeopleIcon />, path: '/settings/users', requiredRole: 'MANAGER' },
     { text: 'Groupes', icon: <AccountBalanceIcon />, path: '/settings/groups', requiredRole: 'MANAGER' },
+    { text: 'Objets', icon: <AssessmentIcon />, path: '/settings/items', requiredRole: 'MANAGER' },
     { text: 'Rôles & Permissions', icon: <SettingsIcon />, path: '/settings/roles', requiredRole: 'ADMIN' },
     { text: 'Logs', icon: <AssessmentIcon />, path: '/settings/logs', requiredRole: 'ADMIN' },
   ] },

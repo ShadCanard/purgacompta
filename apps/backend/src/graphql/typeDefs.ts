@@ -8,8 +8,30 @@ export const typeDefs = `#graphql
     OWNER
   }
 
+  input ImportContactInput {
+    display: String!
+    number: String!
+  }
 
+  # Type Item (objet en jeu)
+  type Item {
+    id: ID!
+    name: String!
+    weight: Float!
+    createdAt: String!
+    updatedAt: String!
+  }
 
+  input CreateItemInput {
+    name: String!
+    weight: Float!
+  }
+
+  input UpdateItemInput {
+    id: ID!
+    name: String
+    weight: Float
+  }
 
   # Type Contact
   type Contact {
@@ -27,6 +49,8 @@ export const typeDefs = `#graphql
     name: String!
     tag: String
     description: String
+    color1: String
+    color2: String
     isActive: Boolean!
     createdAt: String!
     updatedAt: String!
@@ -102,13 +126,23 @@ export const typeDefs = `#graphql
     to: String
   }
 
-    input UpdateGroupIsActiveInput {
-    id: ID!
-    isActive: Boolean!
-  }
+    input UpdateGroupInput {
+      id: ID!
+      name: String
+      tag: String
+      description: String
+      color1: String
+      color2: String
+      isActive: Boolean
+    }
 
   # Queries
   type Query {
+
+    # Objets CRUD
+    items: [Item!]!
+    itemById(id: ID!): Item
+
     # Contacts CRUD
     contacts: [Contact!]!
     contactById(id: ID!): Contact
@@ -161,10 +195,22 @@ export const typeDefs = `#graphql
     # Supprimer un utilisateur (owner only)
     deleteUser(discordId: String!): Boolean!
 
-    # Créer un groupe criminel
-    createGroup(name: String!, tag: String, description: String): Group!
 
-    # Modifier l'état d'activité d'un groupe
-    updateGroupIsActive(input: UpdateGroupIsActiveInput!): Group!
+    # Créer un groupe criminel
+    createGroup(name: String!, tag: String, description: String, color1: String, color2: String): Group!
+
+    # Modifier un groupe (tous champs)
+    updateGroup(input: UpdateGroupInput!): Group!
+
+    # Supprimer un groupe criminel
+    deleteGroup(id: ID!): Boolean!
+
+    # Importer des contacts (ignore ceux déjà existants par numéro)
+    importContacts(input: [ImportContactInput!]!): [Contact!]!
+    # Objets CRUD
+    createItem(input: CreateItemInput!): Item!
+    updateItem(input: UpdateItemInput!): Item!
+    deleteItem(id: ID!): Boolean!
+
   }
 `;

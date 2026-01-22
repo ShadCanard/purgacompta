@@ -41,7 +41,7 @@ const MembersGrid: React.FC = () => {
       const users = (result.data as { users: Member[] }).users;
       // Affiche MEMBER ou supérieur, sans l'utilisateur courant
       const hierarchy = ['GUEST', 'MEMBER', 'MANAGER', 'ADMIN', 'OWNER'];
-      return users.filter(u => hierarchy.indexOf(u.role) >= hierarchy.indexOf('MEMBER') && u.id !== currentUser?.id);
+      return users.filter(u => hierarchy.indexOf(u.role) >= hierarchy.indexOf('MEMBER'));
     },
   });
 
