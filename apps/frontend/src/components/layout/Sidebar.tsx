@@ -27,6 +27,7 @@ import {
   Logout as LogoutIcon,
   ChevronLeft as ChevronLeftIcon,
   Menu as MenuIcon,
+  Contacts as ContactsIcon,
 } from '@mui/icons-material';
 import { signOut, useSession } from 'next-auth/react';
 import { useUser } from '@/providers/UserProvider';
@@ -47,6 +48,7 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+  { text: 'Annuaire', icon: <ContactsIcon />, path: '/contacts' },
   { text: 'Transactions', icon: <ReceiptIcon />, path: '/transactions', requiredRole: 'MEMBER' },
   { text: 'Comptes', icon: <AccountBalanceIcon />, path: '/accounts', requiredRole: 'MEMBER' },
   {

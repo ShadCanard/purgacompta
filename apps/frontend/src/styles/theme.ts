@@ -8,11 +8,6 @@ const theme = createTheme({
       light: '#f05545',
       dark: '#7f0000',
     },
-    secondary: {
-      main: '#c62828', // Rouge secondaire
-      light: '#ff5f52',
-      dark: '#8e0000',
-    },
     background: {
       default: '#181212', // Noir avec une pointe de rouge
       paper: '#221313',
@@ -25,9 +20,8 @@ const theme = createTheme({
     },
     success: {
       main: '#66bb6a',
-    },
-    info: {
-      main: '#b71c1c',
+      light: '#98ee99',
+      dark: '#338a3e',  
     },
   },
   typography: {
@@ -48,7 +42,6 @@ const theme = createTheme({
         root: {
           textTransform: 'none',
           borderRadius: 8,
-          background: 'linear-gradient(90deg, #b71c1c 0%, #8e0000 100%)',
         },
       },
     },

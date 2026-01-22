@@ -14,15 +14,18 @@ datasource db {
 // Les rôles possibles: GUEST, MEMBER, MANAGER, ADMIN, OWNER
 
 model User {
-  id        String   @id @default(cuid())
-  discordId String   @unique
-  username  String
-  name      String   // Nom à afficher dans le frontend (différent du nom Discord)
-  email     String?
-  avatar    String?
-  role      String   @default("GUEST") // GUEST, MEMBER, MANAGER, ADMIN, OWNER
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  discordId   String   @unique
+  username    String
+  name        String   // Nom à afficher dans le frontend (différent du nom Discord)
+  email       String?
+  avatar      String?
+  balance     Int      @default(0)
+  isOnline    Boolean  @default(false)
+  maxBalance  Int      @default(0)
+  role        String   @default("GUEST") // GUEST, MEMBER, MANAGER, ADMIN, OWNER
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   logs      Log[]
 
@@ -45,6 +48,7 @@ model Log {
 }
 
 
+
 model Group {
   id        String   @id @default(cuid())
   name      String   @unique
@@ -52,8 +56,22 @@ model Group {
   description String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   isActive  Boolean  @default(true)
 
+  contacts Contact[]
+  
   @@map("groups")
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String   // Doit commencer par 555-
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  groupid String?
+
+  group     Group? @relation(fields: [groupid], references: [id])
+
+  @@map("contacts")
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Button, Stack } from '@mui/material';
+import { Box, Typography, Paper, Button, Stack, Switch } from '@mui/material';
 import CreateGroupModal from '../../../components/groups/CreateGroupModal';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
@@ -45,8 +45,7 @@ const columns: GridColDef[] = [
     type: 'boolean',
     editable: true,
     renderCell: (params) => (
-      <input
-        type="checkbox"
+      <Switch
         checked={!!params.value}
         disabled
         style={{ pointerEvents: 'none' }}

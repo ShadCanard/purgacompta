@@ -1,7 +1,23 @@
+import { gql } from '@apollo/client';
+import apolloClient from '@/lib/apolloClient';
+import { useQuery as useTanstackQuery } from '@tanstack/react-query';
+// Même query que MembersGrid
+const GET_MEMBERS = gql`
+  query Members {
+    users {
+      id
+      name
+      avatar
+      isOnline
+      balance
+      role
+    }
+  }
+`;
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { Box, Typography, Card, CardContent, Grid } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid, Stack, Button } from '@mui/material';
 import { MainLayout } from '@/components/layout';
 import { useUser } from '@/providers/UserProvider';
 import {
@@ -9,7 +25,10 @@ import {
   Receipt as ReceiptIcon,
   TrendingUp as TrendingUpIcon,
   People as PeopleIcon,
+  OnlinePrediction,
 } from '@mui/icons-material';
+import MembersGrid from '@/components/dashboard/MembersGrid';
+import CurrentUserCard from '@/components/dashboard/CurrentUserCard';
 
 interface StatCardProps {
   title: string;
@@ -17,6 +36,8 @@ interface StatCardProps {
   icon: React.ReactNode;
   color: string;
 }
+
+
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => (
   <Card
@@ -58,6 +79,18 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => (
 
 const HomePage: React.FC = () => {
   const { user, loading } = useUser();
+  // Récupération des membres pour compter les online
+  const { data: membersData } = useTanstackQuery({
+    queryKey: ['dashboard-members'],
+    queryFn: async () => {
+      const result = await apolloClient.query({ query: GET_MEMBERS, fetchPolicy: 'network-only' });
+      const users = (result.data as { users: any[] }).users;
+      // Affiche MEMBER ou supérieur, sans l'utilisateur courant
+      const hierarchy = ['GUEST', 'MEMBER', 'MANAGER', 'ADMIN', 'OWNER'];
+      return users.filter(u => hierarchy.indexOf(u.role) >= hierarchy.indexOf('MEMBER'));
+    },
+  });
+  const onlineCount = (membersData || []).filter((u: any) => u.isOnline).length;
 
   return (
     <MainLayout>
@@ -67,7 +100,7 @@ const HomePage: React.FC = () => {
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Bienvenue sur Purgatory Compta
-          {user && `, ${user.username}`}
+          {user && `, ${user.name}`}
         </Typography>
       </Box>
 
@@ -106,6 +139,12 @@ const HomePage: React.FC = () => {
         </Grid>
       </Grid>
 
+      {/* Carte utilisateur courant */}
+      <Box>
+        {/* @ts-ignore */}
+        {user && <CurrentUserCard />}
+      </Box>
+
       <Card
         sx={{
           background: 'rgba(30, 30, 46, 0.8)',
@@ -114,12 +153,12 @@ const HomePage: React.FC = () => {
           p: 3,
         }}
       >
-        <Typography variant="h6" fontWeight={600} gutterBottom>
-          Activités récentes
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Aucune activité récente à afficher.
-        </Typography>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+          <Typography variant="h6" fontWeight={600} gutterBottom>
+            Membres ({onlineCount} en ligne)
+          </Typography>
+        </Stack>
+        <MembersGrid />
       </Card>
     </MainLayout>
   );

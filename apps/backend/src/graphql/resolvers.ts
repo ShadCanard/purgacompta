@@ -36,9 +36,18 @@ export const resolvers = {
   User: {
     createdAt: (parent: any) => formatDate(parent.createdAt),
     updatedAt: (parent: any) => formatDate(parent.updatedAt),
+    balance: (parent: any) => parent.balance,
+    isOnline: (parent: any) => parent.isOnline,
+    maxBalance: (parent: any) => parent.maxBalance,
   },
   Log: {
     createdAt: (parent: any) => formatDate(parent.createdAt),
+  },
+  Contact: {
+    group: async (parent: any) => {
+      if (!parent.groupid) return null;
+      return prisma.group.findUnique({ where: { id: parent.groupid } });
+    },
   },
   Query: {
     // Récupérer l'utilisateur authentifié
@@ -123,6 +132,13 @@ export const resolvers = {
     },
 
     // ...existing code...
+    // Contacts CRUD
+    contacts: async () => {
+      return prisma.contact.findMany({ orderBy: { createdAt: 'desc' } });
+    },
+    contactById: async (_: any, { id }: { id: string }) => {
+      return prisma.contact.findUnique({ where: { id } });
+    },
   },
 
   Mutation: {
@@ -217,6 +233,26 @@ export const resolvers = {
       return user;
     },
 
+
+    // Mettre à jour le statut en ligne d'un utilisateur
+    updateUserOnline: async (_: any, { discordId, isOnline }: { discordId: string; isOnline: boolean }, context: any) => {
+      const before = await prisma.user.findUnique({ where: { discordId } });
+      const user = await prisma.user.update({
+        where: { discordId },
+        data: { isOnline },
+      });
+      await prisma.log.create({
+        data: {
+          action: 'UPDATE',
+          entity: 'User',
+          entityId: user.id,
+          userId: context.user?.id || user.id,
+          diff: JSON.stringify({ before, after: user }),
+        },
+      });
+      return user;
+    },
+
     // Supprimer un utilisateur
     deleteUser: async (_: any, { discordId }: { discordId: string }, context: any) => {
       const before = await prisma.user.findUnique({ where: { discordId } });
@@ -254,6 +290,38 @@ export const resolvers = {
         where: { id: input.id },
         data: { isActive: input.isActive },
       });
+    },
+    // Contacts CRUD
+    createContact: async (_: any, { input }: { input: { name: string; phone: string; groupId?: string } }, context: any) => {
+      if (!input.phone.startsWith('555-')) {
+        throw new Error('Le numéro doit commencer par 555-');
+      }
+      const contact = await prisma.contact.create({
+        data: {
+          name: input.name,
+          phone: input.phone,
+          groupid: input.groupId || null,
+        },
+      });
+      return contact;
+    },
+    updateContact: async (_: any, { input }: { input: { id: string; name?: string; phone?: string; groupId?: string } }, context: any) => {
+      if (input.phone && !input.phone.startsWith('555-')) {
+        throw new Error('Le numéro doit commencer par 555-');
+      }
+      const contact = await prisma.contact.update({
+        where: { id: input.id },
+        data: {
+          name: input.name ?? undefined,
+          phone: input.phone ?? undefined,
+          groupid: input.groupId ?? undefined,
+        },
+      });
+      return contact;
+    },
+    deleteContact: async (_: any, { id }: { id: string }, context: any) => {
+      await prisma.contact.delete({ where: { id } });
+      return true;
     },
   },
 };

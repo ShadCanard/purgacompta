@@ -79,7 +79,10 @@ Le `UserProvider` expose:
 
 ## Règle d'affichage des données tabulaires
 
+
 **IMPORTANT :** Pour tout affichage de données sous forme de tableau, il faut toujours utiliser le composant `Mui-Datagrid` (de `@mui/x-data-grid`) à la place de `Table` (de `@mui/material`). L'utilisation de `Table` est interdite pour les données dynamiques ou administrables.
+
+**Exception :** L'utilisation de `Table` (de `@mui/material`) est tolérée uniquement pour la page du dashboard du à la limitation concernant le CSS de `Mui-Datagrid` dans les environnements Turbopack.
 
 
 ## Convention de Structure des Pages Next.js

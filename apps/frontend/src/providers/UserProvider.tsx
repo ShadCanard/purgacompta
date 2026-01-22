@@ -14,6 +14,9 @@ export interface User {
   name: string;
   email?: string;
   avatar?: string;
+  isOnline?: boolean;
+  balance?: number;
+  maxBalance?: number;
   role: UserRole;
   createdAt: string;
   updatedAt: string;
@@ -62,6 +65,9 @@ const GET_CURRENT_USER = gql`
       role
       createdAt
       updatedAt
+      isOnline
+      balance
+      maxBalance
     }
   }
 `;

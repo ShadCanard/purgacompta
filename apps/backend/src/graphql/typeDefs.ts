@@ -10,6 +10,17 @@ export const typeDefs = `#graphql
 
 
 
+
+  # Type Contact
+  type Contact {
+    id: ID!
+    name: String!
+    phone: String!
+    group: Group
+    createdAt: String!
+    updatedAt: String!
+  }
+
   # Type Group
   type Group {
     id: ID!
@@ -19,6 +30,19 @@ export const typeDefs = `#graphql
     isActive: Boolean!
     createdAt: String!
     updatedAt: String!
+  }
+  # Inputs pour Contact
+  input CreateContactInput {
+    name: String!
+    phone: String!
+    groupId: ID
+  }
+
+  input UpdateContactInput {
+    id: ID!
+    name: String
+    phone: String
+    groupId: ID
   }
 
   # Type Log
@@ -40,6 +64,9 @@ export const typeDefs = `#graphql
     name: String!
     email: String
     avatar: String
+    balance: Int!
+    isOnline: Boolean!
+    maxBalance: Int!
     role: UserRole!
     createdAt: String!
     updatedAt: String!
@@ -82,6 +109,9 @@ export const typeDefs = `#graphql
 
   # Queries
   type Query {
+    # Contacts CRUD
+    contacts: [Contact!]!
+    contactById(id: ID!): Contact
     # Récupérer l'utilisateur authentifié
     me: User
 
@@ -112,6 +142,10 @@ export const typeDefs = `#graphql
 
   # Mutations
   type Mutation {
+    # Contacts CRUD
+    createContact(input: CreateContactInput!): Contact!
+    updateContact(input: UpdateContactInput!): Contact!
+    deleteContact(id: ID!): Boolean!
     # Enregistrer ou mettre à jour un utilisateur (appelé lors de la connexion)
     registerOrUpdateUser(input: RegisterUserInput!): User!
 
@@ -120,6 +154,9 @@ export const typeDefs = `#graphql
 
     # Mettre à jour le nom affiché d'un utilisateur (admin only)
     updateUserName(input: UpdateUserNameInput!): User!
+
+    # Mettre à jour le statut en ligne d'un utilisateur
+    updateUserOnline(discordId: String!, isOnline: Boolean!): User!
 
     # Supprimer un utilisateur (owner only)
     deleteUser(discordId: String!): Boolean!

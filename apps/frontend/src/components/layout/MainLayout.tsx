@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, CssBaseline, Toolbar } from '@mui/material';
 import Sidebar from './Sidebar';
 
@@ -10,10 +10,22 @@ interface MainLayoutProps {
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+
+  // Correction SSR/CSR : initialisation à false, puis synchro sessionStorage après le montage
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem('sidebarCollapsed');
+    if (stored === 'false') setSidebarCollapsed(false);
+  }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem('sidebarCollapsed', sidebarCollapsed ? 'true' : 'false');
+  }, [sidebarCollapsed]);
 
   const handleToggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
+    setSidebarCollapsed((prev) => !prev);
   };
 
   const drawerWidth = sidebarCollapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH;
