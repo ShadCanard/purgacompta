@@ -67,7 +67,10 @@ const ActionsCell: React.FC<{ row: any; onEdit: (row: any) => void; onDelete: (r
 const columns: GridColDef[] = [
   { field: 'name', headerName: 'Nom', flex: 1, minWidth: 180 },
   { field: 'weight', headerName: 'Poids (kg)', flex: 1, minWidth: 120, type: 'number',
-    valueFormatter: (params) => params.value?.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+    valueFormatter: (params) => {
+      if (!params || typeof params.value !== 'number') return '';
+      return params.value.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
   },
   {
     field: 'actions',

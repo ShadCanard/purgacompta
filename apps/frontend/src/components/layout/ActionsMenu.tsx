@@ -4,13 +4,15 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export interface ActionsMenuProps {
   row: any;
-  onEdit: (row: any) => void;
-  onDelete: (row: any) => void;
+  onEdit?: (row: any) => void;
+  onDelete?: (row: any) => void;
   editLabel?: string;
   deleteLabel?: string;
+  canEdit?: boolean;
+  canDelete?: boolean;
 }
 
-const ActionsMenu: React.FC<ActionsMenuProps> = ({ row, onEdit, onDelete, editLabel = 'Modifier', deleteLabel = 'Supprimer' }) => {
+const ActionsMenu: React.FC<ActionsMenuProps> = ({ row, onEdit, onDelete, editLabel = 'Modifier', deleteLabel = 'Supprimer', canEdit = true, canDelete = true }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
@@ -21,8 +23,8 @@ const ActionsMenu: React.FC<ActionsMenuProps> = ({ row, onEdit, onDelete, editLa
         <MoreVertIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={() => { handleClose(); onEdit(row); }}>{editLabel}</MenuItem>
-        <MenuItem onClick={() => { handleClose(); onDelete(row); }}>{deleteLabel}</MenuItem>
+        {canEdit && onEdit && <MenuItem onClick={() => { handleClose(); onEdit(row); }}>{editLabel}</MenuItem>}
+        {canDelete && onDelete && <MenuItem onClick={() => { handleClose(); onDelete(row); }}>{deleteLabel}</MenuItem>}
       </Menu>
     </>
   );
