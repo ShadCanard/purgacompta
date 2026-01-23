@@ -55,11 +55,10 @@ const menuItems: MenuItem[] = [
   {
     text: 'Gestion',
     icon: <PeopleIcon />,
-    requiredRole: 'MANAGER',
+    requiredRole: 'MEMBER',
     children: [
+      { text: 'Prix Groupes', icon: <CurrencyExchange />, path: '/prices', requiredRole: 'MEMBER' },
       { text: 'Membres', icon: <PeopleIcon />, path: '/members', requiredRole: 'MANAGER' },
-      { text: 'Rapports', icon: <AssessmentIcon />, path: '/reports', requiredRole: 'MANAGER' },
-      { text: 'Prix', icon: <CurrencyExchange />, path: '/prices', requiredRole: 'MANAGER' },
     ],
   },
   { text: 'Paramètres', icon: <SettingsIcon />, path: '/settings', requiredRole: 'MANAGER', children: [

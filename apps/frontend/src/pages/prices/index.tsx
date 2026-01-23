@@ -274,7 +274,7 @@ const PricesPage: React.FC = () => {
             onChange={(_, value) => setSelectedItemId(value ? value.id : '')}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             renderInput={(params) => (
-              <TextField {...params} label="Filtrer par Objet" placeholder="Objet..." />
+              <TextField {...params} label="Objet" placeholder="Objet..." />
             )}
             clearOnEscape
           />

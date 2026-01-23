@@ -105,12 +105,29 @@ export const resolvers = {
     groups: async () => {
       return prisma.group.findMany({
         orderBy: { createdAt: 'desc' },
+        where: {
+          NOT: {
+            name: 'Purgatory',
+          }
+        }
       });
     },
 
     // Compter les utilisateurs
     groupsCount: async () => {
-      return prisma.group.count();
+      return prisma.group.count({
+        where: {
+          NOT: {
+            name: 'Purgatory',
+          }
+        }
+      });
+    },
+
+    myGroup: async () => {
+      return prisma.group.findUnique({
+        where: { name: 'Purgatory' },
+      });
     },
 
     // Objets CRUD

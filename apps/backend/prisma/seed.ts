@@ -7,17 +7,41 @@ async function main() {
 
   // Créer un utilisateur admin par défaut (à remplacer par votre Discord ID)
   const adminUser = await prisma.user.upsert({
-    where: { discordId: 'VOTRE_DISCORD_ID' },
+    where: { discordId: '234330175775571969' },
     update: {},
     create: {
-      discordId: 'VOTRE_DISCORD_ID',
-      username: 'Admin',
+      discordId: '234330175775571969',
+      username: 'shadcanard',
+      name: 'Jackson Johnson',
       email: 'admin@purgatory.com',
       role: 'OWNER',
     },
   });
-
   console.log('✅ Created admin user:', adminUser);
+
+  // Créer un utilisateur admin par défaut (à remplacer par votre Discord ID)
+  const adminUser2 = await prisma.user.upsert({
+    where: { discordId: '931609861526016060' },
+    update: {},
+    create: {
+      discordId: '931609861526016060',
+      username: 'mikekette',
+      name: 'Miky Quest',
+      email: 'admin2@purgatory.com',
+      role: 'OWNER',
+    },
+  });
+  console.log('✅ Created admin user:', adminUser2);
+
+  await prisma.group.upsert({
+    where: { name: 'Purgatory' },
+    update: {},
+    create: {
+      name: 'Purgatory',
+    },
+  });
+  console.log('✅ Created group Purgatory');
+
   console.log('🎉 Seeding completed!');
 }
 

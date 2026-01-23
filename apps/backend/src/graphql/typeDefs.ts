@@ -176,6 +176,9 @@ export const typeDefs = `#graphql
     # Récupérer l'utilisateur authentifié
     me: User
 
+    # Récupérer le groupe 'Purgatory'
+    myGroup: Group
+
     # Récupérer un utilisateur par son Discord ID
     user(discordId: String!): User
     

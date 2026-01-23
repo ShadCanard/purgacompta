@@ -12,6 +12,7 @@ export default function Document() {
           rel="stylesheet"
         />
         <link rel="icon" href="/favicon.ico" />
+        <title>Purgatory Compta</title>
       </Head>
       <body>
         <Main />
