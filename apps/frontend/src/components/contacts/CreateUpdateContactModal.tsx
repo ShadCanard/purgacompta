@@ -1,41 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, MenuItem, Typography, Box
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, MenuItem, Typography, Box,
+  Autocomplete
 } from '@mui/material';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-
-const GET_GROUPS = gql`
-  query Groups {
-    groups {
-      id
-      name
-    }
-  }
-`;
-
-const CREATE_CONTACT = gql`
-  mutation CreateContact($input: CreateContactInput!) {
-    createContact(input: $input) {
-      id
-      name
-      phone
-      group { id name }
-    }
-  }
-`;
-
-const UPDATE_CONTACT = gql`
-  mutation UpdateContact($input: UpdateContactInput!) {
-    updateContact(input: $input) {
-      id
-      name
-      phone
-      group { id name }
-    }
-  }
-`;
+import { CREATE_CONTACT, UPDATE_CONTACT } from '@/lib/mutations';
 
 interface CreateUpdateContactModalProps {
   open: boolean;
@@ -174,21 +145,23 @@ const CreateUpdateContactModal: React.FC<CreateUpdateContactModalProps> = ({ ope
             required
             disabled={loading}
           />
-          <TextField
-            select
-            margin="dense"
-            label="Groupe (optionnel)"
-            name="groupId"
-            value={form.groupId}
-            onChange={handleChange}
-            fullWidth
-            disabled={loading || loadingGroups}
-          >
-            <MenuItem value="">Aucun</MenuItem>
-            {groupsData?.map((g) => (
-              <MenuItem key={g.id} value={g.id}>{g.name}</MenuItem>
-            ))}
-          </TextField>
+          <Autocomplete
+            options={groupsData || []}
+            getOptionLabel={option => option?.name || ''}
+            value={groupsData?.find((g: any) => g.id === form.groupId) || null}
+            onChange={(_, value) => setForm(f => ({ ...f, groupId: value ? value.id : '' }))}
+            renderInput={params => (
+              <TextField
+                {...params}
+                margin="dense"
+                label="Groupe (optionnel)"
+                fullWidth
+                disabled={loading || loadingGroups}
+              />
+            )}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            clearOnEscape
+          />
           {error && <Box mt={1}><Typography color="error">{error}</Typography></Box>}
         </DialogContent>
         <DialogActions>

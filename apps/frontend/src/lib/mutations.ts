@@ -45,6 +45,27 @@ export const IMPORT_CONTACTS = gql`
       }
     }
 `;
+export const CREATE_CONTACT = gql`
+  mutation CreateContact($input: CreateContactInput!) {
+    createContact(input: $input) {
+      id
+      name
+      phone
+      group { id name }
+    }
+  }
+`;
+
+export const UPDATE_CONTACT = gql`
+  mutation UpdateContact($input: UpdateContactInput!) {
+    updateContact(input: $input) {
+      id
+      name
+      phone
+      group { id name }
+    }
+  }
+`;
 
 export const UPDATE_GROUP_IS_ACTIVE = gql`
     mutation UpdateGroupIsActive($id: ID!, $isActive: Boolean!) {
@@ -112,6 +133,15 @@ export const UPDATE_USER_NAME = gql`
       name
       avatar
       role
+    }
+  }
+`;
+
+export const UPDATE_USER_PHONE = gql`
+  mutation UpdateUserPhone($input: UpdateUserPhoneInput!) {
+    updateUserPhone(input: $input) {
+      discordId
+      phone
     }
   }
 `;

@@ -11,7 +11,7 @@ import { formatDollar } from '@/lib/utils';
 import ActionsMenu from '@/components/layout/ActionsMenu';
 import { Edit, HorizontalRule } from '@mui/icons-material';
 import { CREATE_ITEM_PRICE, DELETE_ITEM_PRICE, UPDATE_ITEM_PRICE } from '@/lib/mutations';
-import { GET_ITEM_PRICES, GET_ITEMS, GET_PURGATORY } from '@/lib/queries';
+import { GET_ITEM_PRICES, GET_ITEM_PRICES_BY_GROUP, GET_ITEMS, GET_PURGATORY } from '@/lib/queries';
 
 interface Group {
   id: string;
@@ -132,10 +132,12 @@ const PricesPage: React.FC = () => {
   });
 
   const { data: itemPrices, isLoading } = useQuery<ItemPrice[]>({
-    queryKey: ['itemPrices'],
+    queryKey: ['itemPricesByGroup', groupId],
+    enabled: !!groupId,
     queryFn: async () => {
-      const result = await apolloClient.query({ query: GET_ITEM_PRICES, fetchPolicy: 'network-only' });
-      return (result.data as any).itemPrices;
+      if (!groupId) return [];
+      const result = await apolloClient.query({ query: GET_ITEM_PRICES_BY_GROUP, variables: { groupId }, fetchPolicy: 'network-only' });
+      return (result.data as any).itemPricesByGroup;
     },
   });
   const { data: items = [] } = useQuery<{ id: string; name: string; sellable?: boolean }[]>({
@@ -218,7 +220,7 @@ const PricesPage: React.FC = () => {
           <Button variant='outlined' color='primary' startIcon={<AddIcon />} onClick={() => handleAddItem()}>Ajouter</Button>
           </Stack>
           <hr />
-          <DataGrid
+          {!isLoading && <DataGrid
             autoHeight
             rows={rows}
             columns={columns}
@@ -234,7 +236,7 @@ const PricesPage: React.FC = () => {
               }
               return { ...newRow };
             }}
-          />
+          />}
         </Paper>
 
       <ConfirmModal

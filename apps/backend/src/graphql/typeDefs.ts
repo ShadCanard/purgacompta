@@ -47,6 +47,7 @@ export const typeDefs = `#graphql
     group: Group
     createdAt: String!
     updatedAt: String!
+    notes: String
   }
 
   # Type Group
@@ -66,6 +67,7 @@ export const typeDefs = `#graphql
     name: String!
     phone: String!
     groupId: ID
+    notes: String
   }
 
   input UpdateContactInput {
@@ -73,6 +75,7 @@ export const typeDefs = `#graphql
     name: String
     phone: String
     groupId: ID
+    notes: String
   }
 
   # Type Log
@@ -95,6 +98,7 @@ export const typeDefs = `#graphql
     email: String
     avatar: String
     balance: Int!
+    phone: String
     isOnline: Boolean!
     maxBalance: Int!
     role: UserRole!
@@ -109,6 +113,7 @@ export const typeDefs = `#graphql
     name: String
     email: String
     avatar: String
+    phone: String
   }
 
   input UpdateUserNameInput {
@@ -122,6 +127,10 @@ export const typeDefs = `#graphql
     role: UserRole!
   }
 
+  input UpdateUserPhoneInput {
+    discordId: String!
+    phone: String!
+  }
 
   input LogFilterInput {
     action: String
@@ -263,5 +272,7 @@ export const typeDefs = `#graphql
     updateItem(input: UpdateItemInput!): Item!
     deleteItem(id: ID!): Boolean!
 
+    # Mettre à jour le téléphone d'un utilisateur
+    updateUserPhone(input: UpdateUserPhoneInput!): User!
   }
 `;

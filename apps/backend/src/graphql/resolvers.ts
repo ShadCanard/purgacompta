@@ -45,6 +45,7 @@ export const resolvers = {
     balance: (parent: any) => parent.balance,
     isOnline: (parent: any) => parent.isOnline,
     maxBalance: (parent: any) => parent.maxBalance,
+    phone: (parent: any) => parent.phone,
   },
   Log: {
     createdAt: (parent: any) => formatDate(parent.createdAt),
@@ -190,9 +191,14 @@ export const resolvers = {
     onSellitemPricesByGroup: async (_: any, { groupId }: { groupId: string }) => {
       return prisma.itemPrice.findMany({ where: { groupId, onSell: true }, orderBy: { createdAt: 'desc' } });
     },
+    
     // Contacts CRUD
     contacts: async () => {
-      return prisma.contact.findMany({ orderBy: { createdAt: 'desc' } });
+      const filterMembers = await prisma.user.findMany({select: { phone: true } });
+      const memberPhones = filterMembers.map(m => m.phone);
+      return prisma.contact.findMany({ orderBy: { createdAt: 'desc' } }).then(contacts =>
+        contacts.filter(contact => !memberPhones.includes(contact.phone))
+      );
     },
     contactById: async (_: any, { id }: { id: string }) => {
       return prisma.contact.findUnique({ where: { id } });
@@ -291,7 +297,6 @@ export const resolvers = {
       return user;
     },
 
-
     // Mettre à jour le statut en ligne d'un utilisateur
     updateUserOnline: async (_: any, { discordId, isOnline }: { discordId: string; isOnline: boolean }, context: any) => {
       const before = await prisma.user.findUnique({ where: { discordId } });
@@ -368,6 +373,11 @@ export const resolvers = {
     createContact: async (_: any, { input }: { input: { name: string; phone: string; groupId?: string } }, context: any) => {
       if (!input.phone.startsWith('555-')) {
         throw new Error('Le numéro doit commencer par 555-');
+      }
+      // Vérifie unicité du numéro
+      const existing = await prisma.contact.findFirst({ where: { phone: input.phone }, include: { group: true } });
+      if (existing) {
+        throw new Error(`Il existe déjà un contact avec le numéro ${input.phone} : ${existing.name} ${existing.group ? `(Groupe: ${existing.group.name})` : ''}`);
       }
       const contact = await prisma.contact.create({
         data: {
@@ -465,5 +475,14 @@ export const resolvers = {
       return created;
     },
 
+    updateUserPhone: async (_: any, { input }: { input: { discordId: string; phone: string } }) => {
+      if (!input.phone.startsWith('555-')) {
+        throw new Error('Le numéro doit commencer par 555-');
+      }
+      return prisma.user.update({
+        where: { discordId: input.discordId },
+        data: { phone: input.phone },
+      });
+    },
   },
 };

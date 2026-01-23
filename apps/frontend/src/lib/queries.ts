@@ -16,6 +16,21 @@ export const GET_ITEM_PRICES = gql`
   }
 `;
 
+export const GET_ITEM_PRICES_BY_GROUP = gql`
+  query ItemPricesByGroup($groupId: ID!) {
+    itemPricesByGroup(groupId: $groupId) {
+      id
+      price
+      item { id name }
+      group { id name }
+      createdAt
+      updatedAt
+      onSell
+      buying
+    }
+  }
+`;
+
 export const GET_PURGATORY = gql`
   query MyGroup {
     myGroup { id name color1 color2 tag description }
@@ -74,6 +89,7 @@ export const GET_MEMBERS = gql`
       email
       avatar
       role
+      phone
       createdAt
       updatedAt
       isOnline

@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apolloClient from '@/lib/apolloClient';
 import { useUser } from '@/providers/UserProvider';
 import { GET_MEMBERS } from '@/lib/queries';
-import { UPDATE_USER_ROLE, UPDATE_USER_NAME } from '@/lib/mutations';
+import { UPDATE_USER_ROLE, UPDATE_USER_NAME, UPDATE_USER_PHONE } from '@/lib/mutations';
 
 const USER_ROLES = [
   { value: 'GUEST', label: 'Guest' },
@@ -16,19 +16,26 @@ const USER_ROLES = [
   { value: 'OWNER', label: 'Owner' },
 ];
 
-
-
-
-
-
 const UsersPage: React.FC = () => {
-  // TanStack Query pour récupérer tous les utilisateurs
+  const [nameEditRows, setNameEditRows] = useState<{ [id: string]: string }>({});
+  const [phoneEditRows, setPhoneEditRows] = useState<{ [id: string]: string }>({});
+  const { user: currentUser } = useUser();
   const queryClient = useQueryClient();
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const result = await apolloClient.query({ query: GET_MEMBERS, fetchPolicy: 'network-only', });
       return (result.data as any).users;
+    },
+  });
+  // Mutation pour changer le numéro de téléphone d'un utilisateur
+  const { mutate: updateUserPhone, isLoading: isUpdatingPhone } = useMutation({
+    mutationFn: async ({ discordId, phone }: { discordId: string; phone: string }) => {
+      await apolloClient.mutate({ mutation: UPDATE_USER_PHONE, variables: { input: { discordId, phone } }, });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
     },
   });
 
@@ -51,13 +58,6 @@ const UsersPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
   });
-
-
-  // Gestion de l'édition du nom affiché (inline DataGrid)
-  const [nameEditRows, setNameEditRows] = useState<{ [id: string]: string }>({});
-
-  // Récupère l'utilisateur connecté
-  const { user: currentUser } = useUser();
   const roleHierarchy: Record<string, number> = {
     GUEST: 0,
     MEMBER: 1,
@@ -68,6 +68,33 @@ const UsersPage: React.FC = () => {
 
   // Colonnes du DataGrid
   const columns: GridColDef[] = [
+        {
+          field: 'phone',
+          headerName: 'Téléphone',
+          width: 140,
+          editable: true,
+          renderEditCell: (params) => {
+            return (
+              <input
+                type="text"
+                value={phoneEditRows[params.id as string] ?? params.value ?? ''}
+                onChange={e => setPhoneEditRows({ ...phoneEditRows, [params.id as string]: e.target.value })}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    const newPhone = phoneEditRows[params.id as string];
+                    if (newPhone && newPhone !== params.value && newPhone.startsWith('555-')) {
+                      updateUserPhone({ discordId: params.row.discordId, phone: newPhone });
+                    }
+                  }
+                }}
+                disabled={isUpdatingPhone}
+                style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4, border: '1px solid #ccc' }}
+                autoFocus
+                placeholder="555-XXXX"
+              />
+            );
+          },
+        },
     {
       field: 'avatar',
       headerName: 'Avatar',
