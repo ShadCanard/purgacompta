@@ -89,6 +89,18 @@ export const GET_CONTACTS_WITHOUT_GROUP = gql`
   }
 `;
 
+
+export const GET_ITEM_PRICES_BY_TARGET = gql`
+  query ItemPricesByTarget($targetId: ID) {
+    itemPricesByTarget(targetId: $targetId) {
+      id
+      price
+      item { id name }
+      targetId
+    }
+  }
+`;
+
 export const GET_MEMBERS = gql`
   query Members {
     users {

@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { formatDollar } from '@/lib/utils';
+import { GET_CONTACTS, GET_GROUPS, GET_ITEM_PRICES_BY_GROUP, GET_ITEM_PRICES_BY_TARGET, GET_ITEMS, GET_PURGATORY } from '@/lib/queries';
 
 const GET_ITEM_PRICES = gql`
   query ItemPrices {
@@ -17,20 +18,6 @@ const GET_ITEM_PRICES = gql`
       group { id name }
     }
   }
-`;
-
-const MY_GROUP = gql`
-  query MyGroup { myGroup { id } }
-`;
-
-const GET_GROUPS = gql`
-  query Groups { groups { id name } }
-`;
-const GET_CONTACTS = gql`
-  query Contacts { contacts { id name group { id name } } }
-`;
-const GET_ITEMS = gql`
-  query Items { items { id name } }
 `;
 
 const TransactionsPage: React.FC = () => {
@@ -54,7 +41,7 @@ const TransactionsPage: React.FC = () => {
 
   useEffect(() => {
     // Récupère l'ID du groupe 'Purgatory'
-    apolloClient.query({ query: MY_GROUP }).then(result => {
+    apolloClient.query({ query: GET_PURGATORY }).then(result => {
       const myGroup = (result.data as any).myGroup;
       setPurgatoryId(myGroup.id);
     });
@@ -68,13 +55,6 @@ const TransactionsPage: React.FC = () => {
     },
   });
 
-  const { data: purgatory } = useQuery({
-    queryKey: ['myGroup'],
-    queryFn: async () => {
-      const result = await apolloClient.query({ query: MY_GROUP });
-      return (result.data as any).myGroup;
-    },
-  });
   const { data: contacts = [] } = useQuery({
     queryKey: ['contacts'],
     queryFn: async () => {
@@ -90,6 +70,15 @@ const TransactionsPage: React.FC = () => {
     },
   });
 
+  const { data: pricesByTarget = [] } = useQuery({
+    queryKey: ['itemPricesByTarget', targetGroup ? targetGroup.id : null],
+    queryFn: async () => {
+      const variables = targetGroup && targetGroup.id ? { targetId: targetGroup.id } : {};
+      const result = await apolloClient.query({ query: GET_ITEM_PRICES_BY_TARGET, variables });
+      return (result.data as any).itemPricesByTarget;
+    },
+  });
+  
   // Gestion dynamique des lignes d'objets
   const handleAddItem = () => setItems([...items, { item: null, quantity: 1, price: 0 }]);
   const handleRemoveItem = (idx: number) => setItems(items.filter((_, i) => i !== idx));

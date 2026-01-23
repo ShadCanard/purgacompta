@@ -196,6 +196,13 @@ export const resolvers = {
     itemPricesByGroup: async (_: any, { groupId }: { groupId: string }) => {
       return prisma.itemPrice.findMany({ where: { groupId }, orderBy: { createdAt: 'desc' } });
     },
+    itemPricesByTarget: async (_: any, { targetId }: { targetId?: string }) => {
+      if(!targetId) {
+        return prisma.itemPrice.findMany({ where: { targetId: null, group: { name: 'Purgatory' } }, orderBy: { createdAt: 'desc' } });
+      }
+
+      return prisma.itemPrice.findMany({ where: { targetId, group: { name: 'Purgatory' } }, orderBy: { createdAt: 'desc' } });
+    },
     onSellitemPricesByGroup: async (_: any, { groupId }: { groupId: string }) => {
       return prisma.itemPrice.findMany({ where: { groupId, onSell: true }, orderBy: { createdAt: 'desc' } });
     },

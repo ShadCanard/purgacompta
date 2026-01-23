@@ -191,6 +191,7 @@ export const typeDefs = `#graphql
     itemPriceById(id: ID!): ItemPrice
     itemPricesByItem(itemId: ID!): [ItemPrice!]!
     itemPricesByGroup(groupId: ID!): [ItemPrice!]!
+    itemPricesByTarget(targetId: ID): [ItemPrice!]!
     onSellitemPricesByGroup(groupId: ID!): [ItemPrice!]!
 
     # Objets CRUD
