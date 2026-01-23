@@ -13,6 +13,7 @@ import {
 import apolloClient from '@/lib/apolloClient';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CREATE_CONTACT, UPDATE_CONTACT } from '@/lib/mutations';
+import { GET_GROUPS } from '@/lib/queries';
 
 interface CreateUpdateContactModalProps {
   open: boolean;
