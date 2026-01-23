@@ -11,58 +11,8 @@ import { formatDollar } from '@/lib/utils';
 import ActionsMenu from '@/components/layout/ActionsMenu';
 import { Edit, HorizontalRule } from '@mui/icons-material';
 import { CREATE_ITEM_PRICE, DELETE_ITEM_PRICE, UPDATE_ITEM_PRICE } from '@/lib/mutations';
-import { GET_ITEM_PRICES, GET_ITEM_PRICES_BY_GROUP, GET_ITEMS, GET_PURGATORY } from '@/lib/queries';
-
-interface Group {
-  id: string;
-  name: string;
-}
-
-type ItemPrice = {
-  id: string;
-  price: number;
-  item: { id: string; name: string };
-  group: { id: string; name: string };
-  createdAt: string;
-  updatedAt: string;
-};
-
-  const columns: GridColDef[] = [
-    {
-      field: 'item',
-      headerName: 'Objet',
-      flex: 1,
-      renderCell: (params: any) => params.row.item?.name || '',
-      editable: false,
-    },
-    {
-      field: 'group',
-      headerName: 'Groupe',
-      flex: 1,
-      renderCell: (params: any) => params.row.group?.name || '',
-      editable: false,
-    },
-    {
-      field: 'price',
-      headerName: 'Prix',
-      flex: 1,
-      type: 'number',
-      editable: true,
-      renderCell: (params: any) => formatDollar(params.value),
-      valueFormatter: (params: any) => params.value ?? '',
-    },
-    {
-      field: 'actions',
-      headerName: '',
-      width: 60,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderCell: (params: any) => (
-        <ActionsMenu row={params.row} onDelete={params.row.onDelete} canEdit={false} />
-      ),
-    },
-  ];
+import { GET_CONTACTS, GET_CONTACTS_WITHOUT_GROUP, GET_GROUPS, GET_ITEM_PRICES, GET_ITEM_PRICES_BY_GROUP, GET_ITEMS, GET_PURGATORY } from '@/lib/queries';
+import { Contact, Group, ItemPrice } from '@/lib/types';
 
 const PricesPage: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -75,9 +25,10 @@ const PricesPage: React.FC = () => {
   const [groupId, setGroupId] = useState<string>('');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
   const [price, setPrice] = useState<string>('');
+  const [selectedTargetId, setSelectedTargetId] = useState<string>('');
 
   const createItemPriceMutation = useMutation({
-    mutationFn: async (input: { itemId: string; groupId: string; price: number }) => {
+    mutationFn: async (input: { itemId: string; groupId: string; price: number; targetId?: string }) => {
       setModalLoading(true);
       await apolloClient.mutate({
         mutation: CREATE_ITEM_PRICE,
@@ -96,7 +47,7 @@ const PricesPage: React.FC = () => {
   });
 
   const updateItemPriceMutation = useMutation({
-    mutationFn: async (input: { id: string; price: number }) => {
+    mutationFn: async (input: { id: string; price?: number; targetId?: string }) => {
       setModalLoading(true);
       await apolloClient.mutate({
         mutation: UPDATE_ITEM_PRICE,
@@ -156,8 +107,24 @@ const PricesPage: React.FC = () => {
     },
   });
 
-  const handleEdit = (row: any) => setEditPrice(row);
-  const handleDelete = (row: any) => setConfirmDelete({ open: true, price: row });
+  const {data: groups = []} = useQuery<Group[]>({
+    queryKey: ['groups'],
+    queryFn: async () => {
+      const result = await apolloClient.query({ query: GET_GROUPS });
+      return (result.data as any).groups;
+    },
+  });
+
+  const {data: contacts = []} = useQuery<Contact[]>({
+    queryKey: ['contacts'],
+    queryFn: async () => {
+      const result = await apolloClient.query({ query: GET_CONTACTS_WITHOUT_GROUP });
+      return (result.data as any).contactsWithoutGroup;
+    },
+});
+
+  const handleEdit = (row: ItemPrice) => setEditPrice(row);
+  const handleDelete = (row: ItemPrice) => setConfirmDelete({ open: true, price: row });
   const handleConfirmDelete = () => {
     if (confirmDelete.price) {
       deleteItemPriceMutation.mutate(confirmDelete.price.id);
@@ -172,17 +139,89 @@ const PricesPage: React.FC = () => {
         itemId: selectedItemId,
         groupId: groupId,
         price: parseFloat(price.replace(',', '.')) || 0,
+        targetId: selectedTargetId || undefined,
       });
     }
   }
 
+  const columns: GridColDef[] = [
+    {
+      field: 'item',
+      headerName: 'Objet',
+      flex: 1,
+      renderCell: (params: any) => params.row.item?.name || '',
+      editable: false,
+    },
+    {
+      field: 'group',
+      headerName: 'Groupe',
+      flex: 1,
+      renderCell: (params: any) => params.row.group?.name || '',
+      editable: false,
+    },
+    {
+      field: 'price',
+      headerName: 'Prix',
+      flex: 1,
+      type: 'number',
+      editable: true,
+      renderCell: (params: any) => formatDollar(params.value),
+      valueFormatter: (params: any) => params.value ?? '',
+    },
+    {
+      field: 'targetId',
+      headerName: 'Contact ou Groupe',
+      flex: 1,
+      editable: true,
+      renderCell: (params: any) => {
+        // Affichage simple en lecture
+        const target = [...groups, ...contacts].find((i: any) => i.id === params.value);
+        return target ? target.name : 'Tous';
+      },
+      renderEditCell: (params: any) => (
+        <Autocomplete
+          size="small"
+          sx={{ minWidth: 200 }}
+          options={[...groups, ...contacts.filter(c => !c.group)]}
+          getOptionLabel={(option: any) => option?.name || ''}
+          value={[...groups, ...contacts].find((i: any) => i.id === params.value) || null}
+          onChange={(_, value) => {
+            params.api.setEditCellValue({ id: params.id, field: 'targetId', value: value ? value.id : '' }, event);
+          }}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          renderInput={(inputParams) => (
+            <TextField {...inputParams} label="Contact ou Groupe" placeholder="Contact ou Groupe..." />
+          )}
+          clearOnEscape
+        />
+      ),
+      valueFormatter: (params: any) => params?.value ?? '',
+    },
+    {
+      field: 'actions',
+      headerName: '',
+      width: 60,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params: any) => (
+        <ActionsMenu row={params.row} onDelete={params.row.onDelete} canEdit={false} />
+      ),
+    },
+  ];
+
+
   // Filtrage par groupe
   const filteredPrices = groupId
-    ? (itemPrices || []).filter((row: any) => row.group?.id === groupId)
+    ? (itemPrices || []).filter((row: ItemPrice) => row.group?.id === groupId)
     : (itemPrices || []);
   // Injection des handlers dans chaque ligne
-  const rows = filteredPrices.map((row: any) => ({ ...row, onEdit: handleEdit, onDelete: handleDelete }));
+  const rows = filteredPrices.map((row: ItemPrice) => ({ ...row, onEdit: handleEdit, onDelete: handleDelete }));
 
+  const targets = [
+    ...groups.toSorted((a, b) => a.name.localeCompare(b.name)),
+    ...contacts.toSorted((a, b) => a.name.localeCompare(b.name)),
+  ];
 
   return (
     <MainLayout>
@@ -205,6 +244,19 @@ const PricesPage: React.FC = () => {
               isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
                 <TextField {...params} label="Objet" placeholder="Objet..." />
+              )}
+              clearOnEscape
+            />
+            <Autocomplete
+              size="small"
+              sx={{ minWidth: 220 }}
+              options={targets}
+              getOptionLabel={(option: any) => option?.name || ''}
+              value={targets.find((i: any) => i.id === selectedTargetId) || null}
+              onChange={(_, value) => setSelectedTargetId(value ? value.id : '')}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              renderInput={(params) => (
+                <TextField {...params} label="Groupe ou Contact" placeholder="Groupe ou Contact..." />
               )}
               clearOnEscape
             />
@@ -233,6 +285,11 @@ const PricesPage: React.FC = () => {
             processRowUpdate={async (newRow, oldRow) => {
               if (newRow.price !== oldRow.price) {
                 await updateItemPriceMutation.mutateAsync({ id: newRow.id, price: newRow.price });
+                queryClient.invalidateQueries({ queryKey: ['itemPricesByGroup', groupId] });
+              }
+              if(newRow.targetId !== oldRow.targetId) {
+                await updateItemPriceMutation.mutateAsync({ id: newRow.id, targetId: newRow.targetId });
+                queryClient.invalidateQueries({ queryKey: ['itemPricesByGroup', groupId] });
               }
               return { ...newRow };
             }}

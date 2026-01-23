@@ -99,9 +99,12 @@ const TransactionsPage: React.FC = () => {
       if (i !== idx) return row;
       if (field === 'item') {
         // Détermine le groupe cible selon le type
-        let groupId = type === 'IN' ? group?.id : targetGroup?.id;
-        // Pour OUT, le groupe source est Purgatory, cible = targetGroup
-        // Pour IN, le groupe = group
+        let groupId = null;
+        if (type === 'IN') {
+            groupId = purgatoryId;
+        } else {
+          groupId = targetGroup?.id;
+        }
         let foundPrice = null;
         if (value && groupId) {
           foundPrice = itemPrices.find((p: any) => p.item.id === value.id && p.group.id === groupId);

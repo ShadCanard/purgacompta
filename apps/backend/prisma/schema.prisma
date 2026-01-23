@@ -98,6 +98,7 @@ model ItemPrice {
   id        String   @id @default(cuid())
   itemId    String
   groupId   String
+  targetId  String?
   price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

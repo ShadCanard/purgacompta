@@ -36,6 +36,14 @@ export const resolvers = {
   ItemPrice: {
     item: (parent: any) => prisma.item.findUnique({ where: { id: parent.itemId } }),
     group: (parent: any) => prisma.group.findUnique({ where: { id: parent.groupId } }),
+    targetGroup: (parent: any) => {
+      if (!parent.targetGroupId) return null;
+      return prisma.group.findUnique({ where: { id: parent.targetGroupId } });
+    },
+    targetContact: (parent: any) => {
+      if (!parent.targetId) return null;
+      return prisma.contact.findUnique({ where: { id: parent.targetId } });
+    },
     createdAt: (parent: any) => formatDate(parent.createdAt),
     updatedAt: (parent: any) => formatDate(parent.updatedAt),
   },
@@ -52,8 +60,8 @@ export const resolvers = {
   },
   Contact: {
     group: async (parent: any) => {
-      if (!parent.groupid) return null;
-      return prisma.group.findUnique({ where: { id: parent.groupid } });
+      if (!parent.groupId) return null;
+      return prisma.group.findUnique({ where: { id: parent.groupId } });
     },
   },
 
@@ -202,6 +210,9 @@ export const resolvers = {
     },
     contactById: async (_: any, { id }: { id: string }) => {
       return prisma.contact.findUnique({ where: { id } });
+    },
+    contactsWithoutGroup: async () => {
+      return prisma.contact.findMany({ where: { groupid: null }, orderBy: { createdAt: 'desc' } });
     },
   },
 
@@ -442,14 +453,19 @@ export const resolvers = {
     },
 
     // ItemPrice CRUD
-    createItemPrice: async (_: any, { input }: { input: { itemId: string; groupId: string; price: number; onSell?: boolean; buying?: boolean } }, context: any) => {
+    createItemPrice: async (_: any, { input }: { input: { itemId: string; groupId: string; targetId?: string; price: number; onSell?: boolean; buying?: boolean } }, context: any) => {
       // Vérifie unicité (un seul prix par item/groupe)
       const exists = await prisma.itemPrice.findUnique({ where: { itemId_groupId: { itemId: input.itemId, groupId: input.groupId } } });
       if (exists) throw new Error('Un prix existe déjà pour ce couple item/groupe');
-      return prisma.itemPrice.create({ data: { itemId: input.itemId, groupId: input.groupId, price: input.price, onSell: input.onSell ?? true, buying: input.buying ?? true } });
+      return prisma.itemPrice.create({ data: { itemId: input.itemId, groupId: input.groupId, targetId: input.targetId ?? undefined, price: input.price, onSell: input.onSell ?? true, buying: input.buying ?? true } });
     },
-    updateItemPrice: async (_: any, { input }: { input: { id: string; price?: number, onSell?: boolean, buying?: boolean } }, context: any) => {
-      return prisma.itemPrice.update({ where: { id: input.id }, data: { price: input.price ?? undefined, onSell: input.onSell ?? undefined, buying: input.buying ?? undefined } });
+    updateItemPrice: async (_: any, { input }: { input: { id: string; price?: number, onSell?: boolean, buying?: boolean, targetId?: string } }, context: any) => {
+      return prisma.itemPrice.update({ where: { id: input.id }, data: { 
+        price: input.price ?? undefined, 
+        onSell: input.onSell ?? undefined, 
+        buying: input.buying ?? undefined,
+        targetId: input.targetId ?? undefined,
+        } });
     },
     deleteItemPrice: async (_: any, { id }: { id: string }, context: any) => {
       await prisma.itemPrice.delete({ where: { id } });

@@ -156,6 +156,9 @@ export const typeDefs = `#graphql
     id: ID!
     item: Item!
     group: Group!
+    targetId: ID
+    targetGroup: Group
+    targetContact: Contact
     price: Float!
     createdAt: String!
     updatedAt: String!
@@ -166,6 +169,7 @@ export const typeDefs = `#graphql
   input CreateItemPriceInput {
     itemId: ID!
     groupId: ID!
+    targetId: ID
     price: Float!
     onSell: Boolean
     buying: Boolean
@@ -176,6 +180,7 @@ export const typeDefs = `#graphql
     price: Float
     onSell: Boolean
     buying: Boolean
+    targetId: ID
   }
 
   # Queries
@@ -197,6 +202,7 @@ export const typeDefs = `#graphql
     # Contacts CRUD
     contacts: [Contact!]!
     contactById(id: ID!): Contact
+    contactsWithoutGroup: [Contact!]!
     # Récupérer l'utilisateur authentifié
     me: User
 

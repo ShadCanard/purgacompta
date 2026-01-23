@@ -9,6 +9,7 @@
     "studio": "prisma studio",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
+    "db:format": "prisma format",
     "db:push": "prisma db push",
     "db:seed": "ts-node prisma/seed.ts",
     "lint": "eslint src --ext .ts"

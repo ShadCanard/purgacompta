@@ -34,8 +34,7 @@ const columns: GridColDef[] = [
   { field: 'name', headerName: 'Nom', flex: 1, minWidth: 180 },
   { field: 'weight', headerName: 'Poids (kg)', minWidth: 120, type: 'number',
     valueFormatter: (params) => {
-      if (!params || typeof params.value !== 'number') return '';
-      return params.value.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      return `${params.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg`;
     }
   },
   { field: 'sellable', headerName: 'Vente possible', minWidth: 180,

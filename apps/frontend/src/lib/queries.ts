@@ -23,6 +23,7 @@ export const GET_ITEM_PRICES_BY_GROUP = gql`
       price
       item { id name }
       group { id name }
+      targetId
       createdAt
       updatedAt
       onSell
@@ -75,6 +76,15 @@ export const GET_CONTACTS = gql`
         id
         name
       }
+    }
+  }
+`;
+export const GET_CONTACTS_WITHOUT_GROUP = gql`
+  query ContactsWithoutGroup {
+    contactsWithoutGroup {
+      id
+      name
+      phone
     }
   }
 `;

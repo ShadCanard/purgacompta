@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout';
-import { Box, Typography, Paper, Avatar, CircularProgress } from '@mui/material';
+import { Box, Typography, Paper, Avatar, CircularProgress, Autocomplete, TextField } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowId } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apolloClient from '@/lib/apolloClient';
@@ -68,48 +68,20 @@ const UsersPage: React.FC = () => {
 
   // Colonnes du DataGrid
   const columns: GridColDef[] = [
-        {
-          field: 'phone',
-          headerName: 'Téléphone',
-          width: 140,
-          editable: true,
-          renderEditCell: (params) => {
-            return (
-              <input
-                type="text"
-                value={phoneEditRows[params.id as string] ?? params.value ?? ''}
-                onChange={e => setPhoneEditRows({ ...phoneEditRows, [params.id as string]: e.target.value })}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    const newPhone = phoneEditRows[params.id as string];
-                    if (newPhone && newPhone !== params.value && newPhone.startsWith('555-')) {
-                      updateUserPhone({ discordId: params.row.discordId, phone: newPhone });
-                    }
-                  }
-                }}
-                disabled={isUpdatingPhone}
-                style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4, border: '1px solid #ccc' }}
-                autoFocus
-                placeholder="555-XXXX"
-              />
-            );
-          },
-        },
     {
       field: 'avatar',
       headerName: 'Avatar',
       width: 80,
       renderCell: (params: GridRenderCellParams) => (
-        <Avatar src={params.value} alt={params.row.username} />
+        <Avatar src={params.value} alt={params.row.username} sx={{mt: 1}} />
       ),
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
     },
-    { field: 'username', headerName: 'Nom Discord', width: 180 },
     {
       field: 'name',
-      headerName: 'Nom affiché',
+      headerName: 'Nom ingame',
       width: 180,
       editable: true,
       renderEditCell: (params) => {
@@ -134,6 +106,33 @@ const UsersPage: React.FC = () => {
       },
     },
     {
+      field: 'phone',
+      headerName: 'Téléphone',
+      width: 140,
+      editable: true,
+      renderEditCell: (params) => {
+        return (
+          <input
+            type="text"
+            value={phoneEditRows[params.id as string] ?? params.value ?? ''}
+            onChange={e => setPhoneEditRows({ ...phoneEditRows, [params.id as string]: e.target.value })}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const newPhone = phoneEditRows[params.id as string];
+                if (newPhone && newPhone !== params.value && newPhone.startsWith('555-')) {
+                  updateUserPhone({ discordId: params.row.discordId, phone: newPhone });
+                }
+              }
+            }}
+            disabled={isUpdatingPhone}
+            style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4, border: '1px solid #ccc' }}
+            autoFocus
+            placeholder="555-XXXX"
+          />
+        );
+      },
+    },
+    {
       field: 'role',
       headerName: 'Rôle',
       width: 160,
@@ -145,24 +144,29 @@ const UsersPage: React.FC = () => {
           !currentUser ||
           roleHierarchy[currentUser.role] <= roleHierarchy[user.role];
         return (
-          <select
-            value={user.role}
-            disabled={disabled}
-            onChange={e => updateUserRole({ discordId: user.discordId, role: e.target.value })}
-            style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4 }}
-          >
-            {USER_ROLES.map(role => {
-              const isSuperior = currentUser && roleHierarchy[role.value] > roleHierarchy[currentUser.role];
-              return (
-                <option key={role.value} value={role.value} disabled={isSuperior} style={isSuperior ? { color: '#aaa' } : {}}>
-                  {role.label}
-                </option>
-              );
-            })}
-          </select>
+          <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', height: '100%' }}>
+            <Autocomplete
+              options={USER_ROLES}
+              getOptionLabel={option => option.label}
+              value={USER_ROLES.find(r => r.value === user.role) || null}
+              onChange={(_, value) => {
+                if (value && !disabled) {
+                  updateUserRole({ discordId: user.discordId, role: value.value });
+                }
+              }}
+              size='small'
+              disableClearable
+              disabled={disabled}
+              renderInput={params => (
+                <TextField {...params} label="Rôle" placeholder="Rôle..." />
+              )}
+              sx={{ width: '100%', mt: 2  }}
+            />
+          </Box>
         );
       },
     },
+    { field: 'username', headerName: 'Nom Discord', width: 180 },
   ];
 
   return (

@@ -1,0 +1,175 @@
+// Interfaces générées à partir des types GraphQL de typeDefs
+
+export enum UserRole {
+  GUEST = 'GUEST',
+  MEMBER = 'MEMBER',
+  MANAGER = 'MANAGER',
+  ADMIN = 'ADMIN',
+  OWNER = 'OWNER',
+}
+
+export interface Item {
+  id: string;
+  name: string;
+  weight: number;
+  createdAt: string;
+  updatedAt: string;
+  sellable: boolean;
+  weapon: boolean;
+}
+
+export interface CreateItemInput {
+  name: string;
+  weight: number;
+  sellable: boolean;
+  weapon: boolean;
+}
+
+export interface UpdateItemInput {
+  id: string;
+  name?: string;
+  weight?: number;
+  sellable?: boolean;
+  weapon?: boolean;
+}
+
+export interface Contact {
+  id: string;
+  name: string;
+  phone: string;
+  group?: Group;
+  createdAt: string;
+  updatedAt: string;
+  notes?: string;
+}
+
+export interface CreateContactInput {
+  name: string;
+  phone: string;
+  groupId?: string;
+  notes?: string;
+}
+
+export interface UpdateContactInput {
+  id: string;
+  name?: string;
+  phone?: string;
+  groupId?: string;
+  notes?: string;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  tag?: string;
+  description?: string;
+  color1?: string;
+  color2?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateGroupInput {
+  id: string;
+  name?: string;
+  tag?: string;
+  description?: string;
+  color1?: string;
+  color2?: string;
+  isActive?: boolean;
+}
+
+export interface Log {
+  id: string;
+  action: string;
+  entity: string;
+  entityId: string;
+  user: User;
+  diff?: string;
+  createdAt: string;
+}
+
+export interface LogFilterInput {
+  action?: string;
+  entity?: string;
+  userId?: string;
+  search?: string;
+  from?: string;
+  to?: string;
+}
+
+export interface User {
+  id: string;
+  discordId: string;
+  username: string;
+  name: string;
+  email?: string;
+  avatar?: string;
+  balance: number;
+  phone?: string;
+  isOnline: boolean;
+  maxBalance: number;
+  role: UserRole;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RegisterUserInput {
+  discordId: string;
+  username: string;
+  name?: string;
+  email?: string;
+  avatar?: string;
+  phone?: string;
+}
+
+export interface UpdateUserNameInput {
+  discordId: string;
+  name: string;
+}
+
+export interface UpdateUserRoleInput {
+  discordId: string;
+  role: UserRole;
+}
+
+export interface UpdateUserPhoneInput {
+  discordId: string;
+  phone: string;
+}
+
+export interface ItemPrice {
+  id: string;
+  item: Item;
+  group: Group;
+  targetId?: string;
+  targetGroup?: Group;
+  targetContact?: Contact;
+  price: number;
+  createdAt: string;
+  updatedAt: string;
+  onSell: boolean;
+  buying: boolean;
+}
+
+export interface CreateItemPriceInput {
+  itemId: string;
+  groupId: string;
+  targetId?: string;
+  price: number;
+  onSell?: boolean;
+  buying?: boolean;
+}
+
+export interface UpdateItemPriceInput {
+  id: string;
+  price?: number;
+  onSell?: boolean;
+  buying?: boolean;
+}
+
+export interface ImportContactInput {
+  display: string;
+  number: string;
+}
