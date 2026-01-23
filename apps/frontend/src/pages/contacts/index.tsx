@@ -14,13 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import ActionsMenu from '@/components/layout/ActionsMenu';
 import { IMPORT_CONTACTS } from '@/lib/mutations';
 import { GET_CONTACTS } from '@/lib/queries';
-
-type Contact = {
-  id: string;
-  name: string;
-  phone: string;
-  group?: { id: string; name: string } | null;
-};
+import { Contact } from '@/lib/types';
 
 const ActionsCell: React.FC<{ row: any; onEdit: (row: any) => void; onDelete: (row: any) => void }> = ({ row, onEdit, onDelete }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

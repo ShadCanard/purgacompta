@@ -4,16 +4,8 @@ import { useUser } from '@/providers/UserProvider';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { UPDATE_USER_ONLINE } from '@/lib/mutations';
 // Mutation pour mettre à jour le statut en ligne
-const UPDATE_USER_ONLINE = gql`
-  mutation UpdateUserOnline($discordId: String!, $isOnline: Boolean!) {
-    updateUserOnline(discordId: $discordId, isOnline: $isOnline) {
-      id
-      discordId
-      isOnline
-    }
-  }
-`;
 
 const CurrentUserCard: React.FC = () => {
   const { user, loading, refetch } = useUser();

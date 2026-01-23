@@ -13,6 +13,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ActionsMenu from '@/components/layout/ActionsMenu';
 import { DELETE_GROUP, UPDATE_GROUP_IS_ACTIVE } from '@/lib/mutations';
 import { GET_GROUPS } from '@/lib/queries';
+import { Group } from '@/lib/types';
 
 const GroupsPage: React.FC = () => {
   
@@ -122,17 +123,6 @@ const GroupsPage: React.FC = () => {
       ),
     },
   ];
-  type Group = {
-    id: string;
-    name: string;
-    tag?: string;
-    description?: string;
-    isActive: boolean;
-    color1: string;
-    color2: string;
-    createdAt: string;
-    updatedAt: string;
-  };
 
   const { data, isLoading } = useQuery<Group[]>({
     queryKey: ['groups'],

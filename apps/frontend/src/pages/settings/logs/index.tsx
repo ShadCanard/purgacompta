@@ -6,7 +6,7 @@ import { useUser } from '@/providers/UserProvider';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
-import { GET_LOGS } from '@/lib/queries';
+import { GET_LOGS, GET_MEMBERS } from '@/lib/queries';
 
 
 
@@ -16,17 +16,6 @@ const ACTIONS = [
   { value: 'UPDATE', label: 'Modification' },
   { value: 'DELETE', label: 'Suppression' },
 ];
-
-
-const GET_USERS = gql`
-  query Users {
-    users {
-      id
-      name
-      role
-    }
-  }
-`;
 
 const LogsPage: React.FC = () => {
   const { hasPermission } = useUser();
@@ -40,7 +29,7 @@ const LogsPage: React.FC = () => {
   const { data: usersData } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const { data } = await apolloClient.query({ query: GET_USERS, fetchPolicy: 'network-only' });
+      const { data } = await apolloClient.query({ query: GET_MEMBERS, fetchPolicy: 'network-only' });
       return (data as any).users;
     },
   });

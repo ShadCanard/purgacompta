@@ -8,21 +8,7 @@ import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
 import { formatDollar } from '@/lib/utils';
 import { GET_MEMBERS } from '@/lib/queries';
-
-type User = {
-    id: string;
-    username: string;
-    name: string;
-    email?: string;
-    avatar?: string;
-    isOnline?: boolean;
-    balance?: number;
-    maxBalance?: number;
-    role: string;
-    createdAt: string;
-    updatedAt: string;
-};
-
+import { User } from '@/lib/types';
 
 const columns: GridColDef[] = [
   { field: 'avatar', headerName: '', renderCell: (params) => (

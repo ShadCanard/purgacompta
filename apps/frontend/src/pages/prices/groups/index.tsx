@@ -11,20 +11,7 @@ import { formatDollar } from '@/lib/utils';
 import ActionsMenu from '@/components/layout/ActionsMenu';
 import { CREATE_ITEM_PRICE, UPDATE_ITEM_PRICE, DELETE_ITEM_PRICE } from '@/lib/mutations';
 import { GET_GROUPS, GET_ITEM_PRICES, GET_ITEMS } from '@/lib/queries';
-
-interface Group {
-  id: string;
-  name: string;
-}
-
-type ItemPrice = {
-  id: string;
-  price: number;
-  item: { id: string; name: string };
-  group: { id: string; name: string };
-  createdAt: string;
-  updatedAt: string;
-};
+import { ItemPrice, Group } from '@/lib/types';
 
   const columns: GridColDef[] = [
     {

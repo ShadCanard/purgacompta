@@ -6,38 +6,16 @@ import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@/providers/UserProvider';
 import { formatDollar } from '@/lib/utils';
-
-const GET_MEMBERS = gql`
-  query Members {
-    users {
-      id
-      name
-      avatar
-      isOnline
-      balance
-      role
-    }
-  }
-`;
-
-type Member = {
-  id: string;
-  name: string;
-  avatar?: string;
-  isOnline: boolean;
-  balance: number;
-  role: string;
-};
-
-
+import { User } from '@/lib/types';
+import { GET_MEMBERS } from '@/lib/queries';
 
 const MembersGrid: React.FC = () => {
   const { user: currentUser } = useUser();
-  const { data, isLoading } = useQuery<Member[]>({
+  const { data, isLoading } = useQuery<User[]>({
     queryKey: ['dashboard-members'],
     queryFn: async () => {
       const result = await apolloClient.query({ query: GET_MEMBERS, fetchPolicy: 'network-only' });
-      const users = (result.data as { users: Member[] }).users;
+      const users = (result.data as { users: User[] }).users;
       // Affiche MEMBER ou supérieur, sans l'utilisateur courant
       const hierarchy = ['GUEST', 'MEMBER', 'MANAGER', 'ADMIN', 'OWNER'];
       return users.filter(u => hierarchy.indexOf(u.role) >= hierarchy.indexOf('MEMBER'));

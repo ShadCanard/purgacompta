@@ -7,18 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { formatDollar } from '@/lib/utils';
-import { GET_CONTACTS, GET_GROUPS, GET_ITEM_PRICES_BY_GROUP, GET_ITEM_PRICES_BY_TARGET, GET_ITEMS, GET_PURGATORY } from '@/lib/queries';
-
-const GET_ITEM_PRICES = gql`
-  query ItemPrices {
-    itemPrices {
-      id
-      price
-      item { id name }
-      group { id name }
-    }
-  }
-`;
+import { GET_CONTACTS, GET_GROUPS, GET_ITEM_PRICES, GET_ITEM_PRICES_BY_TARGET, GET_ITEMS, GET_PURGATORY } from '@/lib/queries';
 
 const TransactionsPage: React.FC = () => {
     // Récupère tous les prix item/groupe
