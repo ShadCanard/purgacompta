@@ -1,18 +1,15 @@
-import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery as useTanstackQuery } from '@tanstack/react-query';
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { Box, Typography, Card, CardContent, Grid, Stack, Button } from '@mui/material';
+import { Box, Typography, Card, Grid, Stack } from '@mui/material';
 import { MainLayout } from '@/components/layout';
 import { useUser } from '@/providers/UserProvider';
 import {
   AccountBalance as AccountBalanceIcon,
   Receipt as ReceiptIcon,
   TrendingUp as TrendingUpIcon,
-  People as PeopleIcon,
-  OnlinePrediction,
 } from '@mui/icons-material';
 import MembersGrid from '@/components/dashboard/MembersGrid';
 import CurrentUserCard from '@/components/dashboard/CurrentUserCard';

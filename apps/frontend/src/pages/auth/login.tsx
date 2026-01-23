@@ -10,7 +10,6 @@ import {
   Typography,
   Stack,
 } from '@mui/material';
-import Image from 'next/image';
 
 const LoginPage: React.FC = () => {
   const handleDiscordLogin = () => {

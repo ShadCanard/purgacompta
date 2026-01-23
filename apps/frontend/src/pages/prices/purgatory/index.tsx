@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Button, Stack, TextField, Autocomplete, FormControl, InputLabel, Select, MenuItem, Input } from '@mui/material';
+import { Box, Typography, Paper, Button, Stack, TextField, Autocomplete } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
 import ConfirmModal from '@/components/layout/ConfirmModal';
 import { formatDollar } from '@/lib/utils';
 import ActionsMenu from '@/components/layout/ActionsMenu';
-import { Edit, HorizontalRule } from '@mui/icons-material';
 import { CREATE_ITEM_PRICE, DELETE_ITEM_PRICE, UPDATE_ITEM_PRICE } from '@/lib/mutations';
-import { GET_CONTACTS, GET_CONTACTS_WITHOUT_GROUP, GET_GROUPS, GET_ITEM_PRICES, GET_ITEM_PRICES_BY_GROUP, GET_ITEMS, GET_PURGATORY } from '@/lib/queries';
+import {
+  GET_CONTACTS_WITHOUT_GROUP,
+  GET_GROUPS,
+  GET_ITEM_PRICES_BY_GROUP,
+  GET_ITEMS,
+  GET_PURGATORY,
+} from '@/lib/queries';
 import { Contact, Group, ItemPrice } from '@/lib/types';
 
 const PricesPage: React.FC = () => {

@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Avatar, Box, Typography } from '@mui/material';
 import { MainLayout } from '@/components';
-import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
 import { formatDollar } from '@/lib/utils';

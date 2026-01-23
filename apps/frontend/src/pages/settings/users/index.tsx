@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout';
 import { Box, Typography, Paper, Avatar, CircularProgress, Autocomplete, TextField } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams, GridRowId } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apolloClient from '@/lib/apolloClient';
 import { useUser } from '@/providers/UserProvider';

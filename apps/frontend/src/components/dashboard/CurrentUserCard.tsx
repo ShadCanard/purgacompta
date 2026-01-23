@@ -1,7 +1,15 @@
 import React from 'react';
-import { Card, CardContent, Box, Typography, Avatar, Chip, Stack, Switch, FormControlLabel } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  Chip,
+  Stack,
+  Switch,
+  FormControlLabel,
+} from '@mui/material';
 import { useUser } from '@/providers/UserProvider';
-import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UPDATE_USER_ONLINE } from '@/lib/mutations';

@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { useSession } from 'next-auth/react';
-import { gql, ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery as useTanstackQuery } from '@tanstack/react-query';
+import { GET_CURRENT_USER } from '@/lib/queries';
 
 // Types pour l'utilisateur
 export type UserRole = 'GUEST' | 'MEMBER' | 'MANAGER' | 'ADMIN' | 'OWNER';
@@ -53,24 +53,7 @@ const rolePermissions: Record<UserRole, { create: boolean; read: boolean; update
 };
 
 // Query GraphQL pour récupérer l'utilisateur connecté
-const GET_CURRENT_USER = gql`
-  query GetCurrentUser($discordId: String!) {
-    user(discordId: $discordId) {
-      id
-      discordId
-      username
-      name
-      email
-      avatar
-      role
-      createdAt
-      updatedAt
-      isOnline
-      balance
-      maxBalance
-    }
-  }
-`;
+
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
@@ -92,12 +75,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     queryKey: ['currentUser', discordId],
     queryFn: async () => {
       if (!discordId) return null;
-      const result = await (apolloClient as ApolloClient<NormalizedCacheObject>).query({
+      const result = await apolloClient.query({
         query: GET_CURRENT_USER,
         variables: { discordId },
         fetchPolicy: 'network-only',
       });
-      return result.data.user as User;
+      return (result.data as any).user as User;
     },
     enabled: !!discordId,
     refetchOnWindowFocus: false,

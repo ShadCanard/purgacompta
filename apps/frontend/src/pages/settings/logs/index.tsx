@@ -3,7 +3,6 @@ import { Box, Typography, TextField, MenuItem, Stack, Paper } from '@mui/materia
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@/providers/UserProvider';
-import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
 import { GET_LOGS, GET_MEMBERS } from '@/lib/queries';

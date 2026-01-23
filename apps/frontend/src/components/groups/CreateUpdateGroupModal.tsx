@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, Box, Switch } from '@mui/material';
-import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { convertServerPatchToFullTree } from 'next/dist/client/components/segment-cache/navigation';
 import { CREATE_GROUP, UPDATE_GROUP } from '@/lib/mutations';
 
 interface CreateUpdateGroupModalProps {

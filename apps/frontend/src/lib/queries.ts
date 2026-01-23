@@ -16,6 +16,24 @@ export const GET_ITEM_PRICES = gql`
   }
 `;
 
+export const GET_CURRENT_USER = gql`
+  query GetCurrentUser($discordId: String!) {
+    user(discordId: $discordId) {
+      id
+      discordId
+      username
+      name
+      email
+      avatar
+      role
+      createdAt
+      updatedAt
+      isOnline
+      balance
+      maxBalance
+    }
+  }
+`;
 export const GET_ITEM_PRICES_BY_GROUP = gql`
   query ItemPricesByGroup($groupId: ID!) {
     itemPricesByGroup(groupId: $groupId) {

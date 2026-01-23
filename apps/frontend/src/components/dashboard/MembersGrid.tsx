@@ -1,7 +1,19 @@
 
 import React from 'react';
-import { Avatar, Box, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, CircularProgress, Switch } from '@mui/material';
-import { gql } from '@apollo/client';
+import {
+  Avatar,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  CircularProgress,
+  Switch,
+} from '@mui/material';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@/providers/UserProvider';

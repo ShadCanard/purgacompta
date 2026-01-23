@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Button, Stack, TextField, Autocomplete, FormControl, InputLabel, Select, MenuItem, Input } from '@mui/material';
+import { Box, Typography, Paper, Button, Stack, TextField, Autocomplete } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
 import ConfirmModal from '@/components/layout/ConfirmModal';
@@ -11,44 +10,44 @@ import { formatDollar } from '@/lib/utils';
 import ActionsMenu from '@/components/layout/ActionsMenu';
 import { CREATE_ITEM_PRICE, UPDATE_ITEM_PRICE, DELETE_ITEM_PRICE } from '@/lib/mutations';
 import { GET_GROUPS, GET_ITEM_PRICES, GET_ITEMS } from '@/lib/queries';
-import { ItemPrice, Group } from '@/lib/types';
+import { ItemPrice } from '@/lib/types';
 
-  const columns: GridColDef[] = [
-    {
-      field: 'item',
-      headerName: 'Objet',
-      flex: 1,
-      renderCell: (params: any) => params.row.item?.name || '',
-      editable: false,
-    },
-    {
-      field: 'group',
-      headerName: 'Groupe',
-      flex: 1,
-      renderCell: (params: any) => params.row.group?.name || '',
-      editable: false,
-    },
-    {
-      field: 'price',
-      headerName: 'Prix',
-      flex: 1,
-      type: 'number',
-      editable: true,
-      renderCell: (params: any) => formatDollar(params.value),
-      valueFormatter: (params: any) => params.value ?? '',
-    },
-    {
-      field: 'actions',
-      headerName: '',
-      width: 60,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderCell: (params: any) => (
-        <ActionsMenu row={params.row} onDelete={params.row.onDelete} canEdit={false} />
-      ),
-    },
-  ];
+const columns: GridColDef[] = [
+  {
+    field: 'item',
+    headerName: 'Objet',
+    flex: 1,
+    renderCell: (params: any) => params.row.item?.name || '',
+    editable: false,
+  },
+  {
+    field: 'group',
+    headerName: 'Groupe',
+    flex: 1,
+    renderCell: (params: any) => params.row.group?.name || '',
+    editable: false,
+  },
+  {
+    field: 'price',
+    headerName: 'Prix',
+    flex: 1,
+    type: 'number',
+    editable: true,
+    renderCell: (params: any) => formatDollar(params.value),
+    valueFormatter: (params: any) => params.value ?? '',
+  },
+  {
+    field: 'actions',
+    headerName: '',
+    width: 60,
+    sortable: false,
+    filterable: false,
+    disableColumnMenu: true,
+    renderCell: (params: any) => (
+      <ActionsMenu row={params.row} onDelete={params.row.onDelete} canEdit={false} />
+    ),
+  },
+];
 
 const PricesPage: React.FC = () => {
   const [open, setOpen] = useState(false);

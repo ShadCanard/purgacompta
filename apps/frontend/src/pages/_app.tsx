@@ -1,5 +1,4 @@
 import '@/styles/datagrid.css';
-import React from 'react';
 import type { AppProps } from 'next/app';
 import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from '@mui/material/styles';

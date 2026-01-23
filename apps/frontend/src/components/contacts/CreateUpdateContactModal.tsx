@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, MenuItem, Typography, Box,
-  Autocomplete
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Autocomplete,
 } from '@mui/material';
-import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CREATE_CONTACT, UPDATE_CONTACT } from '@/lib/mutations';
