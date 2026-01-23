@@ -12,20 +12,8 @@ import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
 import ActionsMenu from '@/components/layout/ActionsMenu';
-
-const GET_CONTACTS = gql`
-  query Contacts {
-    contacts {
-      id
-      name
-      phone
-      group {
-        id
-        name
-      }
-    }
-  }
-`;
+import { IMPORT_CONTACTS } from '@/lib/mutations';
+import { GET_CONTACTS } from '@/lib/queries';
 
 type Contact = {
   id: string;
@@ -80,17 +68,7 @@ const ContactsPage: React.FC = () => {
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; contact: any | null }>({ open: false, contact: null });
   const [importOpen, setImportOpen] = useState(false);
   // Mutation GraphQL pour l'import
-  const IMPORT_CONTACTS = gql`
-    mutation ImportContacts($input: [ImportContactInput!]!) {
-      importContacts(input: $input) {
-        id
-        name
-        phone
-        createdAt
-        updatedAt
-      }
-    }
-  `;
+
   const importContactsMutation = useMutation({
     mutationFn: async (contacts: any[]) => {
       await apolloClient.mutate({

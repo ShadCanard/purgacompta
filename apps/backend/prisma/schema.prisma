@@ -53,6 +53,8 @@ model Item {
   weight    Float    // Poids en kilo, décimal possible
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  sellable  Boolean  @default(true)
+  weapon    Boolean  @default(false)
 
   itemPrices ItemPrice[]
 
@@ -97,6 +99,8 @@ model ItemPrice {
   price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  onSell    Boolean  @default(true)
+  buying    Boolean  @default(true)
 
   item      Item   @relation(fields: [itemId], references: [id])
   group     Group  @relation(fields: [groupId], references: [id])

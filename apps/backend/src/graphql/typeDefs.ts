@@ -20,17 +20,23 @@ export const typeDefs = `#graphql
     weight: Float!
     createdAt: String!
     updatedAt: String!
+    sellable: Boolean!
+    weapon: Boolean!
   }
 
   input CreateItemInput {
     name: String!
     weight: Float!
+    sellable: Boolean!
+    weapon: Boolean!
   }
 
   input UpdateItemInput {
     id: ID!
     name: String
     weight: Float
+    sellable: Boolean
+    weapon: Boolean
   }
 
   # Type Contact
@@ -144,17 +150,23 @@ export const typeDefs = `#graphql
     price: Float!
     createdAt: String!
     updatedAt: String!
+    onSell: Boolean!
+    buying: Boolean!
   }
 
   input CreateItemPriceInput {
     itemId: ID!
     groupId: ID!
     price: Float!
+    onSell: Boolean
+    buying: Boolean
   }
 
   input UpdateItemPriceInput {
     id: ID!
     price: Float
+    onSell: Boolean
+    buying: Boolean
   }
 
   # Queries
@@ -165,10 +177,13 @@ export const typeDefs = `#graphql
     itemPriceById(id: ID!): ItemPrice
     itemPricesByItem(itemId: ID!): [ItemPrice!]!
     itemPricesByGroup(groupId: ID!): [ItemPrice!]!
+    onSellitemPricesByGroup(groupId: ID!): [ItemPrice!]!
 
     # Objets CRUD
     items: [Item!]!
     itemById(id: ID!): Item
+    sellableItems: [Item!]!
+    weaponItems: [Item!]!
 
     # Contacts CRUD
     contacts: [Contact!]!

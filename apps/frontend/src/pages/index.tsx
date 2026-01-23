@@ -1,19 +1,6 @@
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery as useTanstackQuery } from '@tanstack/react-query';
-// Même query que MembersGrid
-const GET_MEMBERS = gql`
-  query Members {
-    users {
-      id
-      name
-      avatar
-      isOnline
-      balance
-      role
-    }
-  }
-`;
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
@@ -30,6 +17,7 @@ import {
 import MembersGrid from '@/components/dashboard/MembersGrid';
 import CurrentUserCard from '@/components/dashboard/CurrentUserCard';
 import StatCard from '@/components/layout/StatCard';
+import { GET_MEMBERS } from '@/lib/queries';
 
 const HomePage: React.FC = () => {
   const { user, loading } = useUser();

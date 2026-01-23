@@ -3,9 +3,10 @@ import { MainLayout } from '@/components/layout';
 import { Box, Typography, Paper, Avatar, CircularProgress } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowId } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { gql, ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useUser } from '@/providers/UserProvider';
+import { GET_MEMBERS } from '@/lib/queries';
+import { UPDATE_USER_ROLE, UPDATE_USER_NAME } from '@/lib/mutations';
 
 const USER_ROLES = [
   { value: 'GUEST', label: 'Guest' },
@@ -15,43 +16,10 @@ const USER_ROLES = [
   { value: 'OWNER', label: 'Owner' },
 ];
 
-const GET_USERS = gql`
-  query GetUsers {
-    users {
-      id
-      discordId
-      username
-      name
-      avatar
-      role
-    }
-  }
-`;
 
-const UPDATE_USER_NAME = gql`
-  mutation UpdateUserName($input: UpdateUserNameInput!) {
-    updateUserName(input: $input) {
-      id
-      discordId
-      username
-      name
-      avatar
-      role
-    }
-  }
-`;
 
-const UPDATE_USER_ROLE = gql`
-  mutation UpdateUserRole($input: UpdateUserRoleInput!) {
-    updateUserRole(input: $input) {
-      id
-      discordId
-      username
-      avatar
-      role
-    }
-  }
-`;
+
+
 
 const UsersPage: React.FC = () => {
   // TanStack Query pour récupérer tous les utilisateurs
@@ -59,21 +27,15 @@ const UsersPage: React.FC = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const result = await (apolloClient as ApolloClient<NormalizedCacheObject>).query({
-        query: GET_USERS,
-        fetchPolicy: 'network-only',
-      });
-      return result.data.users;
+      const result = await apolloClient.query({ query: GET_MEMBERS, fetchPolicy: 'network-only', });
+      return (result.data as any).users;
     },
   });
 
   // Mutation pour changer le rôle d'un utilisateur
   const { mutate: updateUserRole, isLoading: isUpdatingRole } = useMutation({
     mutationFn: async ({ discordId, role }: { discordId: string; role: string }) => {
-      await (apolloClient as ApolloClient<NormalizedCacheObject>).mutate({
-        mutation: UPDATE_USER_ROLE,
-        variables: { input: { discordId, role } },
-      });
+      await apolloClient.mutate({ mutation: UPDATE_USER_ROLE, variables: { input: { discordId, role } },});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -83,10 +45,7 @@ const UsersPage: React.FC = () => {
   // Mutation pour changer le nom affiché d'un utilisateur
   const { mutate: updateUserName, isLoading: isUpdatingName } = useMutation({
     mutationFn: async ({ discordId, name }: { discordId: string; name: string }) => {
-      await (apolloClient as ApolloClient<NormalizedCacheObject>).mutate({
-        mutation: UPDATE_USER_NAME,
-        variables: { input: { discordId, name } },
-      });
+      await apolloClient.mutate({ mutation: UPDATE_USER_NAME, variables: { input: { discordId, name } }, });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });

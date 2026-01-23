@@ -141,10 +141,15 @@ const MyComponent: React.FC<Props> = ({ ... }) => {
 export default MyComponent;
 ```
 
-### GraphQL
-- **Queries**: Préfixe `GET_` ou `FETCH_` (ex: `GET_CURRENT_USER`)
-- **Mutations**: Verbe d'action (ex: `registerOrUpdateUser`)
-- **Fragments**: Suffixe `_FRAGMENT`
+
+### Organisation des Queries et Mutations GraphQL
+- **Centralisation** : Toutes les queries doivent être placées dans `/lib/queries.ts` et toutes les mutations dans `/lib/mutations.ts` côté frontend.
+- **Pertinence** : N'ajouter que les queries et mutations réellement utilisées dans l'application.
+- **Unicité** : Si une query ou mutation nécessite des champs supplémentaires, il faut compléter la définition existante plutôt que de dupliquer la query ou mutation sous un autre nom.
+- **Nommage** :
+  - Queries : Préfixe `GET_` ou `FETCH_` (ex: `GET_CURRENT_USER`)
+  - Mutations : Verbe d'action (ex: `registerOrUpdateUser`)
+  - Fragments : Suffixe `_FRAGMENT`
 
 ## Commandes Utiles
 

@@ -57,7 +57,8 @@ const menuItems: MenuItem[] = [
     icon: <PeopleIcon />,
     requiredRole: 'MEMBER',
     children: [
-      { text: 'Prix Groupes', icon: <CurrencyExchange />, path: '/prices', requiredRole: 'MEMBER' },
+      { text: 'Prix Groupes', icon: <CurrencyExchange />, path: '/prices/groups', requiredRole: 'MEMBER' },
+      { text: 'Prix Purgatory', icon: <CurrencyExchange />, path: '/prices/purgatory', requiredRole: 'MEMBER' },
       { text: 'Membres', icon: <PeopleIcon />, path: '/members', requiredRole: 'MANAGER' },
     ],
   },

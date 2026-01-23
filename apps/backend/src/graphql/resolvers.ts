@@ -137,6 +137,12 @@ export const resolvers = {
     itemById: async (_: any, { id }: { id: string }) => {
       return prisma.item.findUnique({ where: { id } });
     },
+    sellableItems: async () => {
+      return prisma.item.findMany({ where: { sellable: true }, orderBy: { createdAt: 'desc' } });
+    },
+    weaponItems: async () => {
+      return prisma.item.findMany({ where: { weapon: true }, orderBy: { createdAt: 'desc' } });
+    },
 
     // Récupérer les logs avec filtres/recherche
     logs: async (_: any, { filter, skip = 0, take = 50 }: any) => {
@@ -180,6 +186,9 @@ export const resolvers = {
     },
     itemPricesByGroup: async (_: any, { groupId }: { groupId: string }) => {
       return prisma.itemPrice.findMany({ where: { groupId }, orderBy: { createdAt: 'desc' } });
+    },
+    onSellitemPricesByGroup: async (_: any, { groupId }: { groupId: string }) => {
+      return prisma.itemPrice.findMany({ where: { groupId, onSell: true }, orderBy: { createdAt: 'desc' } });
     },
     // Contacts CRUD
     contacts: async () => {
@@ -396,20 +405,24 @@ export const resolvers = {
       return true;
     },
     // Objets CRUD
-    createItem: async (_: any, { input }: { input: { name: string; weight: number } }, context: any) => {
+    createItem: async (_: any, { input }: { input: { name: string; weight: number; sellable?: boolean; weapon?: boolean } }, context: any) => {
       return prisma.item.create({
         data: {
           name: input.name,
           weight: input.weight,
+          sellable: input.sellable || false,
+          weapon: input.weapon || false,
         },
       });
     },
-    updateItem: async (_: any, { input }: { input: { id: string; name?: string; weight?: number } }, context: any) => {
+    updateItem: async (_: any, { input }: { input: { id: string; name?: string; weight?: number; sellable?: boolean; weapon?: boolean } }, context: any) => {
       return prisma.item.update({
         where: { id: input.id },
         data: {
           name: input.name ?? undefined,
           weight: input.weight ?? undefined,
+          sellable: input.sellable ?? undefined,
+          weapon: input.weapon ?? undefined,
         },
       });
     },
@@ -419,14 +432,14 @@ export const resolvers = {
     },
 
     // ItemPrice CRUD
-    createItemPrice: async (_: any, { input }: { input: { itemId: string; groupId: string; price: number } }, context: any) => {
+    createItemPrice: async (_: any, { input }: { input: { itemId: string; groupId: string; price: number; onSell?: boolean; buying?: boolean } }, context: any) => {
       // Vérifie unicité (un seul prix par item/groupe)
       const exists = await prisma.itemPrice.findUnique({ where: { itemId_groupId: { itemId: input.itemId, groupId: input.groupId } } });
       if (exists) throw new Error('Un prix existe déjà pour ce couple item/groupe');
-      return prisma.itemPrice.create({ data: { itemId: input.itemId, groupId: input.groupId, price: input.price } });
+      return prisma.itemPrice.create({ data: { itemId: input.itemId, groupId: input.groupId, price: input.price, onSell: input.onSell ?? true, buying: input.buying ?? true } });
     },
-    updateItemPrice: async (_: any, { input }: { input: { id: string; price?: number } }, context: any) => {
-      return prisma.itemPrice.update({ where: { id: input.id }, data: { price: input.price ?? undefined } });
+    updateItemPrice: async (_: any, { input }: { input: { id: string; price?: number, onSell?: boolean, buying?: boolean } }, context: any) => {
+      return prisma.itemPrice.update({ where: { id: input.id }, data: { price: input.price ?? undefined, onSell: input.onSell ?? undefined, buying: input.buying ?? undefined } });
     },
     deleteItemPrice: async (_: any, { id }: { id: string }, context: any) => {
       await prisma.itemPrice.delete({ where: { id } });

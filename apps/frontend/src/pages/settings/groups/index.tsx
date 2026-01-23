@@ -11,6 +11,8 @@ import MainLayout from '@/components/layout/MainLayout';
 import { useUser } from '@/providers/UserProvider';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ActionsMenu from '@/components/layout/ActionsMenu';
+import { DELETE_GROUP, UPDATE_GROUP_IS_ACTIVE } from '@/lib/mutations';
+import { GET_GROUPS } from '@/lib/queries';
 
 const GroupsPage: React.FC = () => {
   
@@ -24,36 +26,7 @@ const GroupsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { hasPermission } = useUser();
 
-  const GET_GROUPS = gql`
-    query Groups {
-      groups {
-        id
-        name
-        tag
-        description
-        isActive
-        createdAt
-        updatedAt
-        color1
-        color2
-      }
-    }
-  `;
-
-  const UPDATE_GROUP_IS_ACTIVE = gql`
-    mutation UpdateGroupIsActive($id: ID!, $isActive: Boolean!) {
-      updateGroupIsActive(input: { id: $id, isActive: $isActive }) {
-        id
-        isActive
-      }
-    }
-  `;
-
-  const DELETE_GROUP = gql`
-    mutation DeleteGroup($id: ID!) {
-      deleteGroup(id: $id)
-    }
-  `;
+  
   const deleteGroupMutation = useMutation({
     mutationFn: async (id: string) => {
       setDeleteLoadingId(id);

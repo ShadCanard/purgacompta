@@ -6,24 +6,9 @@ import { useUser } from '@/providers/UserProvider';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
+import { GET_LOGS } from '@/lib/queries';
 
-const GET_LOGS = gql`
-  query Logs($filter: LogFilterInput, $skip: Int, $take: Int) {
-    logs(filter: $filter, skip: $skip, take: $take) {
-      id
-      action
-      entity
-      entityId
-      diff
-      createdAt
-      user {
-        id
-        name
-        role
-      }
-    }
-  }
-`;
+
 
 const ACTIONS = [
   { value: '', label: 'Toutes' },
@@ -56,7 +41,7 @@ const LogsPage: React.FC = () => {
     queryKey: ['users'],
     queryFn: async () => {
       const { data } = await apolloClient.query({ query: GET_USERS, fetchPolicy: 'network-only' });
-      return data.users;
+      return (data as any).users;
     },
   });
 
@@ -76,7 +61,7 @@ const LogsPage: React.FC = () => {
         },
         fetchPolicy: 'network-only',
       });
-      return data.logs;
+      return (data as any).logs;
     },
   });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Button, Stack } from '@mui/material';
+import { Box, Typography, Paper, Button, Stack, Switch } from '@mui/material';
 import ConfirmModal from '@/components/layout/ConfirmModal';
 import AddIcon from '@mui/icons-material/Add';
 import CreateUpdateItemModal from '@/components/items/CreateUpdateItemModal';
@@ -8,43 +8,9 @@ import MainLayout from '@/components/layout/MainLayout';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
-
-const CREATE_ITEM = gql`
-  mutation CreateItem($input: CreateItemInput!) {
-    createItem(input: $input) {
-      id
-      name
-      weight
-    }
-  }
-`;
-
-const UPDATE_ITEM = gql`
-  mutation UpdateItem($input: UpdateItemInput!) {
-    updateItem(input: $input) {
-      id
-      name
-      weight
-    }
-  }
-`;
-
-const DELETE_ITEM = gql`
-  mutation DeleteItem($id: ID!) {
-    deleteItem(id: $id)
-  }
-`;
-const GET_ITEMS = gql`
-  query Items {
-    items {
-      id
-      name
-      weight
-    }
-  }
-`;
+import { CREATE_ITEM, UPDATE_ITEM, DELETE_ITEM } from '@/lib/mutations';
+import { GET_ITEMS } from '@/lib/queries';
 
 const ActionsCell: React.FC<{ row: any; onEdit: (row: any) => void; onDelete: (row: any) => void }> = ({ row, onEdit, onDelete }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -66,12 +32,22 @@ const ActionsCell: React.FC<{ row: any; onEdit: (row: any) => void; onDelete: (r
 
 const columns: GridColDef[] = [
   { field: 'name', headerName: 'Nom', flex: 1, minWidth: 180 },
-  { field: 'weight', headerName: 'Poids (kg)', flex: 1, minWidth: 120, type: 'number',
+  { field: 'weight', headerName: 'Poids (kg)', minWidth: 120, type: 'number',
     valueFormatter: (params) => {
       if (!params || typeof params.value !== 'number') return '';
       return params.value.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     }
   },
+  { field: 'sellable', headerName: 'Vente possible', minWidth: 180,
+    renderCell: (params: GridRenderCellParams) => (
+      <Switch checked={params.value} disabled />
+    )
+  },
+  { field: 'weapon', headerName: 'Arme', minWidth: 180,
+    renderCell: (params: GridRenderCellParams) => (
+      <Switch checked={params.value} disabled />
+    )
+   },
   {
     field: 'actions',
     headerName: '',
@@ -92,7 +68,7 @@ const ItemsSettingsPage: React.FC = () => {
     queryKey: ['items'],
     queryFn: async () => {
       const result = await apolloClient.query({ query: GET_ITEMS, fetchPolicy: 'network-only' });
-      return result.data.items;
+      return (result.data as any).items;
     },
   });
 
@@ -100,7 +76,7 @@ const ItemsSettingsPage: React.FC = () => {
   const [modalLoading, setModalLoading] = useState(false);
 
   const createItemMutation = useMutation({
-    mutationFn: async (input: { name: string; weight: number }) => {
+    mutationFn: async (input: { name: string; weight: number, sellable: boolean; weapon: boolean }) => {
       setModalLoading(true);
       await apolloClient.mutate({
         mutation: CREATE_ITEM,
@@ -122,7 +98,7 @@ const ItemsSettingsPage: React.FC = () => {
     setOpenModal(false);
     setModalLoading(false);
   };
-  const handleCreateItem = (data: { name: string; weight: number }) => {
+  const handleCreateItem = (data: { name: string; weight: number, sellable: boolean; weapon: boolean }) => {
     createItemMutation.mutate(data);
   };
 
@@ -134,7 +110,7 @@ const ItemsSettingsPage: React.FC = () => {
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; item: any | null }>({ open: false, item: null });
 
   const updateItemMutation = useMutation({
-    mutationFn: async (input: { id: string; name: string; weight: number }) => {
+    mutationFn: async (input: { id: string; name: string; weight: number, sellable: boolean; weapon: boolean }) => {
       setEditLoading(true);
       await apolloClient.mutate({
         mutation: UPDATE_ITEM,

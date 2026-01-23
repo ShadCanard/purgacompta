@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Stack, Button, TextField, MenuItem, Autocomplete, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import MainLayout from '@/components/layout/MainLayout';
 import { Add, Delete } from '@mui/icons-material';
@@ -17,6 +17,10 @@ const GET_ITEM_PRICES = gql`
       group { id name }
     }
   }
+`;
+
+const MY_GROUP = gql`
+  query MyGroup { myGroup { id } }
 `;
 
 const GET_GROUPS = gql`
@@ -38,6 +42,7 @@ const TransactionsPage: React.FC = () => {
         return (result.data as any).itemPrices;
       },
     });
+  
   const [type, setType] = useState<'IN' | 'OUT'>('IN');
   // Pour les transactions sortantes, le groupe source est toujours 'Purgatory'
   const [groupOrContact, setGroupOrContact] = useState<any>(null);
@@ -45,12 +50,29 @@ const TransactionsPage: React.FC = () => {
   const [targetGroup, setTargetGroup] = useState<any>(null);
   const [items, setItems] = useState<any[]>([{ item: null, quantity: 1, price: 0 }]);
   const [reduction, setReduction] = useState<number>(0);
+  const [purgatoryId, setPurgatoryId] = useState<string>('');
+
+  useEffect(() => {
+    // Récupère l'ID du groupe 'Purgatory'
+    apolloClient.query({ query: MY_GROUP }).then(result => {
+      const myGroup = (result.data as any).myGroup;
+      setPurgatoryId(myGroup.id);
+    });
+  }, []);
 
   const { data: groups = [] } = useQuery({
     queryKey: ['groups'],
     queryFn: async () => {
       const result = await apolloClient.query({ query: GET_GROUPS });
       return (result.data as any).groups;
+    },
+  });
+
+  const { data: purgatory } = useQuery({
+    queryKey: ['myGroup'],
+    queryFn: async () => {
+      const result = await apolloClient.query({ query: MY_GROUP });
+      return (result.data as any).myGroup;
     },
   });
   const { data: contacts = [] } = useQuery({
@@ -170,7 +192,11 @@ const TransactionsPage: React.FC = () => {
                                   (p: any) => p.item.id === item.id && p.group.id === targetGroup.id
                                 )
                               )
-                            : allItems
+                            : type === 'IN' ? allItems.filter((item: any) =>
+                                itemPrices.some(
+                                  (p: any) => p.item.id === item.id && p.group.id === purgatoryId
+                                )
+                              ) : []
                         }
                         getOptionLabel={i => i?.name || ''}
                         value={row.item}

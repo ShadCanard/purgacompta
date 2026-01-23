@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField, Button, Stack
+  TextField, Button, Stack,
+  Switch,
+  FormGroup,
+  FormControl,
+  FormControlLabel
 } from '@mui/material';
 
 interface CreateUpdateItemModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: { name: string; weight: number }) => void;
-  initialData?: { name: string; weight: number } | null;
+  onSubmit: (data: { name: string; weight: number; sellable: boolean; weapon: boolean }) => void;
+  initialData?: { name: string; weight: number; sellable: boolean; weapon: boolean } | null;
   loading?: boolean;
 }
 
@@ -21,15 +25,22 @@ const CreateUpdateItemModal: React.FC<CreateUpdateItemModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [weight, setWeight] = useState('');
+  const [weapon, setWeapon] = useState(false);
+  const [sellable, setSellable] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (initialData) {
+      console.dir(initialData);
       setName(initialData.name);
       setWeight(initialData.weight.toString().replace('.', ','));
+      setSellable(initialData.sellable || false);
+      setWeapon(initialData.weapon || false);
     } else {
       setName('');
       setWeight('');
+      setSellable(false);
+      setWeapon(false);
     }
     setError('');
   }, [open, initialData]);
@@ -45,7 +56,7 @@ const CreateUpdateItemModal: React.FC<CreateUpdateItemModalProps> = ({
       return;
     }
     setError('');
-    onSubmit({ name: name.trim(), weight: weightValue });
+    onSubmit({ name: name.trim(), weight: weightValue, sellable: sellable, weapon: weapon });
   };
 
   return (
@@ -70,6 +81,28 @@ const CreateUpdateItemModal: React.FC<CreateUpdateItemModalProps> = ({
             helperText="Utilisez une virgule pour les décimales."
           />
           {error && <span style={{ color: 'red', fontSize: 13 }}>{error}</span>}
+          <FormGroup>
+            <FormControlLabel 
+            control={
+              <Switch
+                checked={weapon}
+                onChange={e => setWeapon(e.target.checked)}
+                disabled={loading}
+              />
+            }
+            label="Arme"
+            />
+            <FormControlLabel 
+            control={
+              <Switch
+                checked={sellable}
+                onChange={e => setSellable(e.target.checked)}
+                disabled={loading}
+              />
+            }
+            label="Vente possible"
+            />
+          </FormGroup>
         </Stack>
       </DialogContent>
       <DialogActions>

@@ -6,55 +6,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
-import CreateUpdateItemPriceModal from '@/components/prices/CreateUpdateItemPriceModal';
 import ConfirmModal from '@/components/layout/ConfirmModal';
 import { formatDollar } from '@/lib/utils';
 import ActionsMenu from '@/components/layout/ActionsMenu';
 import { Edit, HorizontalRule } from '@mui/icons-material';
-
-const DELETE_ITEM_PRICE = gql`
-  mutation DeleteItemPrice($id: ID!) {
-    deleteItemPrice(id: $id)
-  }
-`;
-
-const CREATE_ITEM_PRICE = gql`
-  mutation CreateItemPrice($input: CreateItemPriceInput!) {
-    createItemPrice(input: $input) {
-      id
-      price
-      item { id name }
-      group { id name }
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const GET_ITEMS = gql`
-  query Items {
-    items { id name }
-  }
-`;
-
-const GET_GROUPS = gql`
-  query Groups {
-    groups { id name }
-  }
-`;
-
-const GET_ITEM_PRICES = gql`
-  query ItemPrices {
-    itemPrices {
-      id
-      price
-      item { id name }
-      group { id name }
-      createdAt
-      updatedAt
-    }
-  }
-`;
+import { CREATE_ITEM_PRICE, DELETE_ITEM_PRICE, UPDATE_ITEM_PRICE } from '@/lib/mutations';
+import { GET_ITEM_PRICES, GET_ITEMS, GET_PURGATORY } from '@/lib/queries';
 
 interface Group {
   id: string;
@@ -107,19 +64,6 @@ type ItemPrice = {
     },
   ];
 
-const UPDATE_ITEM_PRICE = gql`
-  mutation UpdateItemPrice($input: UpdateItemPriceInput!) {
-    updateItemPrice(input: $input) {
-      id
-      price
-      item { id name }
-      group { id name }
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
 const PricesPage: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [editPrice, setEditPrice] = useState<any | null>(null);
@@ -128,7 +72,7 @@ const PricesPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; price: any | null }>({ open: false, price: null });
-  const [selectedGroup, setSelectedGroup] = useState<string>('');
+  const [groupId, setGroupId] = useState<string>('');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
   const [price, setPrice] = useState<string>('');
 
@@ -194,18 +138,19 @@ const PricesPage: React.FC = () => {
       return (result.data as any).itemPrices;
     },
   });
-  const { data: items = [] } = useQuery<{ id: string; name: string }[]>({
+  const { data: items = [] } = useQuery<{ id: string; name: string; sellable?: boolean }[]>({
     queryKey: ['items'],
     queryFn: async () => {
       const result = await apolloClient.query({ query: GET_ITEMS });
       return (result.data as any).items;
     },
   });
-  const { data: groups = [] } = useQuery<{ id: string; name: string }[]>({
-    queryKey: ['groups'],
+  const { data: group } = useQuery<{ id: string; name: string }[]>({
+    queryKey: ['myGroup'],
     queryFn: async () => {
-      const result = await apolloClient.query({ query: GET_GROUPS });
-      return (result.data as any).groups;
+      const result = await apolloClient.query({ query: GET_PURGATORY });
+      setGroupId((result.data as any).myGroup.id);
+      return (result.data as any).myGroup;
     },
   });
 
@@ -220,18 +165,18 @@ const PricesPage: React.FC = () => {
   const handleCancelDelete = () => setConfirmDelete({ open: false, price: null });
 
   const handleAddItem = () => {
-    if (selectedGroup && selectedItemId && price) {
+    if (selectedItemId && price) {
       createItemPriceMutation.mutate({
         itemId: selectedItemId,
-        groupId: selectedGroup,
+        groupId: groupId,
         price: parseFloat(price.replace(',', '.')) || 0,
       });
     }
   }
 
   // Filtrage par groupe
-  const filteredPrices = selectedGroup
-    ? (itemPrices || []).filter((row: any) => row.group?.id === selectedGroup)
+  const filteredPrices = groupId
+    ? (itemPrices || []).filter((row: any) => row.group?.id === groupId)
     : (itemPrices || []);
   // Injection des handlers dans chaque ligne
   const rows = filteredPrices.map((row: any) => ({ ...row, onEdit: handleEdit, onDelete: handleDelete }));
@@ -245,39 +190,22 @@ const PricesPage: React.FC = () => {
             Prix des objets par groupe
           </Typography>
         </Stack>
-        <Stack direction="row" alignItems="center" spacing={2} mt={2}>
-          <Autocomplete
-            size="small"
-            sx={{ minWidth: 220 }}
-            options={groups}
-            getOptionLabel={(option: any) => option?.name || ''}
-            value={groups.find((g: any) => g.id === selectedGroup) || undefined}
-            onChange={(_, value) => setSelectedGroup(value ? value.id : '')}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            renderInput={(params) => (
-              <TextField {...params} label="Filtrer par groupe" placeholder="Groupe..." />
-            )}
-            clearOnEscape
-            disableClearable
-          />
-        </Stack>
       </Box>
-      {selectedGroup && (
         <Paper sx={{ p: 2, mb: 2 }}>
           <Stack direction="row" spacing={2} alignItems="center" mb={2}>
             <Autocomplete
-            size="small"
-            sx={{ minWidth: 220 }}
-            options={items}
-            getOptionLabel={(option: any) => option?.name || ''}
-            value={items.find((i: any) => i.id === selectedItemId) || null}
-            onChange={(_, value) => setSelectedItemId(value ? value.id : '')}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            renderInput={(params) => (
-              <TextField {...params} label="Objet" placeholder="Objet..." />
-            )}
-            clearOnEscape
-          />
+              size="small"
+              sx={{ minWidth: 220 }}
+              options={items.filter((item: any) => item.sellable !== false)}
+              getOptionLabel={(option: any) => option?.name || ''}
+              value={items.find((i: any) => i.id === selectedItemId) || null}
+              onChange={(_, value) => setSelectedItemId(value ? value.id : '')}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              renderInput={(params) => (
+                <TextField {...params} label="Objet" placeholder="Objet..." />
+              )}
+              clearOnEscape
+            />
           <TextField
             autoFocus
             label="Prix"
@@ -308,7 +236,6 @@ const PricesPage: React.FC = () => {
             }}
           />
         </Paper>
-      )}
 
       <ConfirmModal
         open={confirmDelete.open}

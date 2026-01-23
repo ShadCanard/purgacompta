@@ -7,24 +7,7 @@ import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
 import { formatDollar } from '@/lib/utils';
-
-const GET_MEMBERS = gql`
-  query Members {
-    users {
-      id
-      username
-      name
-      email
-      avatar
-      role
-      createdAt
-      updatedAt
-      isOnline
-      balance
-      maxBalance
-    }
-  }
-`;
+import { GET_MEMBERS } from '@/lib/queries';
 
 type User = {
     id: string;
