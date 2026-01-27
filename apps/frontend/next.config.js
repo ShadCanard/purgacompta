@@ -10,9 +10,7 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    forceWebpackBuild: true,
-  },
+  // experimental: {},
 };
 
 module.exports = nextConfig;

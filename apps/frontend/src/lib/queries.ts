@@ -1,3 +1,14 @@
+import { gql } from "@apollo/client";
+
+export const GET_SETTINGS = gql`
+  query GetSettings {
+    settings {
+      id
+      name
+      value
+    }
+  }
+`;
 // VehicleUser
 export const GET_VEHICLE_USERS = gql`
   query VehicleUsers {
@@ -40,7 +51,6 @@ export const GET_VEHICLE_USERS_BY_USER = gql`
     }
   }
 `;
-import { gql } from "@apollo/client";
 
 export const GET_TRANSACTIONS_BY_ENTITY = gql`
   query GetTransactionsByEntity($entityId: ID!) {
@@ -128,6 +138,7 @@ export const GET_CURRENT_USER = gql`
       isOnline
       balance
       maxBalance
+      data
     }
   }
 `;
@@ -233,6 +244,7 @@ export const GET_MEMBERS = gql`
       isOnline
       balance
       maxBalance
+      data
     }
   }
 `;

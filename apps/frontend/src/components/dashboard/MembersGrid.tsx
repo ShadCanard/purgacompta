@@ -1,30 +1,31 @@
 
 import React from 'react';
 import {
-  Avatar,
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  CircularProgress,
-  Switch,
+    Avatar,
+    Box,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Typography,
+    CircularProgress,
+    Switch,
 } from '@mui/material';
-import apolloClient from '@/lib/apolloClient';
+import { getApolloClient } from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@/providers/UserProvider';
 import { formatDollar } from '@/lib/utils';
 import { User } from '@/lib/types';
 import { GET_MEMBERS } from '@/lib/queries';
 
-const MembersGrid: React.FC = () => {
+const MembersGrid: React.FC<{ refresh?: number }> = ({ refresh = 0 }) => {
   const { user: currentUser } = useUser();
+  const apolloClient = getApolloClient();
   const { data, isLoading } = useQuery<User[]>({
-    queryKey: ['dashboard-members'],
+    queryKey: ['dashboard-members', refresh],
     queryFn: async () => {
       const result = await apolloClient.query({ query: GET_MEMBERS, fetchPolicy: 'network-only' });
       const users = (result.data as { users: User[] }).users;

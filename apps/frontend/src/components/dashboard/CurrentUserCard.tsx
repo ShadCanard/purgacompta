@@ -10,39 +10,30 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { useUser } from '@/providers/UserProvider';
-import apolloClient from '@/lib/apolloClient';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/lib/useSnackbar';
-import { UPDATE_USER_ONLINE } from '@/lib/mutations';
-// Mutation pour mettre à jour le statut en ligne
+import { useUpdateUser } from '@/providers/UserProvider';
 
 const CurrentUserCard: React.FC = () => {
   const { user, loading, refetch } = useUser();
-  const queryClient = useQueryClient();
-
   const { notify } = useSnackbar();
-  const { mutate: updateOnline, isLoading: isUpdating } = useMutation({
-    mutationFn: async (isOnline: boolean) => {
-      await apolloClient.mutate({
-        mutation: UPDATE_USER_ONLINE,
-        variables: { discordId: user?.discordId, isOnline },
-      });
-    },
-    onSuccess: () => {
-      refetch();
-      queryClient.invalidateQueries({ queryKey: ['dashboard-members'] });
-      notify('Statut en ligne mis à jour', 'success');
-    },
-    onError: (err: any) => {
-      notify(err?.message || 'Erreur lors de la mise à jour du statut', 'error');
-    },
-  });
+  const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
 
   if (loading || !user) return null;
 
   const handleToggleOnline = () => {
-    if (!isUpdating) {
-      updateOnline(!user.isOnline);
+    if (!isUpdating && user) {
+      updateUser(
+        { id: user.id, input: { isOnline: !user.isOnline } },
+        {
+          onSuccess: () => {
+            refetch();
+            notify('Statut en ligne mis à jour', 'success');
+          },
+          onError: (err: any) => {
+            notify(err?.message || 'Erreur lors de la mise à jour du statut', 'error');
+          },
+        }
+      );
     }
   };
 

@@ -7,7 +7,7 @@ import { useSnackbar } from '@/providers';
 import apolloClient from '@/lib/apolloClient';
 import { useUser } from '@/providers/UserProvider';
 import { GET_MEMBERS } from '@/lib/queries';
-import { UPDATE_USER_ROLE, UPDATE_USER_NAME, UPDATE_USER_PHONE } from '@/lib/mutations';
+import { UPDATE_USER } from '@/lib/mutations';
 
 const USER_ROLES = [
   { value: 'GUEST', label: 'Guest' },
@@ -30,39 +30,11 @@ const UsersPage: React.FC = () => {
       return (result.data as any).users;
     },
   });
-  // Mutation pour changer le numéro de téléphone d'un utilisateur
+  // Mutation unifiée pour mettre à jour un utilisateur (nom, téléphone, rôle...)
   const { notify } = useSnackbar();
-  const { mutate: updateUserPhone, isLoading: isUpdatingPhone } = useMutation({
-    mutationFn: async ({ discordId, phone }: { discordId: string; phone: string }) => {
-      await apolloClient.mutate({ mutation: UPDATE_USER_PHONE, variables: { input: { discordId, phone } }, });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-      notify('Succès', 'success');
-    },
-    onError: (err: any) => {
-      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
-    },
-  });
-
-  // Mutation pour changer le rôle d'un utilisateur
-  const { mutate: updateUserRole, isLoading: isUpdatingRole } = useMutation({
-    mutationFn: async ({ discordId, role }: { discordId: string; role: string }) => {
-      await apolloClient.mutate({ mutation: UPDATE_USER_ROLE, variables: { input: { discordId, role } },});
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-      notify('Succès', 'success');
-    },
-    onError: (err: any) => {
-      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
-    },
-  });
-
-  // Mutation pour changer le nom affiché d'un utilisateur
-  const { mutate: updateUserName, isLoading: isUpdatingName } = useMutation({
-    mutationFn: async ({ discordId, name }: { discordId: string; name: string }) => {
-      await apolloClient.mutate({ mutation: UPDATE_USER_NAME, variables: { input: { discordId, name } }, });
+  const { mutate: updateUser, isLoading: isUpdatingUser } = useMutation({
+    mutationFn: async ({ id, input }: { id: string; input: any }) => {
+      await apolloClient.mutate({ mutation: UPDATE_USER, variables: { id, input } });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -108,7 +80,7 @@ const UsersPage: React.FC = () => {
               if (e.key === 'Enter') {
                 const newName = nameEditRows[params.id as string];
                 if (newName && newName !== params.value) {
-                  updateUserName({ discordId: params.row.discordId, name: newName });
+                  updateUser({ id: params.row.id, input: { name: newName } });
                 }
               }
             }}
@@ -134,7 +106,7 @@ const UsersPage: React.FC = () => {
               if (e.key === 'Enter') {
                 const newPhone = phoneEditRows[params.id as string];
                 if (newPhone && newPhone !== params.value && newPhone.startsWith('555-')) {
-                  updateUserPhone({ discordId: params.row.discordId, phone: newPhone });
+                  updateUser({ id: params.row.id, input: { phone: newPhone } });
                 }
               }
             }}
@@ -165,7 +137,7 @@ const UsersPage: React.FC = () => {
               value={USER_ROLES.find(r => r.value === user.role) || null}
               onChange={(_, value) => {
                 if (value && !disabled) {
-                  updateUserRole({ discordId: user.discordId, role: value.value });
+                  updateUser({ id: user.id, input: { role: value.value } });
                 }
               }}
               size='small'

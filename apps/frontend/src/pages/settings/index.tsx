@@ -8,7 +8,7 @@ const SettingsPage: React.FC = () => {
     <MainLayout>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
-          Paramètres
+          Paramètres (sans Setting ou Settings)
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Gérer les paramètres de l'application et les autorisations des membres.

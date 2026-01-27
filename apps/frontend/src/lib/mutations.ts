@@ -1,6 +1,25 @@
 import { gql } from "@apollo/client";
 
-// VehicleUser
+export const UPDATE_USER = gql`
+  mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
+    updateUser(id: $id, input: $input) {
+      id
+      discordId
+      username
+      name
+      email
+      avatar
+      isOnline
+      balance
+      maxBalance
+      role
+      createdAt
+      updatedAt
+      phone
+      data
+    }
+  }
+`;
 
 export const SET_VEHICLE_USER = gql`
   mutation setVehicleUser($input: SetVehicleUserInput!) {
@@ -188,49 +207,9 @@ export const DELETE_ITEM = gql`
   }
 `;
 
-export const UPDATE_USER_ROLE = gql`
-  mutation UpdateUserRole($input: UpdateUserRoleInput!) {
-    updateUserRole(input: $input) {
-      id
-      discordId
-      username
-      avatar
-      role
-    }
-  }
-`;
 
-export const UPDATE_USER_NAME = gql`
-  mutation UpdateUserName($input: UpdateUserNameInput!) {
-    updateUserName(input: $input) {
-      id
-      discordId
-      username
-      name
-      avatar
-      role
-    }
-  }
-`;
 
-export const UPDATE_USER_PHONE = gql`
-  mutation UpdateUserPhone($input: UpdateUserPhoneInput!) {
-    updateUserPhone(input: $input) {
-      discordId
-      phone
-    }
-  }
-`;
 
-export const UPDATE_USER_ONLINE = gql`
-  mutation UpdateUserOnline($discordId: String!, $isOnline: Boolean!) {
-    updateUserOnline(discordId: $discordId, isOnline: $isOnline) {
-      id
-      discordId
-      isOnline
-    }
-  }
-`;
 
 export const CREATE_VEHICLE = gql`
   mutation CreateVehicle($input: CreateVehicleInput!) {

@@ -1,40 +1,30 @@
-import React, { createContext, useContext, ReactNode } from 'react';
-import { useSession } from 'next-auth/react';
-import apolloClient from '@/lib/apolloClient';
-import { useQuery as useTanstackQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { getApolloClient } from '@/lib/apolloClient';
+import { UPDATE_USER } from '@/lib/mutations';
 import { GET_CURRENT_USER } from '@/lib/queries';
+import { User, UserRole, UserData } from '@/lib/types';
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
+import { ReactNode, useContext, createContext } from 'react';
+import { USER_UPDATED } from '@/lib/subscriptions';
 
-// Types pour l'utilisateur
-export type UserRole = 'GUEST' | 'MEMBER' | 'MANAGER' | 'ADMIN' | 'OWNER';
-
-export interface User {
-  id: string;
-  discordId: string;
-  username: string;
-  name: string;
-  email?: string;
-  avatar?: string;
-  isOnline?: boolean;
-  balance?: number;
-  maxBalance?: number;
-  role: UserRole;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface UserContextType {
+interface UserContextType {
   user: User | null;
   loading: boolean;
   error: Error | null;
   refetch: () => void;
-  hasPermission: (requiredRole: UserRole) => boolean;
+  hasPermission: (role: UserRole) => boolean;
   canCreate: boolean;
   canRead: boolean;
   canUpdate: boolean;
   canDelete: boolean;
 }
 
-// Hiérarchie des rôles pour les permissions
+const UserContext = createContext<UserContextType | null>(null);
+function getDefaultUserData(): UserData {
+  return { managingTablet: false };
+}
+
 const roleHierarchy: Record<UserRole, number> = {
   GUEST: 0,
   MEMBER: 1,
@@ -43,7 +33,6 @@ const roleHierarchy: Record<UserRole, number> = {
   OWNER: 4,
 };
 
-// Permissions CRUD par rôle
 const rolePermissions: Record<UserRole, { create: boolean; read: boolean; update: boolean; delete: boolean }> = {
   GUEST: { create: false, read: true, update: false, delete: false },
   MEMBER: { create: true, read: true, update: false, delete: false },
@@ -52,35 +41,52 @@ const rolePermissions: Record<UserRole, { create: boolean; read: boolean; update
   OWNER: { create: true, read: true, update: true, delete: true },
 };
 
-// Query GraphQL pour récupérer l'utilisateur connecté
+export const UserProvider = ({ children }: { children: ReactNode }) => {
+    const { data: session, status } = useSession();
+    const discordId = (session?.user as any)?.discordId;
+    const queryClient = useQueryClient();
 
+  useEffect(() => {
+    if (!discordId) return;
+    const apolloClient = getApolloClient();
+    const sub = apolloClient.subscribe({ query: USER_UPDATED }).subscribe({
+      next: (result: any) => {
+        const { data } = result;
+        if (data?.userUpdated?.discordId === discordId) {
+          queryClient.invalidateQueries({ queryKey: ['currentUser', discordId] });
+        }
+      },
+      error: () => {},
+    });
+    return () => sub.unsubscribe();
+  }, [discordId, queryClient]);
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
-
-interface UserProviderProps {
-  children: ReactNode;
-}
-
-export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const { data: session, status } = useSession();
-  const discordId = (session?.user as any)?.discordId;
-
-  // Utilisation de TanStack Query pour récupérer l'utilisateur
   const {
     data,
     isLoading,
     error,
     refetch,
-  } = useTanstackQuery({
+  } = useQuery({
     queryKey: ['currentUser', discordId],
     queryFn: async () => {
       if (!discordId) return null;
-      const result = await apolloClient.query({
+      const apolloClient = getApolloClient();
+      const { data } = await apolloClient.query({
         query: GET_CURRENT_USER,
         variables: { discordId },
         fetchPolicy: 'network-only',
       });
-      return (result.data as any).user as User;
+      const user = (data as any).user as User | null;
+      if (user && typeof user.data === 'string') {
+        try {
+          user.data = JSON.parse(user.data);
+        } catch {
+          user.data = getDefaultUserData();
+        }
+      } else if (user && typeof user.data !== 'object') {
+        user.data = getDefaultUserData();
+      }
+      return user;
     },
     enabled: !!discordId,
     refetchOnWindowFocus: false,
@@ -90,13 +96,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const loading = status === 'loading' || isLoading;
   const queryError = error instanceof Error ? error : error ? new Error('Erreur inconnue') : null;
 
-  // Vérifier si l'utilisateur a au moins le rôle requis
-  const hasPermission = (requiredRole: UserRole): boolean => {
-    if (!user) return false;
-    return roleHierarchy[user.role] >= roleHierarchy[requiredRole];
-  };
+  const hasPermission = (requiredRole: UserRole): boolean =>
+    !!user && roleHierarchy[user.role] >= roleHierarchy[requiredRole];
 
-  // Permissions CRUD basées sur le rôle
   const currentPermissions = user ? rolePermissions[user.role] : rolePermissions.GUEST;
 
   const value: UserContextType = {
@@ -114,12 +116,34 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
+// Hook pour accéder au contexte utilisateur
 export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
-  if (context === undefined) {
-    throw new Error('useUser must be used within a UserProvider');
-  }
+  if (!context) throw new Error('useUser must be used within a UserProvider');
   return context;
 };
 
+// Hook pour la mutation universelle de l'utilisateur
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, input }: { id: string; input: Partial<User> & { data?: UserData } }) => {
+      // Si input.data est un objet, sérialiser en string
+      const inputToSend = { ...input };
+      if (inputToSend.data && typeof inputToSend.data === 'object') {
+        (inputToSend as any).data = JSON.stringify(inputToSend.data);
+      }
+      const apolloClient = getApolloClient();
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_USER,
+        variables: { id, input: inputToSend },
+      });
+      return (data as any).updateUser;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
 export default UserProvider;

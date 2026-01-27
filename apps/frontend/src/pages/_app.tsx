@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import theme from '@/styles/theme';
-import apolloClient from '@/lib/apolloClient';
+import { getApolloClient } from '@/lib/apolloClient';
 import { UserProvider } from '@/providers/UserProvider';
 import { SnackbarProvider } from '@/providers';
 
@@ -25,7 +25,7 @@ const queryClient = new QueryClient({
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <SessionProvider session={session}>
-      <ApolloProvider client={apolloClient}>
+      <ApolloProvider client={getApolloClient()}>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={theme}>
             <CssBaseline />

@@ -1,8 +1,48 @@
 
 import prisma from '../lib/prisma';
-import { PubSub } from 'graphql-subscriptions';
 
-const pubsub = new PubSub();
+
+// PubSub maison basé sur EventEmitter (compatible Apollo Server v4+)
+import { EventEmitter } from 'events';
+const emitter = new EventEmitter();
+const pubsub = {
+  asyncIterator: (triggers: string[]) => {
+    const event = triggers[0];
+    const queue: any[] = [];
+    let listening = true;
+    const pushValue = (value: any) => {
+      if (listening) queue.push({ value, done: false });
+    };
+    emitter.on(event, pushValue);
+    const asyncIterator = {
+      async next() {
+        while (queue.length === 0 && listening) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        if (!listening) {
+          return { value: undefined, done: true };
+        }
+        return queue.shift() || { value: undefined, done: true };
+      },
+      async return() {
+        listening = false;
+        emitter.off(event, pushValue);
+        return { value: undefined, done: true };
+      },
+      async throw(error: any) {
+        listening = false;
+        emitter.off(event, pushValue);
+        throw error;
+      },
+      [Symbol.asyncIterator]() { return this; }
+    };
+    return asyncIterator;
+  },
+  publish: (event: string, payload: any) => {
+    emitter.emit(event, payload);
+    return Promise.resolve(true);
+  }
+};
 
 // Types pour les inputs
 
@@ -33,6 +73,14 @@ function formatDate(date: string | Date | null | undefined): string {
 }
 
 export const resolvers = {
+    Subscription: {
+      userUpdated: {
+        subscribe: () => pubsub.asyncIterator(['USER_UPDATED'])
+      },
+      vehicleUserChanged: {
+        subscribe: () => pubsub.asyncIterator(['VEHICLE_USER_CHANGED'])
+      }
+    },
   Vehicle: {
     vehicleUsers: (parent: any) => prisma.vehicleUser.findMany({ where: { vehicleId: parent.id } }),
   },
@@ -76,6 +124,7 @@ export const resolvers = {
     isOnline: (parent: any) => parent.isOnline,
     maxBalance: (parent: any) => parent.maxBalance,
     phone: (parent: any) => parent.phone,
+    data: (parent: any) => parent.data,
   },
   Log: {
     createdAt: (parent: any) => formatDate(parent.createdAt),
@@ -86,8 +135,7 @@ export const resolvers = {
       return prisma.group.findUnique({ where: { id: parent.groupId } });
     },
   },
-
-    Item: {
+  Item: {
     createdAt: (parent: any) => formatDate(parent.createdAt),
     updatedAt: (parent: any) => formatDate(parent.updatedAt),
   },
@@ -295,11 +343,7 @@ export const resolvers = {
     },
   },
 
-  Subscription: {
-    vehicleUserChanged: {
-      subscribe: () => pubsub.asyncIterator(['VEHICLE_USER_CHANGED'])
-    }
-  },
+  // Subscription fusionnée ci-dessus
   Mutation: {
     // VehicleUser CRUD
     setVehicleUser: async (_: any, { input }: { input: { vehicleId?: string; userId: string; found?: boolean } }) => {
@@ -308,7 +352,7 @@ export const resolvers = {
         const existing = await prisma.vehicleUser.findFirst({ where: { userId: input.userId } });
         if (existing) {
           await prisma.vehicleUser.delete({ where: { id: existing.id } });
-          pubsub.publish('VEHICLE_USER_CHANGED', { vehicleUserChanged: existing });
+          // pubsub.publish('VEHICLE_USER_CHANGED', { vehicleUserChanged: existing });
         }
         return null;
       }
@@ -325,7 +369,7 @@ export const resolvers = {
           found: input.found ?? false,
         },
       });
-      pubsub.publish('VEHICLE_USER_CHANGED', { vehicleUserChanged: created });
+      // pubsub.publish('VEHICLE_USER_CHANGED', { vehicleUserChanged: created });
       return created;
     },
     setVehicleUserFound: async (_: any, { input }: { input: { id: string; found: boolean } }) => {
@@ -439,69 +483,7 @@ export const resolvers = {
       });
       return user;
     },
-    // Mettre à jour le nom affiché d'un utilisateur
-    updateUserName: async (_: any, { input }: { input: UpdateUserNameInput }, context: any) => {
-      const { discordId, name } = input;
-      const before = await prisma.user.findUnique({ where: { discordId } });
-      const user = await prisma.user.update({
-        where: { discordId },
-        data: { name },
-      });
-      await prisma.log.create({
-        data: {
-          action: 'UPDATE',
-          entity: 'User',
-          entityId: user.id,
-          userId: context.user?.id || user.id,
-          diff: JSON.stringify({ before, after: user }),
-        },
-      });
-      return user;
-    },
-
-    // Mettre à jour le rôle d'un utilisateur
-    updateUserRole: async (_: any, { input }: { input: UpdateUserRoleInput }, context: any) => {
-      const { discordId, role } = input;
-      const validRoles = ['GUEST', 'MEMBER', 'MANAGER', 'ADMIN', 'OWNER'];
-      if (!validRoles.includes(role)) {
-        throw new Error(`Invalid role: ${role}`);
-      }
-      const before = await prisma.user.findUnique({ where: { discordId } });
-      const user = await prisma.user.update({
-        where: { discordId },
-        data: { role },
-      });
-      await prisma.log.create({
-        data: {
-          action: 'UPDATE',
-          entity: 'User',
-          entityId: user.id,
-          userId: context.user?.id || user.id,
-          diff: JSON.stringify({ before, after: user }),
-        },
-      });
-      return user;
-    },
-
-    // Mettre à jour le statut en ligne d'un utilisateur
-    updateUserOnline: async (_: any, { discordId, isOnline }: { discordId: string; isOnline: boolean }, context: any) => {
-      const before = await prisma.user.findUnique({ where: { discordId } });
-      const user = await prisma.user.update({
-        where: { discordId },
-        data: { isOnline },
-      });
-      await prisma.log.create({
-        data: {
-          action: 'UPDATE',
-          entity: 'User',
-          entityId: user.id,
-          userId: context.user?.id || user.id,
-          diff: JSON.stringify({ before, after: user }),
-        },
-      });
-      return user;
-    },
-
+    
     // Supprimer un utilisateur
     deleteUser: async (_: any, { discordId }: { discordId: string }, context: any) => {
       const before = await prisma.user.findUnique({ where: { discordId } });
@@ -666,14 +648,54 @@ export const resolvers = {
       return created;
     },
 
-    updateUserPhone: async (_: any, { input }: { input: { discordId: string; phone: string } }) => {
-      if (!input.phone.startsWith('555-')) {
-        throw new Error('Le numéro doit commencer par 555-');
+    // Mutation unique pour mettre à jour tous les champs d'un utilisateur
+    updateUser: async (_: any, { id, input }: { id: string; input: any }, context: any) => {
+      // Récupère l'utilisateur avant modification pour le log
+      const before = await prisma.user.findUnique({ where: { id } });
+      if (!before) throw new Error("Utilisateur introuvable");
+      // Prépare les données à mettre à jour (ne met à jour que les champs fournis)
+      const updateData: any = {};
+      const allowedFields = [
+        "username", "name", "email", "avatar", "isOnline", "balance", "maxBalance", "role", "phone", "data"
+      ];
+      for (const key of allowedFields) {
+        if (Object.prototype.hasOwnProperty.call(input, key)) {
+          updateData[key] = input[key];
+        }
       }
-      return prisma.user.update({
-        where: { discordId: input.discordId },
-        data: { phone: input.phone },
+      // Si le champ phone est fourni, vérifier le format
+      if (Object.prototype.hasOwnProperty.call(updateData, "phone") && updateData.phone) {
+        if (!updateData.phone.startsWith("555-")) {
+          throw new Error("Le numéro doit commencer par 555-");
+        }
+      }
+      // Si le champ role est fourni, vérifier la validité
+      if (Object.prototype.hasOwnProperty.call(updateData, "role") && updateData.role) {
+        const validRoles = ["GUEST", "MEMBER", "MANAGER", "ADMIN", "OWNER"];
+        if (!validRoles.includes(updateData.role)) {
+          throw new Error(`Invalid role: ${updateData.role}`);
+        }
+      }
+      // Mise à jour
+      const user = await prisma.user.update({
+        where: { id },
+        data: updateData,
       });
+      // Log
+      await prisma.log.create({
+        data: {
+          action: 'UPDATE',
+          entity: 'User',
+          entityId: user.id,
+          userId: context.user?.id || user.id,
+          diff: JSON.stringify({ before, after: user }),
+        },
+      });
+      // Publish subscription event
+      // Apollo Server v4+ compatible
+      await pubsub.publish('USER_UPDATED', { userUpdated: user });
+      return user;
     },
-  },
-};
+
+    },
+  };

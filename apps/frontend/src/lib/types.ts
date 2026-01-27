@@ -1,3 +1,7 @@
+// Interface pour le champ data (JSON) de User
+export interface UserData {
+  managingTablet: boolean;
+}
 // Interfaces générées à partir des types GraphQL de typeDefs
 
 export enum UserRole {
@@ -113,6 +117,7 @@ export interface User {
   role: UserRole;
   createdAt: string;
   updatedAt: string;
+  data: UserData;
 }
 
 export interface RegisterUserInput {
@@ -122,22 +127,9 @@ export interface RegisterUserInput {
   email?: string;
   avatar?: string;
   phone?: string;
+  data?: UserData;
 }
 
-export interface UpdateUserNameInput {
-  discordId: string;
-  name: string;
-}
-
-export interface UpdateUserRoleInput {
-  discordId: string;
-  role: UserRole;
-}
-
-export interface UpdateUserPhoneInput {
-  discordId: string;
-  phone: string;
-}
 
 export interface ItemPrice {
   id: string;
@@ -173,3 +165,4 @@ export interface ImportContactInput {
   display: string;
   number: string;
 }
+

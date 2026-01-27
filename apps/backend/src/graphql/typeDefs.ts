@@ -1,3 +1,4 @@
+
 export const typeDefs = `#graphql
   # Enum pour les rôles utilisateur
   enum UserRole {
@@ -7,6 +8,8 @@ export const typeDefs = `#graphql
     ADMIN
     OWNER
   }
+
+
 
 
   # Type Vehicle
@@ -42,6 +45,19 @@ export const typeDefs = `#graphql
     name: String!
     front: String!
     back: String!
+  }
+
+  input UpdateUserInput {
+    username: String
+    name: String
+    email: String
+    avatar: String
+    isOnline: Boolean
+    balance: Int
+    maxBalance: Int
+    role: UserRole
+    phone: String
+    data: String
   }
 
   input UpdateVehicleInput {
@@ -152,6 +168,7 @@ export const typeDefs = `#graphql
     createdAt: String!
     updatedAt: String!
     vehicleUsers: [VehicleUser!]!
+    data: String
   }
 
   # Input pour l'enregistrement/mise à jour d'un utilisateur
@@ -162,22 +179,6 @@ export const typeDefs = `#graphql
     email: String
     avatar: String
     phone: String
-  }
-
-  input UpdateUserNameInput {
-    discordId: String!
-    name: String!
-  }
-
-  # Input pour la mise à jour du rôle
-  input UpdateUserRoleInput {
-    discordId: String!
-    role: UserRole!
-  }
-
-  input UpdateUserPhoneInput {
-    discordId: String!
-    phone: String!
   }
 
   input LogFilterInput {
@@ -361,15 +362,6 @@ export const typeDefs = `#graphql
     # Enregistrer ou mettre à jour un utilisateur (appelé lors de la connexion)
     registerOrUpdateUser(input: RegisterUserInput!): User!
 
-    # Mettre à jour le rôle d'un utilisateur (admin only)
-    updateUserRole(input: UpdateUserRoleInput!): User!
-
-    # Mettre à jour le nom affiché d'un utilisateur (admin only)
-    updateUserName(input: UpdateUserNameInput!): User!
-
-    # Mettre à jour le statut en ligne d'un utilisateur
-    updateUserOnline(discordId: String!, isOnline: Boolean!): User!
-
     # Supprimer un utilisateur (owner only)
     deleteUser(discordId: String!): Boolean!
 
@@ -390,7 +382,12 @@ export const typeDefs = `#graphql
     updateItem(input: UpdateItemInput!): Item!
     deleteItem(id: ID!): Boolean!
 
-    # Mettre à jour le téléphone d'un utilisateur
-    updateUserPhone(input: UpdateUserPhoneInput!): User!
+        # Mettre à jour tous les champs d'un utilisateur
+    updateUser(id: ID!, input: UpdateUserInput!): User!
+  }
+
+  # Subscriptions
+  type Subscription {
+    userUpdated: User!
   }
 `;

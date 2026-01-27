@@ -1,34 +1,80 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, createHttpLink, split } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { getSession } from 'next-auth/react';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { createClient } from 'graphql-ws';
+import { getMainDefinition } from '@apollo/client/utilities';
 
-const httpLink = createHttpLink({
-  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
-});
 
-const authLink = setContext(async (_, { headers }) => {
-  let token = null;
+let apolloClient: ApolloClient<any> | null = null;
+
+export function getApolloClient() {
+  if (apolloClient) return apolloClient;
+
+  const httpUri = process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql';
+  const wsUri = httpUri.replace(/^http/, 'ws');
+  console.log('[APOLLO] httpUri =', httpUri);
+  console.log('[APOLLO] wsUri =', wsUri);
+
+  const httpLink = createHttpLink({ uri: httpUri });
+
+  const authLink = setContext(async (_, { headers }) => {
+    let token = null;
+    if (typeof window !== 'undefined') {
+      const session = await getSession();
+      token = session?.user?.purgatoryJwt || null;
+    }
+    return {
+      headers: {
+        ...headers,
+        authorization: token ? `Bearer ${token}` : '',
+      },
+    };
+  });
+
+  let link = authLink.concat(httpLink);
   if (typeof window !== 'undefined') {
-    const session = await getSession();
-    // Utilise le JWT custom généré côté NextAuth
-    token = session?.user?.purgatoryJwt || null;
+    console.log('[APOLLO] Bloc WebSocket exécuté côté navigateur');
+    const wsClient = createClient({
+      url: wsUri,
+      connectionParams: async () => {
+        let token = null;
+        const session = await getSession();
+        token = session?.user?.purgatoryJwt || null;
+        return {
+          headers: {
+            authorization: token ? `Bearer ${token}` : '',
+          },
+        };
+      },
+      on: {
+        connected: () => console.log('[APOLLO][WS] WebSocket GraphQL connecté'),
+        closed: (event) => console.warn('[APOLLO][WS] WebSocket GraphQL fermé', event),
+        error: (err) => console.error('[APOLLO][WS] Erreur WebSocket GraphQL', err),
+      },
+    });
+    const wsLink = new GraphQLWsLink(wsClient);
+    link = split(
+      ({ query }) => {
+        const def = getMainDefinition(query);
+        return (
+          def.kind === 'OperationDefinition' &&
+          def.operation === 'subscription'
+        );
+      },
+      wsLink,
+      authLink.concat(httpLink)
+    );
   }
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : '',
-    },
-  };
-});
 
-const apolloClient = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
-  defaultOptions: {
-    watchQuery: {
-      fetchPolicy: 'cache-and-network',
+  apolloClient = new ApolloClient({
+    link,
+    cache: new InMemoryCache(),
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: 'cache-and-network',
+      },
     },
-  },
-});
-
-export default apolloClient;
+  });
+  return apolloClient;
+}
