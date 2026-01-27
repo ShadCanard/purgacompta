@@ -19,11 +19,9 @@ const VehicleTabletList: React.FC<TabletVehicleListProps> = ({ onImageClick }) =
     // Subscription manuelle pour rafraîchir la liste à chaque update
     useEffect(() => {
       if (!apolloClient) return;
-      console.log('[TABLET] Connexion à la subscription TABLET_UPDATED...');
       const observable = apolloClient.subscribe({ query: TABLET_UPDATED });
       const sub = observable.subscribe({
         next: (event: any) => {
-          console.log('[TABLET] Event reçu TABLET_UPDATED:', event);
           queryClient.invalidateQueries({ queryKey: ['vehicleUsers-tablet'] });
         },
         error: (err: any) => { console.error('Erreur de subscription tablette', err);

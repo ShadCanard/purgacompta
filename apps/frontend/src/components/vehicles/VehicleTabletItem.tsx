@@ -12,7 +12,6 @@ interface TabletVehicleItemProps {
 }
 
 const VehicleTabletItem: React.FC<TabletVehicleItemProps> = ({ vehicle, onImageClick }) => {
-    console.log('VehicleTabletItem vehicle:', vehicle);
 
     const { mutate: setVehicleUser, isPending } = useMutation({
       mutationFn: async () => {

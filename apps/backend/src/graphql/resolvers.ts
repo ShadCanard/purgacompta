@@ -348,7 +348,6 @@ export const resolvers = {
   Mutation: {
     // VehicleUser CRUD
     setVehicleUser: async (_: any, { input }: { input: { vehicleId?: string; userId: string; found?: boolean } }) => {
-      console.log("[SET_VEHICLE_USER] Received", input);
       // Find existing vehicleUser by userId
       const existing = await prisma.vehicleUser.findFirst({ where: { userId: input.userId } });
       let result;
@@ -358,7 +357,6 @@ export const resolvers = {
           where: { id: existing.id },
           data: { vehicleId: input.vehicleId ?? null, found: input.found ?? false },
         });
-        console.log("[SET_VEHICLE_USER] Updated:", result);
       } else {
         // Create new record
         result = await prisma.vehicleUser.create({
@@ -368,7 +366,6 @@ export const resolvers = {
             found: input.found ?? false,
           },
         });
-        console.log("[SET_VEHICLE_USER] Created:", result);
       }
       await pubsub.publish('TABLET_UPDATED', { tabletUpdated: result });
       return result;
