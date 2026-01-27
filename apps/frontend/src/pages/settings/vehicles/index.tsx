@@ -107,7 +107,7 @@ const VehiclesSettingsPage: React.FC = () => {
         <ConfirmModal
           open={confirmOpen}
           title="Supprimer le véhicule ?"
-          description="Cette action est irréversible. Voulez-vous vraiment supprimer ce véhicule ?"
+          content="Cette action est irréversible. Voulez-vous vraiment supprimer ce véhicule ?"
           onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
           onCancel={() => { setConfirmOpen(false); setDeleteId(undefined); }}
           loading={deleteMutation.isPending}
