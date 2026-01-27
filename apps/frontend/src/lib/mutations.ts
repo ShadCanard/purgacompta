@@ -1,3 +1,23 @@
+import { gql } from "@apollo/client";
+
+// VehicleUser
+
+export const SET_VEHICLE_USER = gql`
+  mutation setVehicleUser($input: SetVehicleUserInput!) {
+    setVehicleUser(input: $input) {
+      id
+      found
+      vehicle { id name front back }
+      user { id name username discordId }
+    }
+  }
+`;
+
+export const DELETE_VEHICLE_USER = gql`
+  mutation DeleteVehicleUser($id: ID!) {
+    deleteVehicleUser(id: $id)
+  }
+`;
 export const DELETE_TRANSACTION = gql`
   mutation DeleteTransaction($id: ID!) {
     deleteTransaction(id: $id)
@@ -24,7 +44,6 @@ export const CREATE_TRANSACTION = gql`
     }
   }
 `;
-import { gql } from "@apollo/client";
 
 export const UPDATE_ITEM_PRICE = gql`
   mutation UpdateItemPrice($input: UpdateItemPriceInput!) {
@@ -210,5 +229,33 @@ export const UPDATE_USER_ONLINE = gql`
       discordId
       isOnline
     }
+  }
+`;
+
+export const CREATE_VEHICLE = gql`
+  mutation CreateVehicle($input: CreateVehicleInput!) {
+    createVehicle(input: $input) {
+      id
+      name
+      front
+      back
+    }
+  }
+`;
+
+export const UPDATE_VEHICLE = gql`
+  mutation UpdateVehicle($input: UpdateVehicleInput!) {
+    updateVehicle(input: $input) {
+      id
+      name
+      front
+      back
+    }
+  }
+`;
+
+export const DELETE_VEHICLE = gql`
+  mutation DeleteVehicle($id: ID!) {
+    deleteVehicle(id: $id)
   }
 `;

@@ -1,8 +1,9 @@
 import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
 import { typeDefs, resolvers } from './graphql';
 import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken';
+import { createServer } from 'node:http';
+import { makeServer } from 'graphql-ws';
+import { WebSocketServer } from 'ws';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -16,39 +17,26 @@ async function main() {
     resolvers,
   });
 
-  // Démarrer le serveur
-  const { url } = await startStandaloneServer(server, {
-    listen: { port: PORT },
-    context: async ({ req }) => {
-      // Récupération et vérification du JWT dans l'en-tête Authorization
-      let user = null;
-      const authHeader = req.headers['authorization'] || req.headers['Authorization'];
-      if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.replace('Bearer ', '').trim();
-        try {
-          // Le secret doit être défini dans le .env (ex: JWT_SECRET)
-          const secret = process.env.JWT_SECRET || 'dev-secret';
-          user = jwt.verify(token, secret);
-        } catch (err) {
-          // Token invalide ou expiré
-          user = null;
-        }
-      }
-      // user contiendra les infos du JWT (ex: discordId, role, etc)
-      return {
-        user,
-      };
-    },
-  });
+  // Créer le serveur HTTP
+  const httpServer = createServer();
 
-  console.log(`
-  🔥 PurgatoryCompta Backend is running!
-  
-  🚀 Server ready at: ${url}
-  📊 GraphQL Playground: ${url}
-  
-  💾 Run 'pnpm studio' to open Prisma Studio
-  `);
+  // Créer le serveur WebSocket pour graphql-ws
+  const wsServer = new WebSocketServer({ server: httpServer, path: '/graphql' });
+  makeServer({ schema: server.schema }, wsServer);
+
+  // Démarrer le serveur HTTP et Apollo
+  await server.start();
+  httpServer.on('request', (req, res) => {
+    res.writeHead(404);
+    res.end();
+  });
+  httpServer.listen(PORT, () => {
+    console.log(`\n🔥 PurgatoryCompta Backend is running!`);
+    console.log(`🚀 Server ready at: http://localhost:${PORT}/graphql`);
+    console.log(`📊 GraphQL Playground: http://localhost:${PORT}/graphql`);
+    console.log(`💾 Run 'pnpm studio' to open Prisma Studio`);
+    console.log(`🟢 Subscriptions WebSocket ready at ws://localhost:${PORT}/graphql`);
+  });
 }
 
 main().catch((error) => {

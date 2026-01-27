@@ -1,4 +1,8 @@
+
 import prisma from '../lib/prisma';
+import { PubSub } from 'graphql-subscriptions';
+
+const pubsub = new PubSub();
 
 // Types pour les inputs
 
@@ -29,6 +33,13 @@ function formatDate(date: string | Date | null | undefined): string {
 }
 
 export const resolvers = {
+  Vehicle: {
+    vehicleUsers: (parent: any) => prisma.vehicleUser.findMany({ where: { vehicleId: parent.id } }),
+  },
+  VehicleUser: {
+    vehicle: (parent: any) => prisma.vehicle.findUnique({ where: { id: parent.vehicleId } }),
+    user: (parent: any) => prisma.user.findUnique({ where: { id: parent.userId } }),
+  },
   Transaction: {
     sourceGroup: (parent: any) => parent.sourceId ? prisma.group.findUnique({ where: { id: parent.sourceId } }) : null,
     targetGroup: (parent: any) => parent.targetId ? prisma.group.findUnique({ where: { id: parent.targetId } }) : null,
@@ -58,6 +69,7 @@ export const resolvers = {
     updatedAt: (parent: any) => formatDate(parent.updatedAt),
   },
   User: {
+    vehicleUsers: (parent: any) => prisma.vehicleUser.findMany({ where: { userId: parent.id } }),
     createdAt: (parent: any) => formatDate(parent.createdAt),
     updatedAt: (parent: any) => formatDate(parent.updatedAt),
     balance: (parent: any) => parent.balance,
@@ -80,6 +92,13 @@ export const resolvers = {
     updatedAt: (parent: any) => formatDate(parent.updatedAt),
   },
   Query: {
+    // VehicleUser CRUD
+    vehicleUsers: async () => prisma.vehicleUser.findMany({}),
+    vehicleUserById: async (_: any, { id }: { id: string }) => prisma.vehicleUser.findUnique({ where: { id } }),
+    vehicleUsersByVehicle: async (_: any, { vehicleId }: { vehicleId: string }) => prisma.vehicleUser.findMany({ where: { vehicleId } }),
+    vehicleUsersByUser: async (_: any, { userId }: { userId: string }) => prisma.vehicleUser.findMany({ where: { userId } }),
+      vehicles: async () => prisma.vehicle.findMany({ orderBy: { name: 'asc' } }),
+      vehicleById: async (_: any, { id }: { id: string }) => prisma.vehicle.findUnique({ where: { id } }),
     transactions: async () => prisma.transaction.findMany({ orderBy: { createdAt: 'desc' } }),
     transactionById: async (_: any, { id }: { id: string }) => prisma.transaction.findUnique({ where: { id } }),
     // Récupérer l'utilisateur authentifié
@@ -276,7 +295,57 @@ export const resolvers = {
     },
   },
 
+  Subscription: {
+    vehicleUserChanged: {
+      subscribe: () => pubsub.asyncIterator(['VEHICLE_USER_CHANGED'])
+    }
+  },
   Mutation: {
+    // VehicleUser CRUD
+    setVehicleUser: async (_: any, { input }: { input: { vehicleId?: string; userId: string; found?: boolean } }) => {
+      // Si vehicleId absent, supprimer l'association pour cet utilisateur
+      if (!input.vehicleId) {
+        const existing = await prisma.vehicleUser.findFirst({ where: { userId: input.userId } });
+        if (existing) {
+          await prisma.vehicleUser.delete({ where: { id: existing.id } });
+          pubsub.publish('VEHICLE_USER_CHANGED', { vehicleUserChanged: existing });
+        }
+        return null;
+      }
+      // Si le user a déjà un véhicule, supprimer l'association avant de créer la nouvelle
+      const existing = await prisma.vehicleUser.findFirst({ where: { userId: input.userId } });
+      if (existing) {
+        await prisma.vehicleUser.delete({ where: { id: existing.id } });
+      }
+      // Créer la nouvelle association
+      const created = await prisma.vehicleUser.create({
+        data: {
+          vehicleId: input.vehicleId,
+          userId: input.userId,
+          found: input.found ?? false,
+        },
+      });
+      pubsub.publish('VEHICLE_USER_CHANGED', { vehicleUserChanged: created });
+      return created;
+    },
+    setVehicleUserFound: async (_: any, { input }: { input: { id: string; found: boolean } }) => {
+      return prisma.vehicleUser.update({ where: { id: input.id }, data: { found: input.found } });
+    },
+    deleteVehicleUser: async (_: any, { id }: { id: string }) => {
+      await prisma.vehicleUser.delete({ where: { id } });
+      return true;
+    },
+    updateVehicle: async (_: any, { input }: { input: { id: string; name?: string; front?: string; back?: string } }) => {
+      const { id, ...data } = input;
+      return prisma.vehicle.update({ where: { id }, data });
+    },
+    deleteVehicle: async (_: any, { id }: { id: string }) => {
+      await prisma.vehicle.delete({ where: { id } });
+      return true;
+    },
+    createVehicle: async (_: any, { input }: { input: { name: string; front: string; back: string } }) => {
+      return prisma.vehicle.create({ data: input });
+    },
     createTransaction: async (_: any, { input }: { input: any }, context: any) => {
       let {
         sourceId,
@@ -295,7 +364,7 @@ export const resolvers = {
           sourceId = purgatory.id;
         }
       }
-
+      
       const transaction = await prisma.transaction.create({
         data: {
           sourceId: sourceId ?? null,

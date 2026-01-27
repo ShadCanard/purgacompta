@@ -55,7 +55,14 @@ const HistoryTransactions: React.FC<{ entityId?: string }> = ({ entityId }) => {
         )}
         {!isLoading && !error && data && data.length > 0 && (
           <Box>
-            {data.map((transaction: any) => (
+            {(groupOrContact
+              ? data.filter((transaction: any) =>
+                  transaction.sourceGroup?.id === groupOrContact.id ||
+                  transaction.targetGroup?.id === groupOrContact.id ||
+                  transaction.targetContact?.id === groupOrContact.id
+                )
+              : data
+            ).map((transaction: any) => (
               <HistoryCard key={transaction.id} transaction={transaction} />
             ))}
           </Box>

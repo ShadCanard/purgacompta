@@ -1,3 +1,47 @@
+// VehicleUser
+export const GET_VEHICLE_USERS = gql`
+  query VehicleUsers {
+    vehicleUsers {
+      id
+      found
+      vehicle { id name front back }
+      user { id name username discordId }
+    }
+  }
+`;
+
+export const GET_VEHICLE_USER_BY_ID = gql`
+  query VehicleUserById($id: ID!) {
+    vehicleUserById(id: $id) {
+      id
+      found
+      vehicle { id name front back }
+      user { id name username discordId }
+    }
+  }
+`;
+
+export const GET_VEHICLE_USERS_BY_VEHICLE = gql`
+  query VehicleUsersByVehicle($vehicleId: ID!) {
+    vehicleUsersByVehicle(vehicleId: $vehicleId) {
+      id
+      found
+      user { id name username discordId }
+    }
+  }
+`;
+
+export const GET_VEHICLE_USERS_BY_USER = gql`
+  query VehicleUsersByUser($userId: ID!) {
+    vehicleUsersByUser(userId: $userId) {
+      id
+      found
+      vehicle { id name front back }
+    }
+  }
+`;
+import { gql } from "@apollo/client";
+
 export const GET_TRANSACTIONS_BY_ENTITY = gql`
   query GetTransactionsByEntity($entityId: ID!) {
     transactionsByEntity(entityId: $entityId) {
@@ -53,8 +97,6 @@ export const GET_CONTACTS_OR_GROUPS_TRANSACTION = gql`
     }
   }
 `;
-import { gql } from "@apollo/client";
-
 
 export const GET_ITEM_PRICES = gql`
   query ItemPrices {
@@ -209,6 +251,28 @@ export const GET_LOGS = gql`
         name
         role
       }
+    }
+  }
+`;
+
+export const GET_VEHICLES = gql`
+  query Vehicles {
+    vehicles {
+      id
+      name
+      front
+      back
+    }
+  }
+`;
+
+export const GET_VEHICLE = gql`
+  query VehicleById($id: ID!) {
+    vehicleById(id: $id) {
+      id
+      name
+      front
+      back
     }
   }
 `;

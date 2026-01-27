@@ -1,3 +1,12 @@
+# Convention Apollo Client
+
+**IMPORTANT :** Lors de l’utilisation d’Apollo Client dans le frontend, le retour de la propriété `data` doit toujours être casté avec `as any` (ex : `const { data } = await apolloClient.query(...); return (data as any).(...);`). Cela évite les erreurs de typage et garantit la compatibilité avec TanStack Query et les hooks personnalisés.
+
+# Convention Import Apollo Client
+**IMPORTANT :** La ligne `import { gql } from "@apollo/client";` doit toujours être placée en toute première ligne des fichiers `/lib/queries.ts` et `/lib/mutations.ts` côté frontend. Aucun autre import ou déclaration ne doit précéder cette ligne dans ces fichiers.
+# Convention d’ordre dans schema.prisma
+
+**IMPORTANT :** Dans le fichier `schema.prisma`, le bloc `generator client` puis le bloc `datasource db` doivent toujours être placés en tout début de fichier, avant toute déclaration de modèle ou d’enum. Cela garantit la compatibilité Prisma et évite les erreurs de génération.
 # Utilisation de ConfirmModal
 
 **IMPORTANT :** Pour toute question nécessitant une confirmation Oui/Non (ex : suppression, action critique), il faut obligatoirement utiliser la modale `/components/layout/ConfirmModal.tsx`.
@@ -96,6 +105,8 @@ Le `UserProvider` expose:
 ## Règle Frontend TanStack Query
 
 **IMPORTANT :** Toutes les queries et mutations côté frontend doivent obligatoirement utiliser TanStack Query (useQuery, useMutation, useInfiniteQuery, etc.), même pour les requêtes GraphQL Apollo. N'utilisez jamais directement useQuery Apollo ou fetch pour la gestion des données côté React, sauf cas très particulier documenté.
+
+**IMPORTANT :** Le `queryFn` ou `mutationFn` d'une query/mutation TanStack doit toujours utiliser `apolloClient.query` ou `apolloClient.mutate` (et jamais fetch ou axios directement), afin de garantir l'intégration avec le cache Apollo et la gestion des erreurs/authentification. 
 
 ---
 

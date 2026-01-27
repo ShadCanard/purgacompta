@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -29,6 +26,7 @@ model User {
   updatedAt   DateTime @updatedAt
 
   logs      Log[]
+  vehicleUsers VehicleUser[]
 
   @@map("users")
 }
@@ -138,4 +136,26 @@ model TransactionLine {
   item          Item        @relation(fields: [itemId], references: [id])
 
   @@map("transaction_lines")
+}
+
+model Vehicle {
+  id    String @id @default(cuid())
+  name  String
+  front String
+  back  String
+  vehicleUsers VehicleUser[]
+  @@map("vehicles")
+}
+
+model VehicleUser {
+  id        String   @id @default(cuid())
+  vehicleId String
+  userId    String
+  found     Boolean  @default(false)
+
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([vehicleId, userId])
+  @@map("vehicle_users")
 }

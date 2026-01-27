@@ -191,8 +191,8 @@ const TransactionOutgoing: React.FC = () => {
             onClick={() => {
               if (!targetGroup) return alert('Sélectionnez un groupe');
               const input = {
-                sourceId: purgatoryId,
-                targetId: targetGroup?.id,
+                sourceId: targetGroup?.id,
+                targetId: purgatoryId,
                 blanchimentPercent: 0,
                 amountToBring: 0,
                 blanchimentAmount: 0,

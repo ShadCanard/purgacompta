@@ -8,12 +8,59 @@ export const typeDefs = `#graphql
     OWNER
   }
 
+
+  # Type Vehicle
+  type Vehicle {
+    id: ID!
+    name: String!
+    front: String!
+    back: String!
+    vehicleUsers: [VehicleUser!]!
+  }
+
+  # Type VehicleUser (liaison véhicule/utilisateur)
+  type VehicleUser {
+    id: ID!
+    vehicle: Vehicle!
+    user: User!
+    found: Boolean!
+  }
+
+  input SetVehicleUserInput {
+    vehicleId: ID
+    userId: ID!
+    found: Boolean
+  }
+
+  input SetVehiculeUserFoundInput {
+    id: ID!
+    found: Boolean!
+  }
+
+  # Inputs pour Vehicle
+  input CreateVehicleInput {
+    name: String!
+    front: String!
+    back: String!
+  }
+
+  input UpdateVehicleInput {
+    id: ID!
+    name: String
+    front: String
+    back: String
+  }
   input ImportContactInput {
     display: String!
     number: String!
   }
 
   # Type Item (objet en jeu)
+
+  # Subscription
+  type Subscription {
+    vehicleUserChanged: VehicleUser!
+  }
   type Item {
     id: ID!
     name: String!
@@ -104,6 +151,7 @@ export const typeDefs = `#graphql
     role: UserRole!
     createdAt: String!
     updatedAt: String!
+    vehicleUsers: [VehicleUser!]!
   }
 
   # Input pour l'enregistrement/mise à jour d'un utilisateur
@@ -221,6 +269,11 @@ export const typeDefs = `#graphql
 
   # Queries
   type Query {
+    # VehicleUser
+    vehicleUsers: [VehicleUser!]!
+    vehicleUserById(id: ID!): VehicleUser
+    vehicleUsersByVehicle(vehicleId: ID!): [VehicleUser!]!
+    vehicleUsersByUser(userId: ID!): [VehicleUser!]!
 
     # ItemPrice CRUD
     itemPrices: [ItemPrice!]!
@@ -229,6 +282,10 @@ export const typeDefs = `#graphql
     itemPricesByGroup(groupId: ID!): [ItemPrice!]!
     itemPricesByTarget(targetId: ID): [ItemPrice!]!
     onSellitemPricesByGroup(groupId: ID!): [ItemPrice!]!
+
+    # Vehicles CRUD
+    vehicles: [Vehicle!]!
+    vehicleById(id: ID!): Vehicle
 
     # Objets CRUD
     items: [Item!]!
@@ -279,6 +336,10 @@ export const typeDefs = `#graphql
   # Mutations
 
   type Mutation {
+    # VehicleUser
+    setVehicleUser(input: SetVehicleUserInput!): VehicleUser
+    setVehicleUserFound(input: SetVehiculeUserFoundInput!): VehicleUser!
+    deleteVehicleUser(id: ID!): Boolean!
     # Transactions
     createTransaction(input: CreateTransactionInput!): Transaction!
     deleteTransaction(id: ID!): Boolean!
@@ -287,6 +348,11 @@ export const typeDefs = `#graphql
     createItemPrice(input: CreateItemPriceInput!): ItemPrice!
     updateItemPrice(input: UpdateItemPriceInput!): ItemPrice!
     deleteItemPrice(id: ID!): Boolean!
+
+    # Vehicles CRUD
+    createVehicle(input: CreateVehicleInput!): Vehicle!
+    updateVehicle(input: UpdateVehicleInput!): Vehicle!
+    deleteVehicle(id: ID!): Boolean!
 
     # Contacts CRUD
     createContact(input: CreateContactInput!): Contact!

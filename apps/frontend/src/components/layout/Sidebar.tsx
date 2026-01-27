@@ -29,6 +29,7 @@ import {
   Menu as MenuIcon,
   Contacts as ContactsIcon,
   CurrencyExchange,
+  DirectionsCar as DirectionsCarIcon,
 } from '@mui/icons-material';
 import { signOut, useSession } from 'next-auth/react';
 import { useUser } from '@/providers/UserProvider';
@@ -52,6 +53,7 @@ const menuItems: MenuItem[] = [
   { text: 'Annuaire', icon: <ContactsIcon />, path: '/contacts' },
   { text: 'Transactions', icon: <ReceiptIcon />, path: '/transactions', requiredRole: 'MEMBER' },
   { text: 'Comptes', icon: <AccountBalanceIcon />, path: '/accounts', requiredRole: 'MEMBER' },
+  { text: 'Tablette Véhicules', icon: <DirectionsCarIcon />, path: '/vehicles', requiredRole: 'MEMBER' },
   {
     text: 'Gestion',
     icon: <PeopleIcon />,
@@ -66,6 +68,7 @@ const menuItems: MenuItem[] = [
     { text: 'Utilisateurs', icon: <PeopleIcon />, path: '/settings/users', requiredRole: 'MANAGER' },
     { text: 'Groupes', icon: <AccountBalanceIcon />, path: '/settings/groups', requiredRole: 'MANAGER' },
     { text: 'Objets', icon: <AssessmentIcon />, path: '/settings/items', requiredRole: 'MANAGER' },
+    { text: 'Véhicules', icon: <AccountBalanceIcon />, path: '/settings/vehicles', requiredRole: 'MANAGER' },
     { text: 'Rôles & Permissions', icon: <SettingsIcon />, path: '/settings/roles', requiredRole: 'ADMIN' },
     { text: 'Logs', icon: <AssessmentIcon />, path: '/settings/logs', requiredRole: 'ADMIN' },
   ] },
