@@ -151,7 +151,43 @@ export const typeDefs = `#graphql
     isActive: Boolean
   }
   
-  # Type ItemPrice (prix d'un objet pour un groupe)
+  # Type TransactionLine (ligne d'une transaction)
+  type TransactionLine {
+    id: ID!
+    item: Item!
+    quantity: Int!
+    unitPrice: Float!
+  }
+
+  # Type Transaction
+  type Transaction {
+    id: ID!
+    sourceGroup: Group
+    targetGroup: Group
+    targetContact: Contact
+    blanchimentPercent: Int!
+    amountToBring: Float!
+    blanchimentAmount: Float!
+    totalFinal: Float!
+    createdAt: String!
+    lines: [TransactionLine!]!
+  }
+
+  input TransactionLineInput {
+    itemId: ID!
+    quantity: Int!
+    unitPrice: Float!
+  }
+
+  input CreateTransactionInput {
+    sourceId: ID
+    targetId: ID
+    blanchimentPercent: Int!
+    amountToBring: Float!
+    blanchimentAmount: Float!
+    totalFinal: Float!
+    lines: [TransactionLineInput!]!
+  }
   type ItemPrice {
     id: ID!
     item: Item!
@@ -233,10 +269,19 @@ export const typeDefs = `#graphql
 
     # Récupérer le nombre de groupes criminels
     groupsCount: Int!
+
+    # Transactions
+    transactions: [Transaction!]!
+    transactionById(id: ID!): Transaction
+    transactionsByEntity(entityId: ID!): [Transaction!]!
   }
 
   # Mutations
+
   type Mutation {
+    # Transactions
+    createTransaction(input: CreateTransactionInput!): Transaction!
+    deleteTransaction(id: ID!): Boolean!
 
     # ItemPrice CRUD
     createItemPrice(input: CreateItemPriceInput!): ItemPrice!

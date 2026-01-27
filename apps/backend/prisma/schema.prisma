@@ -36,15 +36,14 @@ model User {
 
 model Log {
   id        String   @id @default(cuid())
-  action    String   // ex: CREATE, UPDATE, DELETE
   entity    String   // ex: User, Transaction, etc.
   entityId  String   // id de l'entité modifiée
   userId    String   // id de l'utilisateur ayant fait l'action
   diff      String?  // JSON des changements
   createdAt DateTime @default(now())
+  action    String   // ex: CREATE, UPDATE, DELETE
 
   user      User     @relation(fields: [userId], references: [id])
-
   @@map("logs")
 }
 
@@ -58,6 +57,7 @@ model Item {
   weapon    Boolean  @default(false)
 
   itemPrices ItemPrice[]
+  transactionLines TransactionLine[]
 
   @@map("items")
 }
@@ -110,4 +110,32 @@ model ItemPrice {
 
   @@unique([itemId, groupId])
   @@map("item_prices")
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  sourceId      String? // Groupe source
+  targetId      String? // Groupe ou contact cible
+  blanchimentPercent Int   // Pourcentage de blanchiment appliqué
+  amountToBring   Float   // Montant à apporter (hors blanchiment)
+  blanchimentAmount Float // Montant de blanchiment
+  totalFinal     Float   // Total final de la transaction
+  createdAt      DateTime @default(now())
+
+  lines          TransactionLine[]
+
+  @@map("transactions")
+}
+
+model TransactionLine {
+  id            String   @id @default(cuid())
+  transactionId String
+  itemId        String
+  quantity      Int
+  unitPrice     Float // Prix unitaire (corrigé ou non)
+
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  item          Item        @relation(fields: [itemId], references: [id])
+
+  @@map("transaction_lines")
 }

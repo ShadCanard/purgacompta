@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Button, Stack, TextField, Autocomplete } from '@mui/material';
+import { Box, Typography, Paper, Button, Stack, TextField, Autocomplete, Switch, FormControlLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSnackbar } from '@/providers';
 import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
 import ConfirmModal from '@/components/layout/ConfirmModal';
@@ -29,10 +30,12 @@ const PricesPage: React.FC = () => {
   const [groupId, setGroupId] = useState<string>('');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
   const [price, setPrice] = useState<string>('');
+  const [buying, setBuying] = useState<boolean>(true);
   const [selectedTargetId, setSelectedTargetId] = useState<string>('');
 
+  const { notify } = useSnackbar();
   const createItemPriceMutation = useMutation({
-    mutationFn: async (input: { itemId: string; groupId: string; price: number; targetId?: string }) => {
+    mutationFn: async (input: { itemId: string; groupId: string; price: number; targetId?: string; buying?: boolean }) => {
       setModalLoading(true);
       await apolloClient.mutate({
         mutation: CREATE_ITEM_PRICE,
@@ -44,14 +47,16 @@ const PricesPage: React.FC = () => {
       setEditPrice(null);
       setModalLoading(false);
       queryClient.invalidateQueries({ queryKey: ['itemPrices'] });
+      notify('Succès', 'success');
     },
-    onError: () => {
+    onError: (err: any) => {
       setModalLoading(false);
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 
   const updateItemPriceMutation = useMutation({
-    mutationFn: async (input: { id: string; price?: number; targetId?: string }) => {
+    mutationFn: async (input: { id: string; price?: number; targetId?: string; buying?: boolean }) => {
       setModalLoading(true);
       await apolloClient.mutate({
         mutation: UPDATE_ITEM_PRICE,
@@ -63,9 +68,11 @@ const PricesPage: React.FC = () => {
       setEditPrice(null);
       setModalLoading(false);
       queryClient.invalidateQueries({ queryKey: ['itemPrices'] });
+      notify('Succès', 'success');
     },
-    onError: () => {
+    onError: (err: any) => {
       setModalLoading(false);
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 
@@ -80,9 +87,11 @@ const PricesPage: React.FC = () => {
     onSuccess: () => {
       setDeleteLoadingId(null);
       queryClient.invalidateQueries({ queryKey: ['itemPrices'] });
+      notify('Succès', 'success');
     },
-    onError: () => {
+    onError: (err: any) => {
       setDeleteLoadingId(null);
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 
@@ -144,6 +153,7 @@ const PricesPage: React.FC = () => {
         groupId: groupId,
         price: parseFloat(price.replace(',', '.')) || 0,
         targetId: selectedTargetId || undefined,
+        buying,
       });
     }
   }
@@ -157,13 +167,6 @@ const PricesPage: React.FC = () => {
       editable: false,
     },
     {
-      field: 'group',
-      headerName: 'Groupe',
-      flex: 1,
-      renderCell: (params: any) => params.row.group?.name || '',
-      editable: false,
-    },
-    {
       field: 'price',
       headerName: 'Prix',
       flex: 1,
@@ -171,6 +174,26 @@ const PricesPage: React.FC = () => {
       editable: true,
       renderCell: (params: any) => formatDollar(params.value),
       valueFormatter: (params: any) => params.value ?? '',
+    },
+    {
+      field: 'buying',
+      headerName: 'Rachat',
+      flex: 0.5,
+      type: 'boolean',
+      editable: true,
+      renderCell: (params: any) => (
+        <Switch checked={!!params.value} color="primary" disabled />
+      ),
+      renderEditCell: (params: any) => (
+        <Switch
+          checked={!!params.value}
+          color="primary"
+          onChange={(_, checked) => {
+            params.api.setEditCellValue({ id: params.id, field: 'buying', value: checked }, event);
+          }}
+        />
+      ),
+      valueFormatter: (params: any) => params.value ? 'Oui' : 'Non',
     },
     {
       field: 'targetId',
@@ -273,6 +296,16 @@ const PricesPage: React.FC = () => {
             onChange={(e) => setPrice(e.target.value)}
             required
           />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={buying}
+                onChange={(_, checked) => setBuying(checked)}
+                color="primary"
+              />
+            }
+            label="Rachat (buying)"
+          />
           <Button variant='outlined' color='primary' startIcon={<AddIcon />} onClick={() => handleAddItem()}>Ajouter</Button>
           </Stack>
           <hr />
@@ -293,6 +326,10 @@ const PricesPage: React.FC = () => {
               }
               if(newRow.targetId !== oldRow.targetId) {
                 await updateItemPriceMutation.mutateAsync({ id: newRow.id, targetId: newRow.targetId });
+                queryClient.invalidateQueries({ queryKey: ['itemPricesByGroup', groupId] });
+              }
+              if(newRow.buying !== oldRow.buying) {
+                await updateItemPriceMutation.mutateAsync({ id: newRow.id, buying: newRow.buying });
                 queryClient.invalidateQueries({ queryKey: ['itemPricesByGroup', groupId] });
               }
               return { ...newRow };

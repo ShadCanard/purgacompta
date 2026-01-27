@@ -4,6 +4,7 @@ import ConfirmModal from '@/components/layout/ConfirmModal';
 import AddIcon from '@mui/icons-material/Add';
 import CreateUpdateItemModal from '@/components/items/CreateUpdateItemModal';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { useSnackbar } from '@/providers';
 import MainLayout from '@/components/layout/MainLayout';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { IconButton, Menu, MenuItem } from '@mui/material';
@@ -74,6 +75,7 @@ const ItemsSettingsPage: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
 
+  const { notify } = useSnackbar();
   const createItemMutation = useMutation({
     mutationFn: async (input: { name: string; weight: number, sellable: boolean; weapon: boolean }) => {
       setModalLoading(true);
@@ -86,9 +88,11 @@ const ItemsSettingsPage: React.FC = () => {
       setOpenModal(false);
       setModalLoading(false);
       queryClient.invalidateQueries({ queryKey: ['items'] });
+      notify('Succès', 'success');
     },
-    onError: () => {
+    onError: (err: any) => {
       setModalLoading(false);
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 
@@ -120,9 +124,11 @@ const ItemsSettingsPage: React.FC = () => {
       setEditItem(null);
       setEditLoading(false);
       queryClient.invalidateQueries({ queryKey: ['items'] });
+      notify('Succès', 'success');
     },
-    onError: () => {
+    onError: (err: any) => {
       setEditLoading(false);
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 
@@ -137,9 +143,11 @@ const ItemsSettingsPage: React.FC = () => {
     onSuccess: () => {
       setDeleteLoadingId(null);
       queryClient.invalidateQueries({ queryKey: ['items'] });
+      notify('Succès', 'success');
     },
-    onError: () => {
+    onError: (err: any) => {
       setDeleteLoadingId(null);
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 

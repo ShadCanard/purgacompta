@@ -10,7 +10,7 @@
     "build": "pnpm run --parallel build",
     "build:frontend": "pnpm --filter frontend build",
     "build:backend": "pnpm --filter backend build",
-    "studio": "pnpm --filter backend studio",
+    "studio": "pnpm --filter backend studio -- --browser none",
     "db:migrate": "pnpm --filter backend db:migrate",
     "db:generate": "pnpm --filter backend db:generate",
     "db:format": "pnpm --filter backend db:format",

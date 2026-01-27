@@ -12,6 +12,7 @@ import {
 import { useUser } from '@/providers/UserProvider';
 import apolloClient from '@/lib/apolloClient';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSnackbar } from '@/lib/useSnackbar';
 import { UPDATE_USER_ONLINE } from '@/lib/mutations';
 // Mutation pour mettre à jour le statut en ligne
 
@@ -19,6 +20,7 @@ const CurrentUserCard: React.FC = () => {
   const { user, loading, refetch } = useUser();
   const queryClient = useQueryClient();
 
+  const { notify } = useSnackbar();
   const { mutate: updateOnline, isLoading: isUpdating } = useMutation({
     mutationFn: async (isOnline: boolean) => {
       await apolloClient.mutate({
@@ -29,6 +31,10 @@ const CurrentUserCard: React.FC = () => {
     onSuccess: () => {
       refetch();
       queryClient.invalidateQueries({ queryKey: ['dashboard-members'] });
+      notify('Statut en ligne mis à jour', 'success');
+    },
+    onError: (err: any) => {
+      notify(err?.message || 'Erreur lors de la mise à jour du statut', 'error');
     },
   });
 

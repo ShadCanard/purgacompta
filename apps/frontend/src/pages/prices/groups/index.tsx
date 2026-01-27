@@ -3,6 +3,7 @@ import { Box, Typography, Paper, Button, Stack, TextField, Autocomplete } from '
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSnackbar } from '@/providers';
 import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
 import ConfirmModal from '@/components/layout/ConfirmModal';
@@ -61,6 +62,7 @@ const PricesPage: React.FC = () => {
   const [selectedItemId, setSelectedItemId] = useState<string>('');
   const [price, setPrice] = useState<string>('');
 
+  const { notify } = useSnackbar();
   const createItemPriceMutation = useMutation({
     mutationFn: async (input: { itemId: string; groupId: string; price: number }) => {
       setModalLoading(true);
@@ -74,9 +76,11 @@ const PricesPage: React.FC = () => {
       setEditPrice(null);
       setModalLoading(false);
       queryClient.invalidateQueries({ queryKey: ['itemPrices'] });
+      notify('Succès', 'success');
     },
-    onError: () => {
+    onError: (err: any) => {
       setModalLoading(false);
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 
@@ -93,9 +97,11 @@ const PricesPage: React.FC = () => {
       setEditPrice(null);
       setModalLoading(false);
       queryClient.invalidateQueries({ queryKey: ['itemPrices'] });
+      notify('Succès', 'success');
     },
-    onError: () => {
+    onError: (err: any) => {
       setModalLoading(false);
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 
@@ -110,9 +116,11 @@ const PricesPage: React.FC = () => {
     onSuccess: () => {
       setDeleteLoadingId(null);
       queryClient.invalidateQueries({ queryKey: ['itemPrices'] });
+      notify('Succès', 'success');
     },
-    onError: () => {
+    onError: (err: any) => {
       setDeleteLoadingId(null);
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 

@@ -29,6 +29,16 @@ function formatDate(date: string | Date | null | undefined): string {
 }
 
 export const resolvers = {
+  Transaction: {
+    sourceGroup: (parent: any) => parent.sourceId ? prisma.group.findUnique({ where: { id: parent.sourceId } }) : null,
+    targetGroup: (parent: any) => parent.targetId ? prisma.group.findUnique({ where: { id: parent.targetId } }) : null,
+    targetContact: (parent: any) => parent.targetId ? prisma.contact.findUnique({ where: { id: parent.targetId } }) : null,
+    lines: (parent: any) => prisma.transactionLine.findMany({ where: { transactionId: parent.id } }),
+    createdAt: (parent: any) => parent.createdAt instanceof Date ? parent.createdAt.toISOString() : new Date(parent.createdAt).toISOString(),
+  },
+  TransactionLine: {
+    item: (parent: any) => prisma.item.findUnique({ where: { id: parent.itemId } }),
+  },
   Group: {
     createdAt: (parent: any) => formatDate(parent.createdAt),
     updatedAt: (parent: any) => formatDate(parent.updatedAt),
@@ -70,6 +80,8 @@ export const resolvers = {
     updatedAt: (parent: any) => formatDate(parent.updatedAt),
   },
   Query: {
+    transactions: async () => prisma.transaction.findMany({ orderBy: { createdAt: 'desc' } }),
+    transactionById: async (_: any, { id }: { id: string }) => prisma.transaction.findUnique({ where: { id } }),
     // Récupérer l'utilisateur authentifié
     me: async (_: any, __: any, context: any) => {
       // On attend que le contexte contienne le discordId de l'utilisateur
@@ -197,11 +209,35 @@ export const resolvers = {
       return prisma.itemPrice.findMany({ where: { groupId }, orderBy: { createdAt: 'desc' } });
     },
     itemPricesByTarget: async (_: any, { targetId }: { targetId?: string }) => {
-      if(!targetId) {
-        return prisma.itemPrice.findMany({ where: { targetId: null, group: { name: 'Purgatory' } }, orderBy: { createdAt: 'desc' } });
+      // On récupère tous les prix pour le groupe Purgatory
+      const allPrices = await prisma.itemPrice.findMany({
+        where: { group: { name: 'Purgatory' } },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (!targetId) {
+        // Si pas de targetId, on retourne uniquement les prix génériques
+        return allPrices.filter(p => !p.targetId);
       }
-
-      return prisma.itemPrice.findMany({ where: { targetId, group: { name: 'Purgatory' } }, orderBy: { createdAt: 'desc' } });
+      // On veut :
+      // - les prix spécifiques à ce targetId (prioritaires)
+      // - sinon, le prix générique (targetId null) pour chaque item
+      const result: any[] = [];
+      const seenItemIds = new Set();
+      // Ajoute d'abord les prix spécifiques
+      for (const price of allPrices) {
+        if (price.targetId === targetId) {
+          result.push(price);
+          seenItemIds.add(price.itemId);
+        }
+      }
+      // Ajoute les prix génériques pour les items qui n'ont pas déjà un prix spécifique
+      for (const price of allPrices) {
+        if (!price.targetId && !seenItemIds.has(price.itemId)) {
+          result.push(price);
+          seenItemIds.add(price.itemId);
+        }
+      }
+      return result;
     },
     onSellitemPricesByGroup: async (_: any, { groupId }: { groupId: string }) => {
       return prisma.itemPrice.findMany({ where: { groupId, onSell: true }, orderBy: { createdAt: 'desc' } });
@@ -219,11 +255,74 @@ export const resolvers = {
       return prisma.contact.findUnique({ where: { id } });
     },
     contactsWithoutGroup: async () => {
-      return prisma.contact.findMany({ where: { groupid: null }, orderBy: { createdAt: 'desc' } });
+      // Exclure les contacts dont le numéro est déjà utilisé par un User
+      const users = await prisma.user.findMany({ select: { phone: true } });
+      const userPhones = users.map(u => u.phone);
+      const contacts = await prisma.contact.findMany({ where: { groupid: null }, orderBy: { createdAt: 'desc' } });
+      return contacts.filter(contact => !userPhones.includes(contact.phone));
+    },
+    // Récupérer toutes les transactions où entityId est sourceId ou targetId
+    transactionsByEntity: async (_: any, { entityId }: { entityId: string }) => {
+      return prisma.transaction.findMany({
+        where: {
+          OR: [
+            { sourceId: entityId },
+            { targetId: entityId },
+          ],
+        },
+        orderBy: { createdAt: 'desc' },
+        include: { lines: true },
+      });
     },
   },
 
   Mutation: {
+    createTransaction: async (_: any, { input }: { input: any }, context: any) => {
+      let {
+        sourceId,
+        targetId,
+        blanchimentPercent,
+        amountToBring,
+        blanchimentAmount,
+        totalFinal,
+        lines
+      } = input;
+
+      // Si sourceId est vide, utiliser l'id du groupe 'Purgatory'
+      if (!sourceId) {
+        const purgatory = await prisma.group.findUnique({ where: { name: 'Purgatory' } });
+        if (purgatory) {
+          sourceId = purgatory.id;
+        }
+      }
+
+      const transaction = await prisma.transaction.create({
+        data: {
+          sourceId: sourceId ?? null,
+          targetId: targetId ?? null,
+          blanchimentPercent,
+          amountToBring,
+          blanchimentAmount,
+          totalFinal,
+          lines: {
+            create: lines.map((l: any) => ({
+              itemId: l.itemId,
+              quantity: l.quantity,
+              unitPrice: l.unitPrice,
+            })),
+          },
+        },
+        include: { lines: true },
+      });
+      return transaction;
+    },
+    deleteTransaction: async (_: any, { id }: { id: string }, context: any) => {
+      // Supprimer d'abord les lignes liées
+      await prisma.transactionLine.deleteMany({ where: { transactionId: id } });
+      // Puis la transaction elle-même
+      await prisma.transaction.delete({ where: { id } });
+      return true;
+    },
     // Enregistrer ou mettre à jour un utilisateur lors de la connexion
     registerOrUpdateUser: async (_: any, { input }: { input: RegisterUserInput }, context: any) => {
       const { discordId, username, name, email, avatar } = input;

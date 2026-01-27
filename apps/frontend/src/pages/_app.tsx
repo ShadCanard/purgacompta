@@ -10,6 +10,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import theme from '@/styles/theme';
 import apolloClient from '@/lib/apolloClient';
 import { UserProvider } from '@/providers/UserProvider';
+import { SnackbarProvider } from '@/providers';
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -29,8 +30,10 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <UserProvider>
-              <Component {...pageProps} />
-              {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+              <SnackbarProvider>
+                <Component {...pageProps} />
+                {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+              </SnackbarProvider>
             </UserProvider>
           </ThemeProvider>
         </QueryClientProvider>

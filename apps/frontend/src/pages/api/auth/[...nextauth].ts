@@ -1,5 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import DiscordProvider from 'next-auth/providers/discord';
+import jwt from 'jsonwebtoken';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -64,12 +65,27 @@ export const authOptions: NextAuthOptions = {
         token.discordId = (profile as any).id;
         token.accessToken = account.access_token;
       }
+      // Génère un JWT custom signé avec JWT_SECRET pour le backend
+      if (token.discordId) {
+        const secret = process.env.JWT_SECRET || 'dev-secret';
+        // On encode le rôle si dispo (sinon GUEST)
+        const role = (token.role as string) || 'GUEST';
+        token.purgatoryJwt = jwt.sign(
+          {
+            discordId: token.discordId,
+            role,
+          },
+          secret,
+          { expiresIn: '7d' }
+        );
+      }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).discordId = token.discordId;
         (session.user as any).accessToken = token.accessToken;
+        (session.user as any).purgatoryJwt = token.purgatoryJwt;
       }
       return session;
     },

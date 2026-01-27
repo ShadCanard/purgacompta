@@ -1,3 +1,29 @@
+export const DELETE_TRANSACTION = gql`
+  mutation DeleteTransaction($id: ID!) {
+    deleteTransaction(id: $id)
+  }
+`;
+export const CREATE_TRANSACTION = gql`
+  mutation CreateTransaction($input: CreateTransactionInput!) {
+    createTransaction(input: $input) {
+      id
+      sourceGroup { id name }
+      targetGroup { id name }
+      targetContact { id name }
+      blanchimentPercent
+      amountToBring
+      blanchimentAmount
+      totalFinal
+      createdAt
+      lines {
+        id
+        item { id name }
+        quantity
+        unitPrice
+      }
+    }
+  }
+`;
 import { gql } from "@apollo/client";
 
 export const UPDATE_ITEM_PRICE = gql`

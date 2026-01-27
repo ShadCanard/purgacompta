@@ -1,3 +1,58 @@
+export const GET_TRANSACTIONS_BY_ENTITY = gql`
+  query GetTransactionsByEntity($entityId: ID!) {
+    transactionsByEntity(entityId: $entityId) {
+      id
+      sourceGroup { id name }
+      targetGroup { id name }
+      targetContact { id name }
+      blanchimentPercent
+      amountToBring
+      blanchimentAmount
+      totalFinal
+      createdAt
+      lines {
+        id
+        item { id name }
+        quantity
+        unitPrice
+      }
+    }
+  }
+`;
+export const GET_TRANSACTIONS = gql`
+  query GetTransactions {
+    transactions {
+      id
+      sourceGroup { id name }
+      targetGroup { id name }
+      targetContact { id name }
+      blanchimentPercent
+      amountToBring
+      blanchimentAmount
+      totalFinal
+      createdAt
+      lines {
+        id
+        item { id name }
+        quantity
+        unitPrice
+      }
+    }
+  }
+`;
+// Récupère les groupes et les contacts sans groupe (pour transactions)
+export const GET_CONTACTS_OR_GROUPS_TRANSACTION = gql`
+  query ContactsOrGroupsTransaction {
+    groups {
+      id
+      name
+    }
+    contactsWithoutGroup {
+      id
+      name
+    }
+  }
+`;
 import { gql } from "@apollo/client";
 
 
@@ -115,6 +170,7 @@ export const GET_ITEM_PRICES_BY_TARGET = gql`
       price
       item { id name }
       targetId
+      buying
     }
   }
 `;

@@ -3,6 +3,7 @@ import { MainLayout } from '@/components/layout';
 import { Box, Typography, Paper, Avatar, CircularProgress, Autocomplete, TextField } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSnackbar } from '@/providers';
 import apolloClient from '@/lib/apolloClient';
 import { useUser } from '@/providers/UserProvider';
 import { GET_MEMBERS } from '@/lib/queries';
@@ -30,12 +31,17 @@ const UsersPage: React.FC = () => {
     },
   });
   // Mutation pour changer le numéro de téléphone d'un utilisateur
+  const { notify } = useSnackbar();
   const { mutate: updateUserPhone, isLoading: isUpdatingPhone } = useMutation({
     mutationFn: async ({ discordId, phone }: { discordId: string; phone: string }) => {
       await apolloClient.mutate({ mutation: UPDATE_USER_PHONE, variables: { input: { discordId, phone } }, });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      notify('Succès', 'success');
+    },
+    onError: (err: any) => {
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 
@@ -46,6 +52,10 @@ const UsersPage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      notify('Succès', 'success');
+    },
+    onError: (err: any) => {
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 
@@ -56,6 +66,10 @@ const UsersPage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      notify('Succès', 'success');
+    },
+    onError: (err: any) => {
+      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
   const roleHierarchy: Record<string, number> = {

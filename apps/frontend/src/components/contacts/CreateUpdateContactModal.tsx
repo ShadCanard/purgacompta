@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import apolloClient from '@/lib/apolloClient';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSnackbar } from '@/lib/useSnackbar';
 import { CREATE_CONTACT, UPDATE_CONTACT } from '@/lib/mutations';
 import { GET_GROUPS } from '@/lib/queries';
 
@@ -28,6 +29,7 @@ interface CreateUpdateContactModalProps {
 
 const CreateUpdateContactModal: React.FC<CreateUpdateContactModalProps> = ({ open, onClose, initialData = null }) => {
   const queryClient = useQueryClient();
+  const { notify } = useSnackbar();
   const [form, setForm] = useState({ name: '', phone: '', groupId: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -66,11 +68,13 @@ const CreateUpdateContactModal: React.FC<CreateUpdateContactModalProps> = ({ ope
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      notify('Contact créé avec succès', 'success');
       handleClose();
     },
     onError: (err: any) => {
       setLoading(false);
       setError(err?.message || 'Erreur lors de la création');
+      notify(err?.message || 'Erreur lors de la création', 'error');
     },
   });
 
@@ -86,11 +90,13 @@ const CreateUpdateContactModal: React.FC<CreateUpdateContactModalProps> = ({ ope
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      notify('Contact modifié avec succès', 'success');
       handleClose();
     },
     onError: (err: any) => {
       setLoading(false);
       setError(err?.message || 'Erreur lors de la modification');
+      notify(err?.message || 'Erreur lors de la modification', 'error');
     },
   });
 

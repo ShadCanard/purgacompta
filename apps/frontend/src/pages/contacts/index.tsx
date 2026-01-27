@@ -8,6 +8,7 @@ import CreateUpdateContactModal from '@/components/contacts/CreateUpdateContactM
 import ImportContactModal from '@/components/contacts/ImportContactModal';
 import ConfirmModal from '@/components/layout/ConfirmModal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSnackbar } from '@/lib/useSnackbar';
 import { gql } from '@apollo/client';
 import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
@@ -61,8 +62,8 @@ const ContactsPage: React.FC = () => {
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; contact: any | null }>({ open: false, contact: null });
   const [importOpen, setImportOpen] = useState(false);
+  const { notify } = useSnackbar();
   // Mutation GraphQL pour l'import
-
   const importContactsMutation = useMutation({
     mutationFn: async (contacts: any[]) => {
       await apolloClient.mutate({
@@ -72,6 +73,10 @@ const ContactsPage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      notify('Import des contacts réussi', 'success');
+    },
+    onError: (err: any) => {
+      notify(err?.message || 'Erreur lors de l\'import des contacts', 'error');
     },
   });
 
@@ -99,9 +104,11 @@ const ContactsPage: React.FC = () => {
       onSuccess: () => {
         setDeleteLoadingId(null);
         queryClient.invalidateQueries({ queryKey: ['contacts'] });
+        notify('Contact supprimé avec succès', 'success');
       },
-      onError: () => {
+      onError: (err: any) => {
         setDeleteLoadingId(null);
+        notify(err?.message || 'Erreur lors de la suppression', 'error');
       },
     });
 
