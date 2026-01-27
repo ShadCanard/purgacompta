@@ -13,8 +13,6 @@ export function getApolloClient() {
 
   const httpUri = process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql';
   const wsUri = httpUri.replace(/^http/, 'ws');
-  console.log('[APOLLO] httpUri =', httpUri);
-  console.log('[APOLLO] wsUri =', wsUri);
 
   const httpLink = createHttpLink({ uri: httpUri });
 
@@ -34,7 +32,6 @@ export function getApolloClient() {
 
   let link = authLink.concat(httpLink);
   if (typeof window !== 'undefined') {
-    console.log('[APOLLO] Bloc WebSocket exécuté côté navigateur');
     const wsClient = createClient({
       url: wsUri,
       connectionParams: async () => {
@@ -48,8 +45,6 @@ export function getApolloClient() {
         };
       },
       on: {
-        connected: () => console.log('[APOLLO][WS] WebSocket GraphQL connecté'),
-        closed: (event) => console.warn('[APOLLO][WS] WebSocket GraphQL fermé', event),
         error: (err) => console.error('[APOLLO][WS] Erreur WebSocket GraphQL', err),
       },
     });

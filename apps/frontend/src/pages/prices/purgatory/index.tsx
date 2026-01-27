@@ -4,7 +4,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/providers';
-import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
 import ConfirmModal from '@/components/layout/ConfirmModal';
 import { formatDollar } from '@/lib/utils';
@@ -18,6 +17,7 @@ import {
   GET_PURGATORY,
 } from '@/lib/queries';
 import { Contact, Group, ItemPrice } from '@/lib/types';
+import { getApolloClient } from '@/lib/apolloClient';
 
 const PricesPage: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -33,7 +33,9 @@ const PricesPage: React.FC = () => {
   const [buying, setBuying] = useState<boolean>(true);
   const [selectedTargetId, setSelectedTargetId] = useState<string>('');
 
-  const { notify } = useSnackbar();
+  const { notify } = useSnackbar()!;
+  const apolloClient = getApolloClient();
+  
   const createItemPriceMutation = useMutation({
     mutationFn: async (input: { itemId: string; groupId: string; price: number; targetId?: string; buying?: boolean }) => {
       setModalLoading(true);

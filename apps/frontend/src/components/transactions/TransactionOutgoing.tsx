@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Paper, Stack, Button, TextField, Autocomplete, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box
+  Paper, Stack, Button, TextField, Autocomplete, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useSnackbar } from '@/providers';
-import apolloClient from '@/lib/apolloClient';
 import { formatDollar } from '@/lib/utils';
 import { CREATE_TRANSACTION } from '@/lib/mutations';
 import {
-    GET_GROUPS,
-    GET_ITEM_PRICES,
-    GET_ITEMS, GET_PURGATORY
+  GET_GROUPS,
+  GET_ITEM_PRICES,
+  GET_ITEMS, GET_PURGATORY
 } from '@/lib/queries';
+import { getApolloClient } from '@/lib/apolloClient';
 
 const TransactionOutgoing: React.FC = () => {
   const { notify } = useSnackbar();
@@ -43,10 +43,12 @@ const TransactionOutgoing: React.FC = () => {
   const [targetGroup, setTargetGroup] = useState<any>(null);
   const [itemsOut, setItemsOut] = useState<any[]>([{ item: null, quantity: 1, price: 0 }]);
   const [reductionOut, setReductionOut] = useState<number>(0);
-  const [purgatoryId, setPurgatoryId] = useState<string>('');
+  const [purgatoryId, setPurgatoryId] = useState<string>('');  
+  const apolloClient = getApolloClient();
+  
 
   useEffect(() => {
-    apolloClient.query({ query: GET_PURGATORY }).then(result => {
+    apolloClient.query({ query: GET_PURGATORY }).then((result: { data: any; }) => {
       const myGroup = (result.data as any).myGroup;
       setPurgatoryId(myGroup.id);
     });

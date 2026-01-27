@@ -4,7 +4,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/providers';
-import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
 import ConfirmModal from '@/components/layout/ConfirmModal';
 import { formatDollar } from '@/lib/utils';
@@ -12,6 +11,7 @@ import ActionsMenu from '@/components/layout/ActionsMenu';
 import { CREATE_ITEM_PRICE, UPDATE_ITEM_PRICE, DELETE_ITEM_PRICE } from '@/lib/mutations';
 import { GET_GROUPS, GET_ITEM_PRICES, GET_ITEMS } from '@/lib/queries';
 import { ItemPrice } from '@/lib/types';
+import { getApolloClient } from '@/lib/apolloClient';
 
 const columns: GridColDef[] = [
   {
@@ -62,7 +62,9 @@ const PricesPage: React.FC = () => {
   const [selectedItemId, setSelectedItemId] = useState<string>('');
   const [price, setPrice] = useState<string>('');
 
-  const { notify } = useSnackbar();
+  const { notify } = useSnackbar()!;
+  const apolloClient = getApolloClient();
+  
   const createItemPriceMutation = useMutation({
     mutationFn: async (input: { itemId: string; groupId: string; price: number }) => {
       setModalLoading(true);

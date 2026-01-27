@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import { Box, Chip, CircularProgress } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { GET_VEHICLE_USERS } from '../../../lib/queries';
-import apolloClient from '@/lib/apolloClient';
 import VehicleTablet from '@/components/vehicles/VehicleTablet';
 import VehicleTabletFake from '@/components/vehicle/VehicleTabletFake';
 

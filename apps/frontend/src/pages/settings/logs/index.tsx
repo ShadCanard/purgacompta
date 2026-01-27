@@ -3,9 +3,9 @@ import { Box, Typography, TextField, MenuItem, Stack, Paper } from '@mui/materia
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@/providers/UserProvider';
-import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
 import { GET_LOGS, GET_MEMBERS } from '@/lib/queries';
+import { getApolloClient } from '@/lib/apolloClient';
 
 
 
@@ -23,6 +23,7 @@ const LogsPage: React.FC = () => {
   const [entity, setEntity] = useState('');
   const [userId, setUserId] = useState('');
   const [pageSize, setPageSize] = useState(25);
+  const apolloClient = getApolloClient();
 
   // Récupère la liste des utilisateurs pour le filtre
   const { data: usersData } = useQuery({

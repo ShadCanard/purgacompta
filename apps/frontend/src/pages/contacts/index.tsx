@@ -10,12 +10,12 @@ import ConfirmModal from '@/components/layout/ConfirmModal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/lib/useSnackbar';
 import { gql } from '@apollo/client';
-import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
 import ActionsMenu from '@/components/layout/ActionsMenu';
 import { IMPORT_CONTACTS } from '@/lib/mutations';
 import { GET_CONTACTS } from '@/lib/queries';
 import { Contact } from '@/lib/types';
+import { getApolloClient } from '@/lib/apolloClient';
 
 const ActionsCell: React.FC<{ row: any; onEdit: (row: any) => void; onDelete: (row: any) => void }> = ({ row, onEdit, onDelete }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -62,7 +62,9 @@ const ContactsPage: React.FC = () => {
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; contact: any | null }>({ open: false, contact: null });
   const [importOpen, setImportOpen] = useState(false);
-  const { notify } = useSnackbar();
+  const { notify } = useSnackbar()!;
+  const apolloClient = getApolloClient();
+  
   // Mutation GraphQL pour l'import
   const importContactsMutation = useMutation({
     mutationFn: async (contacts: any[]) => {

@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    TextField,
-    CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  CircularProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GET_VEHICLE } from '@/lib/queries';
-import apolloClient from '@/lib/apolloClient';
 import { CREATE_VEHICLE, UPDATE_VEHICLE } from '@/lib/mutations';
+import { getApolloClient } from '@/lib/apolloClient';
 
 
 
@@ -27,6 +27,7 @@ const CreateUpdateVehicleModal: React.FC<CreateUpdateVehicleModalProps> = ({ ope
   const queryClient = useQueryClient();
   const isEdit = Boolean(vehicleId);
   const [form, setForm] = useState({ name: '', front: '', back: '' });
+  const apolloClient = getApolloClient();
 
   // Réinitialise le formulaire à chaque fermeture
   React.useEffect(() => {
@@ -67,7 +68,7 @@ const CreateUpdateVehicleModal: React.FC<CreateUpdateVehicleModalProps> = ({ ope
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['vehicles']);
+      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       onClose();
     },
   });

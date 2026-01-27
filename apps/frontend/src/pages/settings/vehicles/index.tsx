@@ -10,7 +10,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DELETE_VEHICLE } from '@/lib/mutations';
 import CreateUpdateVehicleModal from '@/components/vehicles/CreateUpdateVehicleModal';
 import { MainLayout } from '@/components';
-import apolloClient from '@/lib/apolloClient';
+import { getApolloClient } from '@/lib/apolloClient';
+import ProxiedImage from '@/components/layout/ProxiedImage';
 
 const VehiclesSettingsPage: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -18,13 +19,14 @@ const VehiclesSettingsPage: React.FC = () => {
   const [deleteId, setDeleteId] = useState<string | undefined>(undefined);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const queryClient = useQueryClient();
+  const apolloClient = getApolloClient();
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       await apolloClient.mutate({ mutation: DELETE_VEHICLE, variables: { id } });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['vehicles']);
+      queryClient.invalidateQueries({queryKey: ['vehicles']});
       setConfirmOpen(false);
       setDeleteId(undefined);
     },
@@ -70,14 +72,14 @@ const VehiclesSettingsPage: React.FC = () => {
                     <TableCell>{v.name}</TableCell>
                     <TableCell>
                       {v.front ? (
-                        <img src={v.front} alt="Avant" style={{ maxWidth: 80, maxHeight: 50, borderRadius: 4 }} />
+                        <ProxiedImage src={v.front} alt="Avant" style={{ maxWidth: 80, maxHeight: 50, borderRadius: 4 }} />
                       ) : (
                         <Typography variant="caption" color="text.secondary">—</Typography>
                       )}
                     </TableCell>
                     <TableCell>
                       {v.back ? (
-                        <img src={v.back} alt="Arrière" style={{ maxWidth: 80, maxHeight: 50, borderRadius: 4 }} />
+                        <ProxiedImage src={v.back} alt="Arrière" style={{ maxWidth: 80, maxHeight: 50, borderRadius: 4 }} />
                       ) : (
                         <Typography variant="caption" color="text.secondary">—</Typography>
                       )}
@@ -108,7 +110,7 @@ const VehiclesSettingsPage: React.FC = () => {
           description="Cette action est irréversible. Voulez-vous vraiment supprimer ce véhicule ?"
           onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
           onCancel={() => { setConfirmOpen(false); setDeleteId(undefined); }}
-          loading={deleteMutation.isLoading}
+          loading={deleteMutation.isPending}
         />
       </Paper>
     </MainLayout>

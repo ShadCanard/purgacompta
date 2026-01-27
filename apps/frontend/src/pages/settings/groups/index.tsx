@@ -5,7 +5,6 @@ import CreateUpdateGroupModal from '../../../components/groups/CreateUpdateGroup
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useQuery } from '@tanstack/react-query';
-import apolloClient from '@/lib/apolloClient';
 import MainLayout from '@/components/layout/MainLayout';
 import { useUser } from '@/providers/UserProvider';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -14,6 +13,7 @@ import ActionsMenu from '@/components/layout/ActionsMenu';
 import { DELETE_GROUP, UPDATE_GROUP_IS_ACTIVE } from '@/lib/mutations';
 import { GET_GROUPS } from '@/lib/queries';
 import { Group } from '@/lib/types';
+import { getApolloClient } from '@/lib/apolloClient';
 
 const GroupsPage: React.FC = () => {
   
@@ -28,7 +28,9 @@ const GroupsPage: React.FC = () => {
   const { hasPermission } = useUser();
 
   
-  const { notify } = useSnackbar();
+  const { notify } = useSnackbar()!;
+  const apolloClient = getApolloClient();
+  
   const deleteGroupMutation = useMutation({
     mutationFn: async (id: string) => {
       setDeleteLoadingId(id);

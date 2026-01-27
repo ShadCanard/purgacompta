@@ -3,11 +3,11 @@ import React, { useState, useMemo } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Avatar, Box, Typography } from '@mui/material';
 import { MainLayout } from '@/components';
-import apolloClient from '@/lib/apolloClient';
 import { useQuery } from '@tanstack/react-query';
 import { formatDollar } from '@/lib/utils';
 import { GET_MEMBERS } from '@/lib/queries';
 import { User } from '@/lib/types';
+import { getApolloClient } from '@/lib/apolloClient';
 
 const columns: GridColDef[] = [
   { field: 'avatar', headerName: '', renderCell: (params) => (
@@ -22,6 +22,7 @@ const columns: GridColDef[] = [
 
 const MembersPage: React.FC = () => {
   const [search, setSearch] = useState('');
+  const apolloClient = getApolloClient();
   const { data, isLoading } = useQuery<User[]>({
     queryKey: ['members'],
     queryFn: async () => {

@@ -9,9 +9,9 @@ import MainLayout from '@/components/layout/MainLayout';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import apolloClient from '@/lib/apolloClient';
 import { CREATE_ITEM, UPDATE_ITEM, DELETE_ITEM } from '@/lib/mutations';
 import { GET_ITEMS } from '@/lib/queries';
+import { getApolloClient } from '@/lib/apolloClient';
 
 const ActionsCell: React.FC<{ row: any; onEdit: (row: any) => void; onDelete: (row: any) => void }> = ({ row, onEdit, onDelete }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -75,7 +75,9 @@ const ItemsSettingsPage: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
 
-  const { notify } = useSnackbar();
+  const { notify } = useSnackbar()!;
+  const apolloClient = getApolloClient();
+  
   const createItemMutation = useMutation({
     mutationFn: async (input: { name: string; weight: number, sellable: boolean; weapon: boolean }) => {
       setModalLoading(true);

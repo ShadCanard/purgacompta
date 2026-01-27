@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Autocomplete,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Button,
+    Typography,
+    Box,
+    Autocomplete,
 } from '@mui/material';
-import apolloClient from '@/lib/apolloClient';
+import { getApolloClient } from '@/lib/apolloClient';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/lib/useSnackbar';
 import { CREATE_CONTACT, UPDATE_CONTACT } from '@/lib/mutations';
@@ -50,7 +50,7 @@ const CreateUpdateContactModal: React.FC<CreateUpdateContactModalProps> = ({ ope
   const { data: groupsData, isLoading: loadingGroups } = useQuery({
     queryKey: ['groups'],
     queryFn: async () => {
-      const result = await apolloClient.query<{ groups: { id: string; name: string }[] }>({ query: GET_GROUPS });
+      const result = await getApolloClient().query<{ groups: { id: string; name: string }[] }>({ query: GET_GROUPS });
       if (!result.data || !result.data.groups) return [];
       return result.data.groups;
     },
@@ -59,7 +59,7 @@ const CreateUpdateContactModal: React.FC<CreateUpdateContactModalProps> = ({ ope
   const createContactMutation = useMutation({
     mutationFn: async (input: { name: string; phone: string; groupId?: string | null }) => {
       setLoading(true);
-      const { data } = await apolloClient.mutate<{ createContact: { id: string; name: string; phone: string; group: { id: string; name: string } | null } }>({
+      const { data } = await getApolloClient().mutate<{ createContact: { id: string; name: string; phone: string; group: { id: string; name: string } | null } }>({
         mutation: CREATE_CONTACT,
         variables: { input },
       });
@@ -81,7 +81,7 @@ const CreateUpdateContactModal: React.FC<CreateUpdateContactModalProps> = ({ ope
   const updateContactMutation = useMutation({
     mutationFn: async (input: { id: string; name?: string; phone?: string; groupId?: string | null }) => {
       setLoading(true);
-      const { data } = await apolloClient.mutate<{ updateContact: { id: string; name: string; phone: string; group: { id: string; name: string } | null } }>({
+      const { data } = await getApolloClient().mutate<{ updateContact: { id: string; name: string; phone: string; group: { id: string; name: string } | null } }>({
         mutation: UPDATE_CONTACT,
         variables: { input },
       });

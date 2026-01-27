@@ -48,13 +48,11 @@ export const authOptions: NextAuthOptions = {
 
           const data = await response.json();
           if (data.errors) {
-            console.error('Error registering user:', data.errors);
             return false;
           }
           
           return true;
         } catch (error) {
-          console.error('Error during sign in:', error);
           return false;
         }
       }

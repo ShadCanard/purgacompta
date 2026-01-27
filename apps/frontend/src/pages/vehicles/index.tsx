@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Box, Typography, Paper, Grid, Chip, Autocomplete, TextField } from '@mui/material';
 import { GET_VEHICLE_USERS, GET_VEHICLES, GET_MEMBERS } from '@/lib/queries';
-import apolloClient from '@/lib/apolloClient';
+import { getApolloClient } from '@/lib/apolloClient';
 import { MainLayout } from '@/components';
 import { useSnackbar } from '@/providers';
 import { SET_VEHICLE_USER } from '@/lib/mutations';
@@ -15,7 +15,7 @@ const VehiclesPage: React.FC = () => {
   const { data: vehicleUsers, isLoading: loadingVU } = useQuery({
     queryKey: ['vehicleUsers-list'],
     queryFn: async () => {
-      const { data } = await apolloClient.query({ query: GET_VEHICLE_USERS });
+      const { data } = await getApolloClient().query({ query: GET_VEHICLE_USERS });
       return (data as any).vehicleUsers;
     },
   });
@@ -24,7 +24,7 @@ const VehiclesPage: React.FC = () => {
   const { data: vehicles, isLoading: loadingVehicles } = useQuery({
     queryKey: ['vehicles-list'],
     queryFn: async () => {
-      const { data } = await apolloClient.query({ query: GET_VEHICLES });
+      const { data } = await getApolloClient().query({ query: GET_VEHICLES });
       return (data as any).vehicles;
     },
   });
@@ -33,7 +33,7 @@ const VehiclesPage: React.FC = () => {
   const { data: members, isLoading: loadingMembers } = useQuery({
     queryKey: ['members-list'],
     queryFn: async () => {
-      const { data } = await apolloClient.query({ query: GET_MEMBERS });
+      const { data } = await getApolloClient().query({ query: GET_MEMBERS });
       return (data as any).users;
     },
   });
@@ -41,7 +41,7 @@ const VehiclesPage: React.FC = () => {
   // Mutation pour modifier le véhicule d'un membre
   const { mutate: setVehicleUser, isPending } = useMutation({
     mutationFn: async (input: any) => {
-      const result = await apolloClient.mutate({
+      const result = await getApolloClient().mutate({
         mutation: SET_VEHICLE_USER,
         variables: { input },
       });

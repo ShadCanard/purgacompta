@@ -8,7 +8,6 @@ import { DELETE_TRANSACTION } from '@/lib/mutations';
 import { useQueryClient } from '@tanstack/react-query';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { formatDollar } from '@/lib/utils';
-import apolloClient from '@/lib/apolloClient';
 
 export interface TransactionLine {
   id: string;

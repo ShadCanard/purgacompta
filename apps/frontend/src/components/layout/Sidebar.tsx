@@ -119,7 +119,25 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onToggle }) => {
 
 
   // Gestion de l'ouverture des sous-menus
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+  // Ouvre automatiquement tous les menus/sous-menus contenant la page active
+  const getActiveMenuPaths = (items: MenuItem[], pathname: string, parents: string[] = []): string[] => {
+    for (const item of items) {
+      if (item.path && pathname.startsWith(item.path)) {
+        return [...parents, item.text];
+      }
+      if (item.children) {
+        const found = getActiveMenuPaths(item.children, pathname, [...parents, item.text]);
+        if (found.length) return found;
+      }
+    }
+    return [];
+  };
+  const activeMenuPaths = getActiveMenuPaths(menuItems, router.pathname);
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
+    const obj: Record<string, boolean> = {};
+    activeMenuPaths.forEach((text) => { obj[text] = true; });
+    return obj;
+  });
 
   const handleToggleMenu = (text: string) => {
     setOpenMenus((prev) => ({ ...prev, [text]: !prev[text] }));

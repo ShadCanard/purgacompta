@@ -1,4 +1,3 @@
-console.log('[INDEX] Page dashboard chargée');
 import { getApolloClient } from '@/lib/apolloClient';
 import { useEffect } from 'react';
 import { USER_UPDATED } from '@/lib/subscriptions';
@@ -28,22 +27,18 @@ const HomePage: React.FC = () => {
   // Ajout d'un état local pour forcer le refresh
   const [refresh, setRefresh] = React.useState(0);
   useEffect(() => {
-    console.log('[USER_UPDATED][frontend] Initialisation de la souscription USER_UPDATED');
     const sub = apolloClient.subscribe({ query: USER_UPDATED }).subscribe({
       next: async (result: any) => {
         const { data } = result;
         if (data?.userUpdated) {
-          console.log('[USER_UPDATED][frontend] Event reçu pour', data.userUpdated.id, data.userUpdated.name, data.userUpdated.isOnline);
           // Invalider explicitement le cache Apollo pour la liste des membres
           apolloClient.cache.evict({ id: 'ROOT_QUERY', fieldName: 'users' });
           apolloClient.cache.gc();
           setRefresh((r) => r + 1); // Incrémente pour forcer le refetch
         } else {
-          console.warn('[USER_UPDATED][frontend] Event reçu mais data.userUpdated absent', data);
         }
       },
       error: (err: any) => {
-        console.error('[USER_UPDATED][frontend][error]', err);
         if (err && err.message) {
           alert('Erreur subscription USER_UPDATED : ' + err.message);
         }
@@ -58,7 +53,6 @@ const HomePage: React.FC = () => {
     queryFn: async () => {
       const result = await apolloClient.query({ query: GET_MEMBERS, fetchPolicy: 'network-only' });
       const users = (result.data as { users: any[] }).users;
-      console.log('[GET_MEMBERS][queryFn] Utilisateurs reçus:', users.map(u => ({ id: u.id, name: u.name, isOnline: u.isOnline })));
       // Affiche MEMBER ou supérieur, sans l'utilisateur courant
       const hierarchy = ['GUEST', 'MEMBER', 'MANAGER', 'ADMIN', 'OWNER'];
       return users.filter(u => hierarchy.indexOf(u.role) >= hierarchy.indexOf('MEMBER'));

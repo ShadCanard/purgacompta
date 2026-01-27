@@ -1,33 +1,33 @@
 import React from 'react';
 import {
-    Stack,
-    Paper,
-    Autocomplete,
-    TextField,
-    TableContainer,
-    Table,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    IconButton,
-    Button,
-    Box,
-    FormControlLabel,
-    Switch,
-    Typography,
-    InputAdornment
+  Stack,
+  Paper,
+  Autocomplete,
+  TextField,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  IconButton,
+  Button,
+  Box,
+  FormControlLabel,
+  Switch,
+  Typography,
+  InputAdornment
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import { formatDollar } from '@/lib/utils';
 import CreateUpdateContactModal from '@/components/contacts/CreateUpdateContactModal';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useSnackbar } from '@/providers';
-import apolloClient from '@/lib/apolloClient';
 import { CREATE_TRANSACTION } from '@/lib/mutations';
 import {
-    GET_CONTACTS_OR_GROUPS_TRANSACTION, GET_ITEM_PRICES_BY_TARGET, GET_PURGATORY
+  GET_CONTACTS_OR_GROUPS_TRANSACTION, GET_ITEM_PRICES_BY_TARGET, GET_PURGATORY
 } from '@/lib/queries';
+import { getApolloClient } from '@/lib/apolloClient';
 
 const IncomingTransaction: React.FC = () => {
 
@@ -53,6 +53,7 @@ const IncomingTransaction: React.FC = () => {
 
   // Modale création contact
   const [openCreateContact, setOpenCreateContact] = React.useState(false);
+  const apolloClient = getApolloClient();
 
   // Rafraîchit la liste après ajout d'un contact
   React.useEffect(() => {

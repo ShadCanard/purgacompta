@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Stack,
-  Switch,
-  FormGroup,
-  FormControlLabel,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Button,
+    Stack,
+    Switch,
+    FormGroup,
+    FormControlLabel,
 } from '@mui/material';
 
 interface CreateUpdateItemModalProps {
@@ -35,7 +35,6 @@ const CreateUpdateItemModal: React.FC<CreateUpdateItemModalProps> = ({
 
   useEffect(() => {
     if (initialData) {
-      console.dir(initialData);
       setName(initialData.name);
       setWeight(initialData.weight.toString().replace('.', ','));
       setSellable(initialData.sellable || false);

@@ -1,5 +1,5 @@
 
-import apolloClient from "@/lib/apolloClient";
+import { getApolloClient } from '@/lib/apolloClient';
 import { GET_TRANSACTIONS_BY_ENTITY, GET_TRANSACTIONS, GET_CONTACTS_OR_GROUPS_TRANSACTION } from "@/lib/queries";
 import { Typography, Box, Autocomplete, Paper, TextField } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { useState } from "react";
 
 // Composant pour afficher l'historique des transactions d'une entité (groupe/contact) ou toutes si aucun filtre
 const HistoryTransactions: React.FC<{ entityId?: string }> = ({ entityId }) => {
+  const apolloClient = getApolloClient();
   const [groupOrContact, setGroupOrContact] = useState<any>(null); // pour Entrante
   const { data: contactsOrGroups = { groups: [], contactsWithoutGroup: [] } } = useQuery({
     queryKey: ['contactsOrGroupsTransaction'],

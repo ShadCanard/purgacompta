@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout';
 import { Box, Typography, Paper, Avatar, CircularProgress, Autocomplete, TextField } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/providers';
-import apolloClient from '@/lib/apolloClient';
-import { useUser } from '@/providers/UserProvider';
+import { useUser, useUpdateUser } from '@/providers/UserProvider';
 import { GET_MEMBERS } from '@/lib/queries';
-import { UPDATE_USER } from '@/lib/mutations';
+import { getApolloClient } from '@/lib/apolloClient';
+// import { UPDATE_USER } from '@/lib/mutations';
+// import { getApolloClient } from '@/lib/apolloClient';
 
 const USER_ROLES = [
   { value: 'GUEST', label: 'Guest' },
@@ -22,28 +23,18 @@ const UsersPage: React.FC = () => {
   const [phoneEditRows, setPhoneEditRows] = useState<{ [id: string]: string }>({});
   const { user: currentUser } = useUser();
   const queryClient = useQueryClient();
+  const {mutate: updateUser, isPending: isUpdatingUser } = useUpdateUser();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
+      const apolloClient = getApolloClient();
       const result = await apolloClient.query({ query: GET_MEMBERS, fetchPolicy: 'network-only', });
       return (result.data as any).users;
     },
   });
   // Mutation unifiée pour mettre à jour un utilisateur (nom, téléphone, rôle...)
-  const { notify } = useSnackbar();
-  const { mutate: updateUser, isLoading: isUpdatingUser } = useMutation({
-    mutationFn: async ({ id, input }: { id: string; input: any }) => {
-      await apolloClient.mutate({ mutation: UPDATE_USER, variables: { id, input } });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-      notify('Succès', 'success');
-    },
-    onError: (err: any) => {
-      notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
-    },
-  });
+  const { notify } = useSnackbar()!;
   const roleHierarchy: Record<string, number> = {
     GUEST: 0,
     MEMBER: 1,
@@ -84,7 +75,7 @@ const UsersPage: React.FC = () => {
                 }
               }
             }}
-            disabled={isUpdatingName}
+            disabled={isUpdatingUser}
             style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4, border: '1px solid #ccc' }}
             autoFocus
           />
@@ -110,7 +101,7 @@ const UsersPage: React.FC = () => {
                 }
               }
             }}
-            disabled={isUpdatingPhone}
+            disabled={isUpdatingUser}
             style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4, border: '1px solid #ccc' }}
             autoFocus
             placeholder="555-XXXX"
@@ -126,7 +117,7 @@ const UsersPage: React.FC = () => {
       renderCell: (params: GridRenderCellParams) => {
         const user = params.row;
         const disabled =
-          isUpdatingRole ||
+          isUpdatingUser ||
           !currentUser ||
           roleHierarchy[currentUser.role] <= roleHierarchy[user.role];
         return (
@@ -137,7 +128,7 @@ const UsersPage: React.FC = () => {
               value={USER_ROLES.find(r => r.value === user.role) || null}
               onChange={(_, value) => {
                 if (value && !disabled) {
-                  updateUser({ id: user.id, input: { role: value.value } });
+                  updateUser({ id: user.id, input: { role: value.value as any } });
                 }
               }}
               size='small'
