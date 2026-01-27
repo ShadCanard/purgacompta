@@ -149,13 +149,14 @@ model Vehicle {
 
 model VehicleUser {
   id        String   @id @default(cuid())
-  vehicleId String
+  vehicleId String?
   userId    String
   found     Boolean  @default(false)
 
-  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicle   Vehicle?  @relation(fields: [vehicleId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 
-  @@unique([vehicleId, userId])
+  // Suppression de la contrainte d'unicité vehicleId+userId car vehicleId peut être null
+  @@index([userId])
   @@map("vehicle_users")
 }

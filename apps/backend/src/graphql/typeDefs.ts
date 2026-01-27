@@ -24,7 +24,7 @@ export const typeDefs = `#graphql
   # Type VehicleUser (liaison véhicule/utilisateur)
   type VehicleUser {
     id: ID!
-    vehicle: Vehicle!
+    vehicle: Vehicle
     user: User!
     found: Boolean!
   }
@@ -389,5 +389,6 @@ export const typeDefs = `#graphql
   # Subscriptions
   type Subscription {
     userUpdated: User!
+    tabletUpdated: VehicleUser!
   }
 `;

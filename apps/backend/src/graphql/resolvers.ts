@@ -73,19 +73,11 @@ function formatDate(date: string | Date | null | undefined): string {
 }
 
 export const resolvers = {
-    Subscription: {
-      userUpdated: {
-        subscribe: () => pubsub.asyncIterator(['USER_UPDATED'])
-      },
-      vehicleUserChanged: {
-        subscribe: () => pubsub.asyncIterator(['VEHICLE_USER_CHANGED'])
-      }
-    },
   Vehicle: {
     vehicleUsers: (parent: any) => prisma.vehicleUser.findMany({ where: { vehicleId: parent.id } }),
   },
   VehicleUser: {
-    vehicle: (parent: any) => prisma.vehicle.findUnique({ where: { id: parent.vehicleId } }),
+    vehicle: (parent: any) => parent.vehicleId ? prisma.vehicle.findUnique({ where: { id: parent.vehicleId } }) : null,
     user: (parent: any) => prisma.user.findUnique({ where: { id: parent.userId } }),
   },
   Transaction: {
@@ -342,38 +334,49 @@ export const resolvers = {
       });
     },
   },
-
-  // Subscription fusionnée ci-dessus
+  Subscription: {
+    userUpdated: {
+      subscribe: () => pubsub.asyncIterator(['USER_UPDATED'])
+    },
+    tabletUpdated: {
+      subscribe: (...args: any[]) => {
+        console.log('[BACKEND] Nouvelle souscription TABLET_UPDATED');
+        return pubsub.asyncIterator(['TABLET_UPDATED']);
+      }
+    }
+  },
   Mutation: {
     // VehicleUser CRUD
     setVehicleUser: async (_: any, { input }: { input: { vehicleId?: string; userId: string; found?: boolean } }) => {
-      // Si vehicleId absent, supprimer l'association pour cet utilisateur
-      if (!input.vehicleId) {
-        const existing = await prisma.vehicleUser.findFirst({ where: { userId: input.userId } });
-        if (existing) {
-          await prisma.vehicleUser.delete({ where: { id: existing.id } });
-          // pubsub.publish('VEHICLE_USER_CHANGED', { vehicleUserChanged: existing });
-        }
-        return null;
-      }
-      // Si le user a déjà un véhicule, supprimer l'association avant de créer la nouvelle
+      console.log("[SET_VEHICLE_USER] Received", input);
+      // Find existing vehicleUser by userId
       const existing = await prisma.vehicleUser.findFirst({ where: { userId: input.userId } });
+      let result;
       if (existing) {
-        await prisma.vehicleUser.delete({ where: { id: existing.id } });
+        // Update using the unique id (robuste même si vehicleId change ou null)
+        result = await prisma.vehicleUser.update({
+          where: { id: existing.id },
+          data: { vehicleId: input.vehicleId ?? null, found: input.found ?? false },
+        });
+        console.log("[SET_VEHICLE_USER] Updated:", result);
+      } else {
+        // Create new record
+        result = await prisma.vehicleUser.create({
+          data: {
+            vehicleId: input.vehicleId ?? null,
+            userId: input.userId,
+            found: input.found ?? false,
+          },
+        });
+        console.log("[SET_VEHICLE_USER] Created:", result);
       }
-      // Créer la nouvelle association
-      const created = await prisma.vehicleUser.create({
-        data: {
-          vehicleId: input.vehicleId,
-          userId: input.userId,
-          found: input.found ?? false,
-        },
-      });
-      // pubsub.publish('VEHICLE_USER_CHANGED', { vehicleUserChanged: created });
-      return created;
+      await pubsub.publish('TABLET_UPDATED', { tabletUpdated: result });
+      return result;
     },
     setVehicleUserFound: async (_: any, { input }: { input: { id: string; found: boolean } }) => {
-      return prisma.vehicleUser.update({ where: { id: input.id }, data: { found: input.found } });
+      const updated = await prisma.vehicleUser.update({ where: { id: input.id }, data: { found: input.found } });
+      await pubsub.publish('TABLET_UPDATED', { tabletUpdated: updated });
+      return updated;
     },
     deleteVehicleUser: async (_: any, { id }: { id: string }) => {
       await prisma.vehicleUser.delete({ where: { id } });
@@ -697,5 +700,5 @@ export const resolvers = {
       return user;
     },
 
-    },
+  },
   };
