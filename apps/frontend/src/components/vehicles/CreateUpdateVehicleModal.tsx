@@ -114,9 +114,9 @@ const CreateUpdateVehicleModal: React.FC<CreateUpdateVehicleModalProps> = ({ ope
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} disabled={mutation.isLoading}>Annuler</Button>
-          <Button type="submit" variant="contained" disabled={mutation.isLoading} startIcon={isEdit ? <EditIcon /> : <AddIcon />}>
-            {mutation.isLoading ? <CircularProgress size={20} /> : isEdit ? 'Enregistrer' : 'Créer'}
+          <Button onClick={onClose} disabled={mutation.isPending}>Annuler</Button>
+          <Button type="submit" variant="contained" disabled={mutation.isPending} startIcon={isEdit ? <EditIcon /> : <AddIcon />}>
+            {mutation.isPending ? <CircularProgress size={20} /> : isEdit ? 'Enregistrer' : 'Créer'}
           </Button>
         </DialogActions>
       </form>
