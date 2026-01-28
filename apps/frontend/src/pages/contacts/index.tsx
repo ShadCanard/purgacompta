@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box, Typography, Stack, Button, Menu, MenuItem } from '@mui/material';
+import { Box, Typography, Stack, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { MainLayout } from '@/components';
@@ -9,29 +9,12 @@ import ImportContactModal from '@/components/contacts/ImportContactModal';
 import ConfirmModal from '@/components/layout/ConfirmModal';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/lib/useSnackbar';
-import { gql } from '@apollo/client';
 import { useQuery } from '@tanstack/react-query';
 import ActionsMenu from '@/components/layout/ActionsMenu';
-import { IMPORT_CONTACTS } from '@/lib/mutations';
+import { DELETE_CONTACT, IMPORT_CONTACTS } from '@/lib/mutations';
 import { GET_CONTACTS } from '@/lib/queries';
 import { Contact } from '@/lib/types';
 import { getApolloClient } from '@/lib/apolloClient';
-
-const ActionsCell: React.FC<{ row: any; onEdit: (row: any) => void; onDelete: (row: any) => void }> = ({ row, onEdit, onDelete }) => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
-  const handleClose = () => setAnchorEl(null);
-  return (
-    <>
-      <Button size="small" onClick={handleOpen}>⋮</Button>
-      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={() => { handleClose(); onEdit(row); }}>Modifier</MenuItem>
-        <MenuItem onClick={() => { handleClose(); onDelete(row); }}>Supprimer</MenuItem>
-      </Menu>
-    </>
-  );
-};
 
 const columns: GridColDef[] = [
   { field: 'name', headerName: 'Nom', flex: 1 },
@@ -90,11 +73,7 @@ const ContactsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-    const DELETE_CONTACT = gql`
-      mutation DeleteContact($id: ID!) {
-        deleteContact(id: $id)
-      }
-    `;
+
     const deleteContactMutation = useMutation({
       mutationFn: async (id: string) => {
         setDeleteLoadingId(id);

@@ -198,6 +198,7 @@ export const GET_CONTACTS = gql`
       id
       name
       phone
+      groupid
       group {
         id
         name

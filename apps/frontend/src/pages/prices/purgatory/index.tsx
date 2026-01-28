@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Button, Stack, TextField, Autocomplete, Switch, FormControlLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
@@ -32,6 +32,8 @@ const PricesPage: React.FC = () => {
   const [price, setPrice] = useState<string>('');
   const [buying, setBuying] = useState<boolean>(true);
   const [selectedTargetId, setSelectedTargetId] = useState<string>('');
+  const [rows, setRows] = useState<any>([]);
+  const [itemPrices, setItemPrices] = useState<any>(null);
 
   const { notify } = useSnackbar()!;
   const apolloClient = getApolloClient();
@@ -48,7 +50,7 @@ const PricesPage: React.FC = () => {
       setOpen(false);
       setEditPrice(null);
       setModalLoading(false);
-      queryClient.invalidateQueries({ queryKey: ['itemPrices'] });
+      queryClient.invalidateQueries({ queryKey: ['itemPricesByGroup'] });
       notify('Succès', 'success');
     },
     onError: (err: any) => {
@@ -69,7 +71,7 @@ const PricesPage: React.FC = () => {
       setOpen(false);
       setEditPrice(null);
       setModalLoading(false);
-      queryClient.invalidateQueries({ queryKey: ['itemPrices'] });
+      queryClient.invalidateQueries({ queryKey: ['itemPricesByGroup'] });
       notify('Succès', 'success');
     },
     onError: (err: any) => {
@@ -88,7 +90,7 @@ const PricesPage: React.FC = () => {
     },
     onSuccess: () => {
       setDeleteLoadingId(null);
-      queryClient.invalidateQueries({ queryKey: ['itemPrices'] });
+      queryClient.invalidateQueries({ queryKey: ['itemPricesByGroup'] });
       notify('Succès', 'success');
     },
     onError: (err: any) => {
@@ -97,12 +99,13 @@ const PricesPage: React.FC = () => {
     },
   });
 
-  const { data: itemPrices, isLoading } = useQuery<ItemPrice[]>({
+  const { data: _, isLoading } = useQuery<ItemPrice[]>({
     queryKey: ['itemPricesByGroup', groupId],
     enabled: !!groupId,
     queryFn: async () => {
       if (!groupId) return [];
       const result = await apolloClient.query({ query: GET_ITEM_PRICES_BY_GROUP, variables: { groupId }, fetchPolicy: 'network-only' });
+      setItemPrices((result.data as any).itemPricesByGroup);
       return (result.data as any).itemPricesByGroup;
     },
   });
@@ -240,12 +243,15 @@ const PricesPage: React.FC = () => {
   ];
 
 
-  // Filtrage par groupe
-  const filteredPrices = groupId
-    ? (itemPrices || []).filter((row: ItemPrice) => row.group?.id === groupId)
-    : (itemPrices || []);
-  // Injection des handlers dans chaque ligne
-  const rows = filteredPrices.map((row: ItemPrice) => ({ ...row, onEdit: handleEdit, onDelete: handleDelete }));
+  useEffect(() => {
+      // Filtrage par groupe
+    const filteredPrices = groupId
+      ? (itemPrices || []).filter((row: ItemPrice) => row.group?.id === groupId)
+      : (itemPrices || []);
+    // Injection des handlers dans chaque ligne
+    setRows(filteredPrices.map((row: ItemPrice) => ({ ...row, onEdit: handleEdit, onDelete: handleDelete })));
+
+  }, [itemPrices, groupId]);
 
   const targets = [
     ...groups.toSorted((a, b) => a.name.localeCompare(b.name)),

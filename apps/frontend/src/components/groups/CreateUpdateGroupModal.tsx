@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, Box, Switch } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CREATE_GROUP, UPDATE_GROUP } from '@/lib/mutations';
+import { getApolloClient } from '@/lib/apolloClient';
 
 interface CreateUpdateGroupModalProps {
   open: boolean;
@@ -22,6 +23,7 @@ const CreateUpdateGroupModal: React.FC<CreateUpdateGroupModalProps> = ({ open, o
   const [form, setForm] = useState({ name: '', tag: '', description: '', isActive: true, color1: '#000000', color2: '#000000' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const apolloClient = getApolloClient();
 
   useEffect(() => {
     if (initialData) {

@@ -106,7 +106,7 @@ model ItemPrice {
   item      Item   @relation(fields: [itemId], references: [id])
   group     Group  @relation(fields: [groupId], references: [id])
 
-  @@unique([itemId, groupId])
+  @@unique([itemId, groupId, targetId])
   @@map("item_prices")
 }
 

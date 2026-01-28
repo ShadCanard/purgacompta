@@ -108,6 +108,7 @@ export const typeDefs = `#graphql
     name: String!
     phone: String!
     group: Group
+    groupid: ID
     createdAt: String!
     updatedAt: String!
     notes: String
@@ -359,15 +360,17 @@ export const typeDefs = `#graphql
     createContact(input: CreateContactInput!): Contact!
     updateContact(input: UpdateContactInput!): Contact!
     deleteContact(id: ID!): Boolean!
+
     # Enregistrer ou mettre à jour un utilisateur (appelé lors de la connexion)
     registerOrUpdateUser(input: RegisterUserInput!): User!
+
 
     # Supprimer un utilisateur (owner only)
     deleteUser(discordId: String!): Boolean!
 
 
     # Créer un groupe criminel
-    createGroup(name: String!, tag: String, description: String, color1: String, color2: String): Group!
+    createGroup(name: String!, tag: String, description: String, color1: String, color2: String, isActive: Boolean): Group!
 
     # Modifier un groupe (tous champs)
     updateGroup(input: UpdateGroupInput!): Group!

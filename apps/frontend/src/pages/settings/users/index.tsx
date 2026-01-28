@@ -7,8 +7,6 @@ import { useSnackbar } from '@/providers';
 import { useUser, useUpdateUser } from '@/providers/UserProvider';
 import { GET_MEMBERS } from '@/lib/queries';
 import { getApolloClient } from '@/lib/apolloClient';
-// import { UPDATE_USER } from '@/lib/mutations';
-// import { getApolloClient } from '@/lib/apolloClient';
 
 const USER_ROLES = [
   { value: 'GUEST', label: 'Guest' },
@@ -24,6 +22,7 @@ const UsersPage: React.FC = () => {
   const { user: currentUser } = useUser();
   const queryClient = useQueryClient();
   const {mutate: updateUser, isPending: isUpdatingUser } = useUpdateUser();
+  const apolloClient = getApolloClient();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['users'],
@@ -44,6 +43,8 @@ const UsersPage: React.FC = () => {
   };
 
   // Colonnes du DataGrid
+
+
   const columns: GridColDef[] = [
     {
       field: 'avatar',
@@ -144,6 +145,7 @@ const UsersPage: React.FC = () => {
       },
     },
     { field: 'username', headerName: 'Nom Discord', width: 180 },
+
   ];
 
   return (
