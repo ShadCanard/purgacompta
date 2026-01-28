@@ -11,7 +11,7 @@ import cors from 'cors';
 // Charger les variables d'environnement
 dotenv.config();
 
-const PORT = parseInt(process.env.PORT || '4000', 10);
+const PORT = Number.parseInt(process.env.PORT || '4000', 10);
 
 async function main() {
   // Créer le schéma GraphQL
