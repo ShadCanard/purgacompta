@@ -2,16 +2,12 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
-import { useQueryClient } from '@tanstack/react-query';
 import VehicleTablet from '@/components/vehicles/VehicleTablet';
 import VehicleTabletFake from '@/components/vehicles/VehicleTabletFake';
-import { getApolloClient } from '@/lib/apolloClient';
 
 
 const VehicleTabletPage: React.FC = () => {
   const router = useRouter();
-  const apolloClient = getApolloClient();
-  const queryClient = useQueryClient();
 
   const accessKey = typeof window !== 'undefined' ? (router.query.AccessKey as string || '') : '';
 
