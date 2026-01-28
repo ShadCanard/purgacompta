@@ -20,13 +20,10 @@ import { Contact, Group, ItemPrice } from '@/lib/types';
 import { getApolloClient } from '@/lib/apolloClient';
 
 const PricesPage: React.FC = () => {
-  const [open, setOpen] = useState(false);
-  const [editPrice, setEditPrice] = useState<any | null>(null);
-  const [modalLoading, setModalLoading] = useState(false);
 
   const queryClient = useQueryClient();
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; price: any | null }>({ open: false, price: null });
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; price: ItemPrice | null }>({ open: false, price: null });
   const [groupId, setGroupId] = useState<string>('');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
   const [price, setPrice] = useState<string>('');
@@ -40,42 +37,32 @@ const PricesPage: React.FC = () => {
   
   const createItemPriceMutation = useMutation({
     mutationFn: async (input: { itemId: string; groupId: string; price: number; targetId?: string; buying?: boolean }) => {
-      setModalLoading(true);
       await apolloClient.mutate({
         mutation: CREATE_ITEM_PRICE,
         variables: { input },
       });
     },
     onSuccess: () => {
-      setOpen(false);
-      setEditPrice(null);
-      setModalLoading(false);
       queryClient.invalidateQueries({ queryKey: ['itemPricesByGroup'] });
       notify('Succès', 'success');
     },
     onError: (err: any) => {
-      setModalLoading(false);
       notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
 
   const updateItemPriceMutation = useMutation({
     mutationFn: async (input: { id: string; price?: number; targetId?: string; buying?: boolean }) => {
-      setModalLoading(true);
       await apolloClient.mutate({
         mutation: UPDATE_ITEM_PRICE,
         variables: { input },
       });
     },
     onSuccess: () => {
-      setOpen(false);
-      setEditPrice(null);
-      setModalLoading(false);
       queryClient.invalidateQueries({ queryKey: ['itemPricesByGroup'] });
       notify('Succès', 'success');
     },
     onError: (err: any) => {
-      setModalLoading(false);
       notify((err?.message || 'Erreur') + (err?.stack ? '\n' + err.stack : ''), 'error');
     },
   });
@@ -116,7 +103,8 @@ const PricesPage: React.FC = () => {
       return (result.data as any).items;
     },
   });
-  const { data: group } = useQuery<{ id: string; name: string }[]>({
+  
+  useQuery<{ id: string; name: string }[]>({
     queryKey: ['myGroup'],
     queryFn: async () => {
       const result = await apolloClient.query({ query: GET_PURGATORY });
@@ -141,7 +129,6 @@ const PricesPage: React.FC = () => {
     },
 });
 
-  const handleEdit = (row: ItemPrice) => setEditPrice(row);
   const handleDelete = (row: ItemPrice) => setConfirmDelete({ open: true, price: row });
   const handleConfirmDelete = () => {
     if (confirmDelete.price) {
@@ -156,7 +143,7 @@ const PricesPage: React.FC = () => {
       createItemPriceMutation.mutate({
         itemId: selectedItemId,
         groupId: groupId,
-        price: parseFloat(price.replace(',', '.')) || 0,
+        price: Number.parseFloat(price.replace(',', '.')) || 0,
         targetId: selectedTargetId || undefined,
         buying,
       });
@@ -194,7 +181,7 @@ const PricesPage: React.FC = () => {
           checked={!!params.value}
           color="primary"
           onChange={(_, checked) => {
-            params.api.setEditCellValue({ id: params.id, field: 'buying', value: checked }, event);
+            params.api.setEditCellValue({ id: params.id, field: 'buying', value: checked });
           }}
         />
       ),
@@ -218,7 +205,7 @@ const PricesPage: React.FC = () => {
           getOptionLabel={(option: any) => option?.name || ''}
           value={[...groups, ...contacts].find((i: any) => i.id === params.value) || null}
           onChange={(_, value) => {
-            params.api.setEditCellValue({ id: params.id, field: 'targetId', value: value ? value.id : '' }, event);
+            params.api.setEditCellValue({ id: params.id, field: 'targetId', value: value ? value.id : '' });
           }}
           isOptionEqualToValue={(option, value) => option.id === value.id}
           renderInput={(inputParams) => (
@@ -249,7 +236,7 @@ const PricesPage: React.FC = () => {
       ? (itemPrices || []).filter((row: ItemPrice) => row.group?.id === groupId)
       : (itemPrices || []);
     // Injection des handlers dans chaque ligne
-    setRows(filteredPrices.map((row: ItemPrice) => ({ ...row, onEdit: handleEdit, onDelete: handleDelete })));
+    setRows(filteredPrices.map((row: ItemPrice) => ({ ...row, onDelete: handleDelete })));
 
   }, [itemPrices, groupId]);
 
