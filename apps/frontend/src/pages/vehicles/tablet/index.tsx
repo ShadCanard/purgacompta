@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import VehicleTablet from '@/components/vehicles/VehicleTablet';
-import VehicleTabletFake from '@/components/vehicle/VehicleTabletFake';
+import VehicleTabletFake from '@/components/vehicles/VehicleTabletFake';
 import { getApolloClient } from '@/lib/apolloClient';
 
 
