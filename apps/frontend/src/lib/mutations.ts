@@ -1,3 +1,5 @@
+import { gql } from "@apollo/client";
+
 export const UPDATE_CONTACTS_MASS = gql`
 	mutation UpdateContactsMass($ids: [ID!]!, $groupId: ID!) {
 		updateContactsMass(ids: $ids, groupId: $groupId) {
@@ -14,7 +16,6 @@ export const DELETE_CONTACTS_MASS = gql`
 		deleteContactsMass(ids: $ids)
 	}
 `;
-import { gql } from "@apollo/client";
 
 export const UPDATE_USER = gql`
 	mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {

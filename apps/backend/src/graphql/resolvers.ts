@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 const emitter = new EventEmitter();
 const pubsub = {
 	asyncIterator: (triggers: string[]) => {
@@ -53,7 +53,7 @@ interface RegisterUserInput {
 function formatDate(date: string | Date | null | undefined): string {
 	if (!date) return '';
 	const d = typeof date === 'string' ? new Date(date) : date;
-	if (isNaN(d.getTime())) return '';
+	if (Number.isNaN(d.getTime())) return '';
 	const pad = (n: number) => n.toString().padStart(2, '0');
 	return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
@@ -291,9 +291,9 @@ export const resolvers = {
 		// Contacts CRUD
 		contacts: async () => {
 		const filterMembers = await prisma.user.findMany({select: { phone: true } });
-		const memberPhones = filterMembers.map(m => m.phone);
+		const memberPhones = new Set(filterMembers.map(m => m.phone));
 		return prisma.contact.findMany({ orderBy: { createdAt: 'desc' }, include: { group: true } }).then(contacts =>
-			contacts.filter(contact => !memberPhones.includes(contact.phone))
+			contacts.filter(contact => !memberPhones.has(contact.phone))
 		);
 		},
 		contactById: async (_: any, { id }: { id: string }) => {
@@ -302,9 +302,9 @@ export const resolvers = {
 		contactsWithoutGroup: async () => {
 		// Exclure les contacts dont le numéro est déjà utilisé par un User
 		const users = await prisma.user.findMany({ select: { phone: true } });
-		const userPhones = users.map(u => u.phone);
+		const userPhones = new Set(users.map(u => u.phone));
 		const contacts = await prisma.contact.findMany({ where: { groupid: null }, orderBy: { createdAt: 'desc' } });
-		return contacts.filter(contact => !userPhones.includes(contact.phone));
+		return contacts.filter(contact => !userPhones.has(contact.phone));
 		},
 		// Récupérer toutes les transactions où entityId est sourceId ou targetId
 		transactionsByEntity: async (_: any, { entityId }: { entityId: string }) => {
@@ -517,7 +517,8 @@ export const resolvers = {
 			// Vérifie unicité du numéro
 			const existing = await prisma.contact.findFirst({ where: { phone: input.phone }, include: { group: true } });
 			if (existing) {
-				throw new Error(`Il existe déjà un contact avec le numéro ${input.phone} : ${existing.name} ${existing.group ? `(Groupe: ${existing.group.name})` : ''}`);
+				const groupInfo = existing.group ? `(Groupe: ${existing.group.name})` : '';
+				throw new Error(`Il existe déjà un contact avec le numéro ${input.phone} : ${existing.name} ${groupInfo}`);
 			}
 			const contact = await prisma.contact.create({
 				data: {
