@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  CircularProgress,
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -42,7 +34,7 @@ const CreateUpdateVehicleModal: React.FC<CreateUpdateVehicleModalProps> = ({ ope
     queryFn: async () => {
       if (!vehicleId) return null;
       const { data } = await apolloClient.query({ query: GET_VEHICLE, variables: { id: vehicleId } });
-      var vehicleData = (data as any).vehicleById;
+      const vehicleData = (data as any).vehicleById;
       setForm({
         name: vehicleData.name || '',
         front: vehicleData.front || '',
@@ -116,7 +108,7 @@ const CreateUpdateVehicleModal: React.FC<CreateUpdateVehicleModalProps> = ({ ope
         <DialogActions>
           <Button onClick={onClose} disabled={mutation.isPending}>Annuler</Button>
           <Button type="submit" variant="contained" disabled={mutation.isPending} startIcon={isEdit ? <EditIcon /> : <AddIcon />}>
-            {mutation.isPending ? <CircularProgress size={20} /> : isEdit ? 'Enregistrer' : 'Créer'}
+            { isEdit ? 'Enregistrer' : 'Créer' }
           </Button>
         </DialogActions>
       </form>

@@ -7,9 +7,8 @@ import { MainLayout } from '@/components';
 import CreateUpdateContactModal from '@/components/contacts/CreateUpdateContactModal';
 import ImportContactModal from '@/components/contacts/ImportContactModal';
 import ConfirmModal from '@/components/layout/ConfirmModal';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useSnackbar } from '@/lib/useSnackbar';
-import { useQuery } from '@tanstack/react-query';
 import ActionsMenu from '@/components/layout/ActionsMenu';
 import { DELETE_CONTACT, IMPORT_CONTACTS } from '@/lib/mutations';
 import { GET_CONTACTS } from '@/lib/queries';
@@ -41,9 +40,9 @@ const columns: GridColDef[] = [
 const ContactsPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
-  const [editContact, setEditContact] = useState<any | null>(null);
+  const [editContact, setEditContact] = useState<Contact | null>(null);
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; contact: any | null }>({ open: false, contact: null });
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; contact: Contact | null }>({ open: false, contact: null });
   const [importOpen, setImportOpen] = useState(false);
   const { notify } = useSnackbar()!;
   const apolloClient = getApolloClient();

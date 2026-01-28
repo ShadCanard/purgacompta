@@ -29,7 +29,7 @@ interface CreateUpdateContactModalProps {
 
 const CreateUpdateContactModal: React.FC<CreateUpdateContactModalProps> = ({ open, onClose, initialData = null }) => {
   const queryClient = useQueryClient();
-  const { notify } = useSnackbar();
+  const { notify } = useSnackbar()!;
   const [form, setForm] = useState({ name: '', phone: '', groupId: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ const CreateUpdateContactModal: React.FC<CreateUpdateContactModalProps> = ({ ope
     queryKey: ['groups'],
     queryFn: async () => {
       const result = await getApolloClient().query<{ groups: { id: string; name: string }[] }>({ query: GET_GROUPS });
-      if (!result.data || !result.data.groups) return [];
+      if (!result.data?.groups) return [];
       return result.data.groups;
     },
   });
