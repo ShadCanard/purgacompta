@@ -15,7 +15,10 @@ async function main() {
       email: 'admin@purgatory.com',
       role: 'OWNER',
       data: JSON.stringify({
-        name: 'Jackson Johnson'
+        firstName: 'Jackson',
+        lastName: 'Johnson',
+        alias: 'Jax',
+        phone: '555-6181',
       }),
     },
   });
@@ -30,7 +33,9 @@ async function main() {
       email: 'admin2@purgatory.com',
       role: 'OWNER',
       data: JSON.stringify({
-        name: 'Miky Quest'
+        firstName: 'Miky',
+        lastName: 'Quest',
+        phone: '555-2438',
       }),
     },
   });
@@ -44,6 +49,38 @@ async function main() {
     },
   });
   console.log('✅ Created group Purgatory');
+
+  const peyote = await prisma.vehicle.findFirst({
+    where: { name: 'Peyote' },
+  });
+
+  if(!peyote)
+  {
+    await prisma.vehicle.create({
+    data: {
+      name: 'Peyote',
+      front: 'https://static.wikia.nocookie.net/gtawiki/images/4/4b/Peyote-GTAV-FrontQuarter.png/revision/latest/scale-to-width-down/1000?cb=20160323190724',
+      back: 'https://static.wikia.nocookie.net/gtawiki/images/d/d3/Peyote-GTAV-RearQuarter.png/revision/latest/scale-to-width-down/1000?cb=20160323190818',
+    },
+  });
+  console.log('✅ Created vehicle Peyote');
+  }
+
+  const tornado = await prisma.vehicle.findFirst({
+    where: { name: 'Tornado' },
+  });
+
+  if(!tornado)
+  {
+    await prisma.vehicle.create({
+    data: {
+      name: 'Tornado',
+      front: 'https://static.wikia.nocookie.net/gtawiki/images/e/ee/Tornado-GTAV-FrontQuarter.png/revision/latest/scale-to-width-down/1000?cb=20180512140313',
+      back: 'https://static.wikia.nocookie.net/gtawiki/images/d/d3/Tornado-GTAV-RearQuarter.png/revision/latest/scale-to-width-down/1000?cb=20180512140314',
+    },
+  });
+  console.log('✅ Created vehicle Tornado');
+  }
 
   console.log('🎉 Seeding completed!');
 }

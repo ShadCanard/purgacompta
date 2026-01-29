@@ -1,10 +1,3 @@
-// Interface pour le champ data (JSON) de User
-export interface UserData {
-  managingTablet?: boolean;
-  tabletUsername?: string;
-}
-// Interfaces générées à partir des types GraphQL de typeDefs
-
 import { User, UserData } from '@purgacompta/common';
 
 export interface Item {

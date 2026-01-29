@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import VehiclesUserItem from './VehiclesUserItem';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { GET_MEMBERS } from '@/lib/queries';
 import { getApolloClient } from '@/lib/apolloClient';
+import { useSubscription } from '@/lib/useSubscription';
+import { USER_UPDATED } from '@/lib/subscriptions';
 
 const VehiclesUserList: React.FC = () => {
     const apolloClient = getApolloClient();
+    const updatedUser = useSubscription(USER_UPDATED);
+    const queryClient = useQueryClient();
 
   const { data: members, isLoading: loadingMembers } = useQuery({
     queryKey: ['members-list'],
@@ -15,6 +19,13 @@ const VehiclesUserList: React.FC = () => {
       return (data as any).users;
     },
   });
+
+  useEffect(() => {
+    if (updatedUser) {
+      console.dir(updatedUser);
+      queryClient.invalidateQueries({ queryKey: ['members-list'] });
+    } 
+  }, [updatedUser]);
 
   if(loadingMembers) {
     return <Box sx={{ minHeight: '100vh', bgcolor: 'black', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Chargement...</Box>;

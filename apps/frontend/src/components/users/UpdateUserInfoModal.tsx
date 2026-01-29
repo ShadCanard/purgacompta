@@ -27,6 +27,7 @@ const UpdateUserInfoModal: React.FC<UpdateUserInfoModalProps> = ({ open, onClose
   const [lastName, setLastName] = useState(user?.data?.lastName || '');
   const [alias, setAlias] = useState(user?.data?.alias || '');
   const [role, setRole] = useState<UserRole>(user?.role || UserRole.MEMBER);
+  const [tabletUsername, setTabletUsername] = useState(user?.data?.tabletUsername || '');
 
   // Pour garder les valeurs à jour si user change
   React.useEffect(() => {
@@ -34,6 +35,7 @@ const UpdateUserInfoModal: React.FC<UpdateUserInfoModalProps> = ({ open, onClose
     setFirstName(user?.data?.firstName || '');
     setLastName(user?.data?.lastName || '');
     setAlias(user?.data?.alias || '');
+    setTabletUsername(user?.data?.tabletUsername || '');
     setRole(user?.role || UserRole.MEMBER);
   }, [user]);
 
@@ -48,6 +50,7 @@ const UpdateUserInfoModal: React.FC<UpdateUserInfoModalProps> = ({ open, onClose
           firstName,
           lastName,
           alias,
+          tabletUsername,
         },
       },
     }, { onSuccess: onClose });
@@ -84,6 +87,12 @@ const UpdateUserInfoModal: React.FC<UpdateUserInfoModalProps> = ({ open, onClose
             onChange={e => setPhone(e.target.value)}
             fullWidth
             required
+          />
+          <TextField
+            label="Nom sur tablette"
+            value={tabletUsername}
+            onChange={e => setTabletUsername(e.target.value)}
+            fullWidth
           />
         {(hasMinimumRole(currentUser, UserRole.ADMIN) && currentUser.id !== user?.id) && (
           <Autocomplete

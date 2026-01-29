@@ -60,7 +60,7 @@ const HomePage: React.FC = () => {
       return users.filter(u => hierarchy.indexOf(u.role) >= hierarchy.indexOf('MEMBER'));
     },
   });
-  const onlineCount = (membersData || []).filter((u: any) => u.isOnline).length;
+  const onlineCount = (membersData || []).filter((u: any) => u.data.isOnline).length;
 
 
   const [openEditModal, setOpenEditModal] = React.useState(false);

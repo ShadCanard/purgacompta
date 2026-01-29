@@ -9,19 +9,20 @@ import { useSnackbar } from '@/providers';
 import { TABLET_UPDATED } from '@/lib/subscriptions';
 import Switch from '@mui/material/Switch';
 import { useUpdateUser } from '@/providers/UserProvider';
-import { User } from '@/lib/types';
+import { User } from '@purgacompta/common';
+import { formatDisplayName } from '@/lib/utils';
 
 export interface VehiclesUserItemProps {
   member: User;
 }
 const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
       const updateUser = useUpdateUser();
-      const managingTablet = !!member.data?.managingTablet;
-      const [switchValue, setSwitchValue] = useState(managingTablet);
+      const manageTablet = !!member.data?.manageTablet;
+      const [switchValue, setSwitchValue] = useState(manageTablet);
 
       useEffect(() => {
-        setSwitchValue(managingTablet);
-      }, [managingTablet]);
+        setSwitchValue(manageTablet);
+      }, [manageTablet]);
 
     const apolloClient = getApolloClient();
     const { notify} = useSnackbar()!;
@@ -87,7 +88,7 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
         title={
           <>
             <Typography variant="h6" sx={{ color: 'white', fontWeight: 700, display: 'inline-block', mr: 1 }}>
-              {member.name}
+              {formatDisplayName(member)}
             </Typography>
             <Chip label={member.data.tabletUsername || ''} size="small" sx={{ ml: 1 }} />
             <Switch
@@ -96,7 +97,7 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
                 setSwitchValue(checked);
                 updateUser.mutate({
                   id: member.id,
-                  input: { data: { managingTablet: checked } },
+                  input: { data: { manageTablet: checked } },
                 });
               }}
               color="primary"

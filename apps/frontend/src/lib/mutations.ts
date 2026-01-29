@@ -81,8 +81,8 @@ export const SET_VEHICLE_USER = gql`
 		setVehicleUser(input: $input) {
 			id
 			found
-			vehicle { id name front back }
-			user { id name username discordId }
+			vehicle { id }
+			user { id }
 		}
 	}
 `;

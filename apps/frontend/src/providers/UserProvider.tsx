@@ -35,7 +35,7 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | null>(null);
 function getDefaultUserData(): UserData {
-  return { managingTablet: false };
+  return { manageTablet: false };
 }
 
 const roleHierarchy: Record<UserRole, number> = {
