@@ -122,17 +122,9 @@ export const Mutation = {
       }
     }
     const user = await prisma.user.update({ where: { id }, data: updateData });
-    await prisma.log.create({
-      data: {
-        action: 'UPDATE',
-        entity: 'User',
-        entityId: user.id,
-        userId: context.user?.id || user.id,
-        diff: JSON.stringify({ before, after: user }),
-      },
-    });
+
     console.log('[BACKEND] Publication USER_UPDATED', user.id, user.username);
-    await pubsub.publish('USER_UPDATED', { userUpdated: user });
+    await pubsub.publish('USER_UPDATED', { userUpdated: { ...user, data: user.data ? (JSON.parse(user.data) as UserData) : undefined } });
     return { ...user, data: user.data ? (JSON.parse(user.data) as UserData) : undefined };
   },
 };

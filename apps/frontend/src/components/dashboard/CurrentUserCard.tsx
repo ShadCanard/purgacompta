@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { useUser, useUpdateUser } from '@/providers/UserProvider';
 import { useSnackbar } from '@/lib/useSnackbar';
-import { formatDisplayName, formatDollar } from '@/lib/utils';
+import { formatDollar, formatFullName } from '@/lib/utils';
 
 
 const CurrentUserCard: React.FC = () => {
@@ -53,9 +53,9 @@ const CurrentUserCard: React.FC = () => {
     >
       <CardContent>
         <Stack direction="row" sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar src={user.avatar} alt={formatDisplayName(user)} sx={{ width: 64, height: 64, mr: 2 }} />
+          <Avatar src={user.avatar} alt={formatFullName(user)} sx={{ width: 64, height: 64, mr: 2 }} />
           <Typography variant="h6" fontWeight={700} gutterBottom sx={{ mx: 5 }}>
-            {formatDisplayName(user)}
+            {formatFullName(user)}
           </Typography>
           <Chip
             label={user.data?.isOnline ? 'En ligne' : 'Hors ligne'}

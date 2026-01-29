@@ -35,3 +35,12 @@ export function formatDisplayName(user: { username: string; data?: { alias?: str
   console.dir(user);
   return user.username;
 }
+
+export function formatFullName(user: { data?: { alias?: string; firstName?: string; lastName?: string } } | null | undefined): string {
+  if (!user?.data?.firstName || !user?.data?.lastName) return 'inconnu';
+  const { firstName, lastName, alias } = user.data;
+  if (alias && alias.trim().length > 0) {
+    return `${firstName} "${alias}" ${lastName}`;
+  }
+  return `${firstName} ${lastName}`;
+}

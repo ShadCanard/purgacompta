@@ -19,7 +19,7 @@ import {
 import { getApolloClient } from '@/lib/apolloClient';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/providers/UserProvider';
-import { formatDisplayName, formatDollar } from '@/lib/utils';
+import { formatDisplayName, formatDollar, formatFullName } from '@/lib/utils';
 import { User } from '@/purgacompta/common';
 import { GET_MEMBERS } from '@/lib/queries';
 import { USER_UPDATED } from '@/lib/subscriptions';
@@ -80,7 +80,7 @@ const MembersGrid: React.FC<{ refresh?: number }> = ({ refresh = 0 }) => {
                   <Avatar src={row.avatar} alt={formatDisplayName(row)} sx={{ width: 36, height: 36 }} />
                 </TableCell>
                 <TableCell>
-                  <Typography fontWeight={500}>{row?.data.firstName ? `${row?.data.firstName}${row?.data.alias ? ' "' + row?.data.alias + '" ' : ' '}${row?.data.lastName}` : row.username}</Typography>
+                  <Typography fontWeight={500}>{formatFullName(row)}</Typography>
                 </TableCell>
                 <TableCell>
                 <Chip
