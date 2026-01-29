@@ -1,12 +1,25 @@
+import { GET_MEMBERS } from '@/lib/queries';
+// Hook pour récupérer la liste des membres (users)
+import { useQuery as useRQ } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { getApolloClient } from '@/lib/apolloClient';
 import { UPDATE_USER } from '@/lib/mutations';
 import { GET_CURRENT_USER } from '@/lib/queries';
-import { User, UserRole, UserData } from '@/lib/types';
+import { User, UserRole, UserData } from '@purgacompta/common';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { ReactNode, useContext, createContext } from 'react';
 import { USER_UPDATED } from '@/lib/subscriptions';
+export function useMembers() {
+  return useRQ<User[]>({
+    queryKey: ['members-list'],
+    queryFn: async () => {
+      const apolloClient = getApolloClient();
+      const { data } = await apolloClient.query({ query: GET_MEMBERS });
+      return (data as any).users || [];
+    },
+  });
+}
 
 interface UserContextType {
   user: User | null;
@@ -77,16 +90,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         fetchPolicy: 'network-only',
       });
       const user = (data as any).user as User | null;
-      if (user && typeof user.data === 'string') {
+      if (!user) return null;
+      // Toujours cloner l’objet pour éviter l’erreur "data is read-only"
+      let safeUser = { ...user };
+      if (typeof safeUser.data === 'string') {
         try {
-          user.data = JSON.parse(user.data);
+          safeUser.data = JSON.parse(safeUser.data);
         } catch {
-          user.data = getDefaultUserData();
+          safeUser.data = getDefaultUserData();
         }
-      } else if (user && typeof user.data !== 'object') {
-        user.data = getDefaultUserData();
+      } else if (typeof safeUser.data !== 'object') {
+        safeUser.data = getDefaultUserData();
       }
-      return user;
+      return safeUser;
     },
     enabled: !!discordId,
     refetchOnWindowFocus: false,
@@ -119,6 +135,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 // Hook pour accéder au contexte utilisateur
 export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
+  if (!context) {
+    throw new Error('useUser must be used within UserProvider');
+  }
   return context;
 };
 
@@ -127,10 +146,11 @@ export const useUpdateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, input }: { id: string; input: Partial<User> & { data?: UserData } }) => {
-      // Si input.data est un objet, sérialiser en string
-      const inputToSend = { ...input };
+      // Filtrer __typename de data pour éviter l'erreur GraphQL
+      let inputToSend = { ...input };
       if (inputToSend.data && typeof inputToSend.data === 'object') {
-        (inputToSend as any).data = JSON.stringify(inputToSend.data);
+        const { __typename, ...rest } = inputToSend.data as any;
+        inputToSend.data = rest;
       }
       const apolloClient = getApolloClient();
       const { data } = await apolloClient.mutate({

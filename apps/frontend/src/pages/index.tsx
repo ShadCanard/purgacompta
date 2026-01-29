@@ -5,11 +5,13 @@ import { useQueryClient, useQuery as useTanstackQuery } from '@tanstack/react-qu
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { Box, Typography, Card, Grid, Stack } from '@mui/material';
+import { Box, Typography, Card, Grid, Stack, Button } from '@mui/material';
+import { UpdateUserInfoModal } from '@/components/users';
 import { MainLayout } from '@/components/layout';
 import { useUser } from '@/providers/UserProvider';
 import {
   AccountBalance as AccountBalanceIcon,
+  Edit,
   Receipt as ReceiptIcon,
   TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
@@ -60,23 +62,36 @@ const HomePage: React.FC = () => {
   });
   const onlineCount = (membersData || []).filter((u: any) => u.isOnline).length;
 
+
+  const [openEditModal, setOpenEditModal] = React.useState(false);
+
   if(loading) {
-    return 
-    <MainLayout>
-      <Typography>Chargement...</Typography>
-    </MainLayout>;
+    return (
+      <MainLayout>
+        <Typography>Chargement...</Typography>
+      </MainLayout>
+    );
   }
 
   return (
     <MainLayout>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom>
-          Dashboard
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Bienvenue sur Purgatory Compta
-          {user && `, ${user.name}`}
-        </Typography>
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Typography variant="h4" fontWeight={700} gutterBottom>
+            Dashboard
+          </Typography>
+          <Box>
+            <Button 
+              variant="contained" 
+              color="primary"
+              startIcon={<Edit />}
+              onClick={() => setOpenEditModal(true)}
+            >
+              Éditer
+            </Button>
+            <UpdateUserInfoModal open={openEditModal} onClose={() => setOpenEditModal(false)} />
+          </Box>
+        </Stack>
       </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>

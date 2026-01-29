@@ -4,8 +4,15 @@ import { MainLayout } from '@/components';
 import { useSnackbar } from '@/providers';
 import { Launch } from '@mui/icons-material';
 import VehiclesUserList from '@/components/vehicles/VehiclesUserList';
+import { useUser, useUpdateUser } from '@/providers/UserProvider';
+import TextField from '@mui/material/TextField';
+import { useState } from 'react';
 const VehiclesPage: React.FC = () => {
   const { notify} = useSnackbar()!;
+
+  const { user } = useUser()!;
+  const updateUser = useUpdateUser();
+  const [tabletUserName, setTabletUserName] = useState<string>(user?.data?.tabletUsername || '');
 
   return (
     <MainLayout>
@@ -30,6 +37,26 @@ const VehiclesPage: React.FC = () => {
               Presse-Papier
             </Button>
           </ButtonGroup>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <TextField
+            label="Surnom tablette"
+            value={tabletUserName}
+            onChange={e => setTabletUserName(e.target.value)}
+            size="small"
+            sx={{ mr: 2 }}
+            placeholder='Surnom tablette'
+          />
+          <Button variant="contained" color="secondary" 
+            onClick={() => {
+              updateUser.mutate({
+                id: user?.id as string,
+                input: { data: { tabletUsername: tabletUserName } },
+              });
+              notify('Nom de la tablette mis à jour', 'success');}}
+            >
+            Mettre à jour
+          </Button>
         </Box>
         <VehiclesUserList />
       </Box>

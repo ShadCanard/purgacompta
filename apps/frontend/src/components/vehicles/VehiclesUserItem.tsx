@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Chip, Autocomplete, TextField } from '@mui/material';
 import { Card, CardHeader, CardContent, CardActions, Button } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -7,12 +7,22 @@ import { getApolloClient } from '@/lib/apolloClient';
 import { SET_VEHICLE_USER } from '@/lib/mutations';
 import { useSnackbar } from '@/providers';
 import { TABLET_UPDATED } from '@/lib/subscriptions';
+import Switch from '@mui/material/Switch';
+import { useUpdateUser } from '@/providers/UserProvider';
+import { User } from '@/lib/types';
 
 export interface VehiclesUserItemProps {
-  member: any;
+  member: User;
 }
-
 const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
+      const updateUser = useUpdateUser();
+      const managingTablet = !!member.data?.managingTablet;
+      const [switchValue, setSwitchValue] = useState(managingTablet);
+
+      useEffect(() => {
+        setSwitchValue(managingTablet);
+      }, [managingTablet]);
+
     const apolloClient = getApolloClient();
     const { notify} = useSnackbar()!;
     const queryClient = useQueryClient();
@@ -38,22 +48,19 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
       },
     });
 
-
-    
-        // Subscription manuelle pour rafraîchir la liste à chaque update
-        useEffect(() => {
-          if (!apolloClient) return;
-          const observable = apolloClient.subscribe({ query: TABLET_UPDATED });
-          const sub = observable.subscribe({
-            next: (event: any) => {
-              queryClient.invalidateQueries({ queryKey: ['vehicleUsers-list'] });
-            },
-            error: (err: any) => { console.error('Erreur de subscription tablette', err);
-            },
-          });
-          return () => sub.unsubscribe();
-        }, [apolloClient, queryClient]);
-        
+    // Subscription manuelle pour rafraîchir la liste à chaque update
+    useEffect(() => {
+      if (!apolloClient) return;
+      const observable = apolloClient.subscribe({ query: TABLET_UPDATED });
+      const sub = observable.subscribe({
+        next: (event: any) => {
+          queryClient.invalidateQueries({ queryKey: ['vehicleUsers-list'] });
+        },
+        error: (err: any) => { console.error('Erreur de subscription tablette', err);
+        },
+      });
+      return () => sub.unsubscribe();
+    }, [apolloClient, queryClient]);
 
         // Mutation
     const { mutate: setVehicleUser, isPending } = useMutation({
@@ -77,7 +84,27 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
   return (
     <Card sx={{ mb: 3, bgcolor: '#222', color: 'white', borderRadius: 2, boxShadow: 4 }}>
       <CardHeader
-        title={<Typography variant="h6" sx={{ color: 'white', fontWeight: 700 }}>{member.name} <Chip label={member.username} size="small" sx={{ ml: 1 }} /></Typography>}
+        title={
+          <>
+            <Typography variant="h6" sx={{ color: 'white', fontWeight: 700, display: 'inline-block', mr: 1 }}>
+              {member.name}
+            </Typography>
+            <Chip label={member.data.tabletUsername || ''} size="small" sx={{ ml: 1 }} />
+            <Switch
+              checked={!!switchValue}
+              onChange={(_, checked) => {
+                setSwitchValue(checked);
+                updateUser.mutate({
+                  id: member.id,
+                  input: { data: { managingTablet: checked } },
+                });
+              }}
+              color="primary"
+              inputProps={{ 'aria-label': 'Gérer tablette' }}
+              sx={{ ml: 2, verticalAlign: 'middle' }}
+            />
+          </>
+        }
         sx={{ pb: 1 }}
       />
       <CardContent>

@@ -1,14 +1,11 @@
 import prisma from '../../lib/prisma';
 import { pubsub } from './_pubsub';
+import { UserData } from '@purgacompta/common';
 
 export const User = {
   vehicleUsers: (parent: any) => prisma.vehicleUser.findMany({ where: { userId: parent.id } }),
   createdAt: (parent: any) => formatDate(parent.createdAt),
   updatedAt: (parent: any) => formatDate(parent.updatedAt),
-  balance: (parent: any) => parent.balance,
-  isOnline: (parent: any) => parent.isOnline,
-  maxBalance: (parent: any) => parent.maxBalance,
-  phone: (parent: any) => parent.phone,
   data: (parent: any) => parent.data,
 };
 
@@ -24,16 +21,23 @@ export const Query = {
   me: async (_: any, __: any, context: any) => {
     const discordId = context.discordId;
     if (!discordId) return null;
-    return prisma.user.findUnique({ where: { discordId } });
+    const user = await prisma.user.findUnique({ where: { discordId } });
+    if (!user) return null;
+    return { ...user, data: user.data ? (JSON.parse(user.data) as UserData) : undefined };
   },
   user: async (_: any, { discordId }: { discordId: string }) => {
-    return prisma.user.findUnique({ where: { discordId } });
+    const user = await prisma.user.findUnique({ where: { discordId } });
+    if (!user) return null;
+    return { ...user, data: user.data ? (JSON.parse(user.data) as UserData) : undefined };
   },
   userById: async (_: any, { id }: { id: string }) => {
-    return prisma.user.findUnique({ where: { id } });
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) return null;
+    return { ...user, data: user.data ? (JSON.parse(user.data) as UserData) : undefined };
   },
   users: async () => {
-    return prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
+    const users = await prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
+    return users.map(u => ({ ...u, data: u.data ? (JSON.parse(u.data) as UserData) : undefined }));
   },
   usersCount: async () => {
     return prisma.user.count();
@@ -42,17 +46,22 @@ export const Query = {
 
 export const Mutation = {
   registerOrUpdateUser: async (_: any, { input }: { input: any }, context: any) => {
-    const { discordId, username, name, email, avatar } = input;
+    const { discordId, username, email, avatar, phone, role, data } = input;
     const existing = await prisma.user.findUnique({ where: { discordId } });
     let user;
     if (existing) {
+      // Fusionner l'ancien data et le nouveau
+      const oldData: UserData = existing.data ? (JSON.parse(existing.data) as UserData) : {};
+      const newData: UserData = data ? data : {};
+      const mergedData: UserData = { ...oldData, ...newData };
       user = await prisma.user.update({
         where: { discordId },
         data: {
           username,
-          name: name ?? existing.name,
           email,
           avatar,
+          role,
+          data: JSON.stringify(mergedData),
         },
       });
     } else {
@@ -60,15 +69,16 @@ export const Mutation = {
         data: {
           discordId,
           username,
-          name: name ?? username,
           email,
           avatar,
-          role: 'GUEST',
+          role: role || 'GUEST',
+          data: data ? JSON.stringify(data) : undefined,
         },
       });
     }
+    console.log('[BACKEND] Publication USER_UPDATED', user.id, user.username);
     await pubsub.publish('USER_UPDATED', { userUpdated: user });
-    return user;
+    return { ...user, data: user.data ? (JSON.parse(user.data) as UserData) : undefined };
   },
   deleteUser: async (_: any, { discordId }: { discordId: string }, context: any) => {
     const before = await prisma.user.findUnique({ where: { discordId } });
@@ -88,13 +98,17 @@ export const Mutation = {
     const before = await prisma.user.findUnique({ where: { id } });
     if (!before) throw new Error('Utilisateur introuvable');
     const updateData: any = {};
-    const allowedFields = [
-      'username', 'name', 'email', 'avatar', 'isOnline', 'balance', 'maxBalance', 'role', 'phone', 'data',
-    ];
+    const allowedFields = ['username', 'email', 'avatar', 'role', 'data'];
     for (const key of allowedFields) {
       if (Object.prototype.hasOwnProperty.call(input, key)) {
         updateData[key] = input[key];
       }
+    }
+    // Gestion du champ data (fusionner avec l'existant)
+    if (Object.prototype.hasOwnProperty.call(input, 'data')) {
+      const oldData: UserData = before.data ? (JSON.parse(before.data) as UserData) : {};
+      const newData: UserData = input.data ? input.data : {};
+      updateData.data = JSON.stringify({ ...oldData, ...newData });
     }
     if (Object.prototype.hasOwnProperty.call(updateData, 'phone') && updateData.phone) {
       if (!updateData.phone.startsWith('555-')) {
@@ -117,7 +131,8 @@ export const Mutation = {
         diff: JSON.stringify({ before, after: user }),
       },
     });
+    console.log('[BACKEND] Publication USER_UPDATED', user.id, user.username);
     await pubsub.publish('USER_UPDATED', { userUpdated: user });
-    return user;
+    return { ...user, data: user.data ? (JSON.parse(user.data) as UserData) : undefined };
   },
 };

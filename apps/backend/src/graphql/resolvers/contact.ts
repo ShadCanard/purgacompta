@@ -1,4 +1,5 @@
 import prisma from '../../lib/prisma';
+import { UserData } from '@purgacompta/common';
 
 export const Contact = {
   group: async (parent: any) => {
@@ -9,8 +10,12 @@ export const Contact = {
 
 export const Query = {
   contacts: async () => {
-    const filterMembers = await prisma.user.findMany({ select: { phone: true } });
-    const memberPhones = new Set(filterMembers.map(m => m.phone));
+    const filterMembers = await prisma.user.findMany({ select: { data: true } });
+    const memberPhones = new Set(
+      filterMembers
+        .map(m => m.data ? (JSON.parse(m.data) as UserData).phone : undefined)
+        .filter((p): p is string => !!p)
+    );
     return prisma.contact.findMany({ orderBy: { createdAt: 'desc' }, include: { group: true } }).then(contacts =>
       contacts.filter(contact => !memberPhones.has(contact.phone))
     );
@@ -19,8 +24,12 @@ export const Query = {
     return prisma.contact.findUnique({ where: { id } });
   },
   contactsWithoutGroup: async () => {
-    const users = await prisma.user.findMany({ select: { phone: true } });
-    const userPhones = new Set(users.map(u => u.phone));
+    const users = await prisma.user.findMany({ select: { data: true } });
+    const userPhones = new Set(
+      users
+        .map(u => u.data ? (JSON.parse(u.data) as UserData).phone : undefined)
+        .filter((p): p is string => !!p)
+    );
     const contacts = await prisma.contact.findMany({ where: { groupid: null }, orderBy: { createdAt: 'desc' } });
     return contacts.filter(contact => !userPhones.has(contact.phone));
   },

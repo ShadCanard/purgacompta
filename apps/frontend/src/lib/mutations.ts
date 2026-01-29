@@ -56,17 +56,22 @@ export const UPDATE_USER = gql`
 			id
 			discordId
 			username
-			name
 			email
 			avatar
-			isOnline
-			balance
-			maxBalance
 			role
 			createdAt
 			updatedAt
-			phone
-			data
+			data {
+			  firstName
+			  lastName
+			  alias
+			  balance
+			  maxBalance
+			  isOnline
+			  manageTablet
+			  tabletUsername
+			  phone
+			}
 		}
 	}
 `;
@@ -296,7 +301,6 @@ export const UPDATE_DISCORD_USER = gql`
 			username
 			avatar
 			email
-			name
 		}
 	}
 `;

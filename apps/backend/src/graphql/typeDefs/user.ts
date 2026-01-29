@@ -11,18 +11,25 @@ export const userTypeDefs = `#graphql
     id: ID!
     discordId: String!
     username: String!
-    name: String!
     email: String
     avatar: String
-    balance: Int!
-    phone: String
-    isOnline: Boolean!
-    maxBalance: Int!
     role: UserRole!
     createdAt: String!
     updatedAt: String!
     vehicleUsers: [VehicleUser!]!
-    data: String
+    data: UserData
+  }
+
+  type UserData {
+    firstName: String
+    lastName: String
+    alias: String
+    balance: Int
+    maxBalance: Int
+    isOnline: Boolean
+    manageTablet: Boolean
+    tabletUsername: String
+    phone: String
   }
 
   input RegisterUserInput {
@@ -44,6 +51,18 @@ export const userTypeDefs = `#graphql
     maxBalance: Int
     role: UserRole
     phone: String
-    data: String
+    data: InputUserData
   }
+
+    input InputUserData {
+    firstName: String
+    lastName: String
+    alias: String
+    balance: Int
+    maxBalance: Int
+    isOnline: Boolean
+    manageTablet: Boolean
+    tabletUsername: String
+    phone: String
+    }
 `;

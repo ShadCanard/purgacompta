@@ -9,13 +9,14 @@ import {
   Switch,
   FormControlLabel,
 } from '@mui/material';
-import { useUser } from '@/providers/UserProvider';
+import { useUser, useUpdateUser } from '@/providers/UserProvider';
 import { useSnackbar } from '@/lib/useSnackbar';
-import { useUpdateUser } from '@/providers/UserProvider';
+import { formatDisplayName, formatDollar } from '@/lib/utils';
+
 
 const CurrentUserCard: React.FC = () => {
   const { user, loading, refetch } = useUser();
-  const { notify } = useSnackbar();
+  const { notify } = useSnackbar()!;
   const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
 
   if (loading || !user) return null;
@@ -23,7 +24,7 @@ const CurrentUserCard: React.FC = () => {
   const handleToggleOnline = () => {
     if (!isUpdating && user) {
       updateUser(
-        { id: user.id, input: { isOnline: !user.isOnline } },
+        { id: user.id, input: { data: { ...user.data, isOnline: !user.data?.isOnline } } },
         {
           onSuccess: () => {
             refetch();
@@ -52,20 +53,20 @@ const CurrentUserCard: React.FC = () => {
     >
       <CardContent>
         <Stack direction="row" sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar src={user.avatar} alt={user.name} sx={{ width: 64, height: 64, mr: 2 }} />
+          <Avatar src={user.avatar} alt={formatDisplayName(user)} sx={{ width: 64, height: 64, mr: 2 }} />
           <Typography variant="h6" fontWeight={700} gutterBottom sx={{ mx: 5 }}>
-            {user.name}
+            {formatDisplayName(user)}
           </Typography>
           <Chip
-            label={user.isOnline ? 'En ligne' : 'Hors ligne'}
-            color={user.isOnline ? 'success' : 'error'}
+            label={user.data?.isOnline ? 'En ligne' : 'Hors ligne'}
+            color={user.data?.isOnline ? 'success' : 'error'}
             size="small"
             sx={{ fontWeight: 600, mx: 5 }}
           />
           <Typography variant="h6" fontWeight={700} gutterBottom sx={{ mx: 5 }}>
-            Solde : {`$${user.balance}`}
+            Solde : {formatDollar(user.data?.balance)}
           </Typography>
-          <FormControlLabel control={<Switch checked={user.isOnline} />} label="En ligne" />
+          <FormControlLabel control={<Switch checked={user.data?.isOnline} />} label="En ligne" />
         </Stack>
       </CardContent>
     </Card>

@@ -12,23 +12,26 @@ async function main() {
     create: {
       discordId: '234330175775571969',
       username: 'shadcanard',
-      name: 'Jackson Johnson',
       email: 'admin@purgatory.com',
       role: 'OWNER',
+      data: JSON.stringify({
+        name: 'Jackson Johnson'
+      }),
     },
   });
   console.log('✅ Created admin user:', adminUser);
 
-  // Créer un utilisateur admin par défaut (à remplacer par votre Discord ID)
   const adminUser2 = await prisma.user.upsert({
     where: { discordId: '931609861526016060' },
     update: {},
     create: {
       discordId: '931609861526016060',
       username: 'mikekette',
-      name: 'Miky Quest',
       email: 'admin2@purgatory.com',
       role: 'OWNER',
+      data: JSON.stringify({
+        name: 'Miky Quest'
+      }),
     },
   });
   console.log('✅ Created admin user:', adminUser2);

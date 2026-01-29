@@ -1,49 +1,35 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { MainLayout } from '@/components/layout';
-import { Box, Typography, Paper, Avatar, CircularProgress, Autocomplete, TextField } from '@mui/material';
+import { Box, Typography, Paper, Avatar, CircularProgress, Button } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from '@/providers';
-import { useUser, useUpdateUser } from '@/providers/UserProvider';
+import UpdateUserInfoModal from '@/components/users/UpdateUserInfoModal';
+import { useQuery } from '@tanstack/react-query';
 import { GET_MEMBERS } from '@/lib/queries';
 import { getApolloClient } from '@/lib/apolloClient';
+import { formatDisplayName } from '@/lib/utils';
+import { Edit } from '@mui/icons-material';
 
-const USER_ROLES = [
-  { value: 'GUEST', label: 'Guest' },
-  { value: 'MEMBER', label: 'Member' },
-  { value: 'MANAGER', label: 'Manager' },
-  { value: 'ADMIN', label: 'Admin' },
-  { value: 'OWNER', label: 'Owner' },
-];
+const USER_ROLES_MAP: Record<string, string> = {
+  GUEST: 'Guest',
+  MEMBER: 'Member',
+  MANAGER: 'Manager',
+  ADMIN: 'Admin',
+  OWNER: 'Owner',
+};
 
 const UsersPage: React.FC = () => {
-  const [nameEditRows, setNameEditRows] = useState<{ [id: string]: string }>({});
-  const [phoneEditRows, setPhoneEditRows] = useState<{ [id: string]: string }>({});
-  const { user: currentUser } = useUser();
-  const queryClient = useQueryClient();
-  const {mutate: updateUser, isPending: isUpdatingUser } = useUpdateUser();
-  const apolloClient = getApolloClient();
-
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState<any | null>(null);
   const { data, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const apolloClient = getApolloClient();
       const result = await apolloClient.query({ query: GET_MEMBERS, fetchPolicy: 'network-only', });
+      console.dir(result);
       return (result.data as any).users;
     },
   });
-  // Mutation unifiée pour mettre à jour un utilisateur (nom, téléphone, rôle...)
-  const { notify } = useSnackbar()!;
-  const roleHierarchy: Record<string, number> = {
-    GUEST: 0,
-    MEMBER: 1,
-    MANAGER: 2,
-    ADMIN: 3,
-    OWNER: 4,
-  };
-
-  // Colonnes du DataGrid
-
 
   const columns: GridColDef[] = [
     {
@@ -51,7 +37,7 @@ const UsersPage: React.FC = () => {
       headerName: 'Avatar',
       width: 80,
       renderCell: (params: GridRenderCellParams) => (
-        <Avatar src={params.value} alt={params.row.username} sx={{mt: 1}} />
+        <Avatar src={params.row.avatar} alt={params.row.username} sx={{ mt: 1 }} />
       ),
       sortable: false,
       filterable: false,
@@ -61,92 +47,55 @@ const UsersPage: React.FC = () => {
       field: 'name',
       headerName: 'Nom ingame',
       width: 180,
-      editable: true,
-      renderEditCell: (params) => {
-        return (
-          <input
-            type="text"
-            value={nameEditRows[params.id as string] ?? params.value ?? ''}
-            onChange={e => setNameEditRows({ ...nameEditRows, [params.id as string]: e.target.value })}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const newName = nameEditRows[params.id as string];
-                if (newName && newName !== params.value) {
-                  updateUser({ id: params.row.id, input: { name: newName } });
-                }
-              }
-            }}
-            disabled={isUpdatingUser}
-            style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4, border: '1px solid #ccc' }}
-            autoFocus
-          />
-        );
-      },
     },
     {
       field: 'phone',
       headerName: 'Téléphone',
       width: 140,
-      editable: true,
-      renderEditCell: (params) => {
-        return (
-          <input
-            type="text"
-            value={phoneEditRows[params.id as string] ?? params.value ?? ''}
-            onChange={e => setPhoneEditRows({ ...phoneEditRows, [params.id as string]: e.target.value })}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const newPhone = phoneEditRows[params.id as string];
-                if (newPhone && newPhone !== params.value && newPhone.startsWith('555-')) {
-                  updateUser({ id: params.row.id, input: { phone: newPhone } });
-                }
-              }
-            }}
-            disabled={isUpdatingUser}
-            style={{ width: '100%', padding: 4, fontSize: 14, borderRadius: 4, border: '1px solid #ccc' }}
-            autoFocus
-            placeholder="555-XXXX"
-          />
-        );
-      },
     },
     {
       field: 'role',
       headerName: 'Rôle',
-      width: 160,
-      editable: false,
-      renderCell: (params: GridRenderCellParams) => {
-        const user = params.row;
-        const disabled =
-          isUpdatingUser ||
-          !currentUser ||
-          roleHierarchy[currentUser.role] <= roleHierarchy[user.role];
-        return (
-          <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', height: '100%' }}>
-            <Autocomplete
-              options={USER_ROLES}
-              getOptionLabel={option => option.label}
-              value={USER_ROLES.find(r => r.value === user.role) || null}
-              onChange={(_, value) => {
-                if (value && !disabled) {
-                  updateUser({ id: user.id, input: { role: value.value as any } });
-                }
-              }}
-              size='small'
-              disableClearable
-              disabled={disabled}
-              renderInput={params => (
-                <TextField {...params} label="Rôle" placeholder="Rôle..." />
-              )}
-              sx={{ width: '100%', mt: 2  }}
-            />
-          </Box>
-        );
-      },
+      width: 120,
+      valueGetter: (params: any) => USER_ROLES_MAP[params] || params,
     },
-    { field: 'username', headerName: 'Nom Discord', width: 180 },
-
+    {
+      field: 'username',
+      headerName: 'Nom Discord',
+      width: 180,
+    },
+    {
+      field: 'actions',
+      headerName: '',
+      width: 120,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params: GridRenderCellParams) => (
+        <Button
+          variant="text"
+          size="small"
+          onClick={e => {
+            e.stopPropagation();
+            setSelectedUser(params.row);
+            setModalOpen(true);
+          }}
+        >
+          <Edit />
+        </Button>
+      ),
+    },
   ];
+
+  // Mapping à plat pour DataGrid
+  const usersData = Array.isArray(data)
+    ? data.map((u: any) => ({
+        ...u,
+        name: formatDisplayName(u) || '',
+        phone: u.data?.phone || '',
+        role: u.role,
+      }))
+    : [];
 
   return (
     <MainLayout>
@@ -166,18 +115,21 @@ const UsersPage: React.FC = () => {
         ) : error ? (
           <Typography color="error">Erreur lors du chargement des utilisateurs.</Typography>
         ) : (
-          <DataGrid
-            rows={data}
-            columns={columns}
-            getRowId={row => row.id}
-            autoHeight
-            pageSizeOptions={[10, 25, 50]}
-            disableRowSelectionOnClick
-            sx={{ minHeight: 400, background: 'transparent' }}
-            disableColumnMenu
-            hideFooterSelectedRowCount
-            localeText={{ noRowsLabel: 'Aucun utilisateur.' }}
-          />
+          <>
+            <DataGrid
+              rows={usersData}
+              columns={columns}
+              getRowId={row => row.id}
+              autoHeight
+              pageSizeOptions={[10, 25, 50]}
+              disableRowSelectionOnClick
+              sx={{ minHeight: 400, background: 'transparent' }}
+              disableColumnMenu
+              hideFooterSelectedRowCount
+              localeText={{ noRowsLabel: 'Aucun utilisateur.' }}
+            />
+            <UpdateUserInfoModal open={modalOpen} onClose={() => setModalOpen(false)} user={selectedUser} />
+          </>
         )}
       </Paper>
     </MainLayout>

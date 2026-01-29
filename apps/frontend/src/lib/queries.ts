@@ -65,7 +65,7 @@ export const GET_VEHICLE_USERS = gql`
       id
       found
       vehicle { id name front back }
-      user { id name username discordId }
+      user { id username discordId data { firstName lastName alias } }
     }
   }
 `;
@@ -76,7 +76,7 @@ export const GET_VEHICLE_USER_BY_ID = gql`
       id
       found
       vehicle { id name front back }
-      user { id name username discordId }
+      user { id username discordId data { firstName lastName alias } }
     }
   }
 `;
@@ -86,7 +86,7 @@ export const GET_VEHICLE_USERS_BY_VEHICLE = gql`
     vehicleUsersByVehicle(vehicleId: $vehicleId) {
       id
       found
-      user { id name username discordId }
+      user { id username discordId data { firstName lastName alias } }
     }
   }
 `;
@@ -178,16 +178,22 @@ export const GET_CURRENT_USER = gql`
       id
       discordId
       username
-      name
       email
       avatar
       role
       createdAt
       updatedAt
-      isOnline
-      balance
-      maxBalance
-      data
+      data {
+        firstName
+        lastName
+        alias
+        balance
+        maxBalance
+        isOnline
+        manageTablet
+        tabletUsername
+        phone
+      }
     }
   }
 `;
@@ -284,17 +290,22 @@ export const GET_MEMBERS = gql`
       id
       username
       discordId
-      name
       email
       avatar
       role
-      phone
       createdAt
       updatedAt
-      isOnline
-      balance
-      maxBalance
-      data
+      data { 
+        firstName
+        lastName
+        alias 
+        balance 
+        maxBalance 
+        isOnline 
+        manageTablet 
+        tabletUsername 
+        phone 
+      }
     }
   }
 `;
@@ -310,7 +321,11 @@ export const GET_LOGS = gql`
       createdAt
       user {
         id
-        name
+        data {
+          firstName
+          lastName
+          alias
+        }
         role
       }
     }

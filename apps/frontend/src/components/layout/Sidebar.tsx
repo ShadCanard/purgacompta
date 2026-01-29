@@ -39,6 +39,7 @@ const DRAWER_WIDTH_COLLAPSED = 72;
 
 
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { formatDisplayName } from '@/lib/utils';
 
 interface MenuItem {
   text: string;
@@ -264,7 +265,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onToggle }) => {
         <Box sx={{ p: collapsed ? 1 : 2, textAlign: 'center' }}>
           <Avatar
             src={user?.avatar || undefined}
-            alt={user?.name || 'User'}
+            alt={formatDisplayName(user)}
             sx={{
               width: collapsed ? 40 : 64,
               height: collapsed ? 40 : 64,
@@ -277,7 +278,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onToggle }) => {
           {!collapsed && (
             <>
               <Typography variant="subtitle1" fontWeight={600}>
-                {user?.name}
+                {formatDisplayName(user)}
               </Typography>
               {user && (
                 <Chip

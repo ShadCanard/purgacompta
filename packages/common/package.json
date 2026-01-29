@@ -1,0 +1,7 @@
+{
+  "name": "@purgacompta/common",
+  "version": "1.0.0",
+  "main": "types.ts",
+  "types": "types.ts",
+  "license": "MIT"
+}

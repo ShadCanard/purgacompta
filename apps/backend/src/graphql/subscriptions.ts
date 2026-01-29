@@ -1,8 +1,12 @@
-import { pubsub } from './resolvers/_pubsub';
+import { pubsub } from "./resolvers/_pubsub";
 
+// Affichage dynamique des subscriptions actives basé sur l'objet Subscription
 export const Subscription = {
   userUpdated: {
-    subscribe: () => pubsub.asyncIterator(['USER_UPDATED'])
+    subscribe: () => {
+      console.log('[BACKEND] Nouvelle souscription USER_UPDATED');
+      return pubsub.asyncIterator(['USER_UPDATED']);
+    }
   },
   tabletUpdated: {
     subscribe: (...args: any[]) => {
@@ -11,6 +15,11 @@ export const Subscription = {
     }
   },
   storageUpdated: {
-    subscribe: () => pubsub.asyncIterator(['STORAGE_UPDATED'])
+    subscribe: () => {
+      console.log('[BACKEND] Nouvelle souscription STORAGE_UPDATED');
+      return pubsub.asyncIterator(['STORAGE_UPDATED']);
+    }
   }
 };
+
+console.log('[BACKEND] Subscriptions actives :', Object.keys(Subscription).join(', '));

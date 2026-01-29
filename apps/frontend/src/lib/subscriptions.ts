@@ -19,21 +19,26 @@ export const STORAGE_UPDATED = gql`
 
 export const USER_UPDATED = gql`
   subscription OnUserUpdated {
-    userUpdated {
-      id
-      discordId
-      username
-      name
-      email
-      avatar
-      isOnline
+  userUpdated {
+    id
+    discordId
+    username
+    email
+    avatar
+    role
+    createdAt
+    updatedAt
+    data {
+      firstName
+      lastName
+      alias
       balance
       maxBalance
-      role
-      createdAt
-      updatedAt
+      isOnline
+      manageTablet
+      tabletUsername
       phone
-      data
     }
   }
+}
 `;

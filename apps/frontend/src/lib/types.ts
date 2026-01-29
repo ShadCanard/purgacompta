@@ -1,16 +1,11 @@
 // Interface pour le champ data (JSON) de User
 export interface UserData {
-  managingTablet: boolean;
+  managingTablet?: boolean;
+  tabletUsername?: string;
 }
 // Interfaces générées à partir des types GraphQL de typeDefs
 
-export enum UserRole {
-  GUEST = 'GUEST',
-  MEMBER = 'MEMBER',
-  MANAGER = 'MANAGER',
-  ADMIN = 'ADMIN',
-  OWNER = 'OWNER',
-}
+import { User, UserData } from '@purgacompta/common';
 
 export interface Item {
   id: string;
@@ -103,22 +98,7 @@ export interface LogFilterInput {
   to?: string;
 }
 
-export interface User {
-  id: string;
-  discordId: string;
-  username: string;
-  name: string;
-  email?: string;
-  avatar?: string;
-  balance: number;
-  phone?: string;
-  isOnline: boolean;
-  maxBalance: number;
-  role: UserRole;
-  createdAt: string;
-  updatedAt: string;
-  data: UserData;
-}
+// Utiliser User de la librairie commune
 
 export interface RegisterUserInput {
   discordId: string;
