@@ -15,7 +15,7 @@ import {
 import { getApolloClient } from '@/lib/apolloClient';
 
 const TransactionOutgoing: React.FC = () => {
-  const { notify } = useSnackbar();
+  const { notify } = useSnackbar()!;
   const { mutate: saveTransaction, status: savingTransactionStatus } = useMutation({
     mutationFn: async (input: any) => {
       const result = await apolloClient.mutate({
@@ -50,7 +50,7 @@ const TransactionOutgoing: React.FC = () => {
   useEffect(() => {
     apolloClient.query({ query: GET_PURGATORY }).then((result: { data: any; }) => {
       const myGroup = (result.data as any).myGroup;
-      setPurgatoryId(myGroup.id);
+      setPurgatoryId(myGroup?.id);
     });
   }, []);
 

@@ -57,6 +57,8 @@ model Item {
   itemPrices ItemPrice[]
   transactionLines TransactionLine[]
 
+  storageItems StorageItem[]
+
   @@map("items")
 }
 
@@ -159,4 +161,32 @@ model VehicleUser {
   // Suppression de la contrainte d'unicité vehicleId+userId car vehicleId peut être null
   @@index([userId])
   @@map("vehicle_users")
+}
+
+
+model Storage {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  type        String   // "armurerie" ou "stockage"
+  location    String   // Emplacement du stockage (QG, B-Jax, ...)
+  maxWeight   Float?   // en kg, null = illimité
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items       StorageItem[]
+
+  @@map("storages")
+}
+
+model StorageItem {
+  id         String   @id @default(cuid())
+  storageId  String
+  itemId     String
+  quantity   Int      @default(1)
+
+  storage    Storage  @relation(fields: [storageId], references: [id])
+  item       Item     @relation(fields: [itemId], references: [id])
+
+  @@unique([storageId, itemId])
+  @@map("storage_items")
 }

@@ -8,6 +8,13 @@ export const TABLET_UPDATED = gql`
   }
 `;
 import { gql } from "@apollo/client";
+export const STORAGE_UPDATED = gql`
+  subscription OnStorageUpdated {
+    storageUpdated {
+      storageId
+    }
+  }
+`;
 
 
 export const USER_UPDATED = gql`
