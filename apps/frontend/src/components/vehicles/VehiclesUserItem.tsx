@@ -8,8 +8,10 @@ import { useSnackbar } from '@/providers';
 import { TABLET_UPDATED } from '@/lib/subscriptions/vehicles';
 import Switch from '@mui/material/Switch';
 import { useUpdateUser } from '@/providers/UserProvider';
-import { User } from '@purgacompta/common';
+import { User, VehicleUser } from '@purgacompta/common';
 import { formatDisplayName } from '@/lib/utils';
+
+import CreateVehicleTransactionModal from './CreateVehicleTransactionModal';
 
 export interface VehiclesUserItemProps {
   member: User;
@@ -38,8 +40,11 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
     });
 
     
-    const vu = vehicleUsers?.find((v: any) => v.user?.id === member.id);
+    const vu = vehicleUsers?.find((v: any) => v.user?.id === member.id) as VehicleUser;
 
+    // Pour la modale transaction véhicule
+    const [openTransaction, setOpenTransaction] = useState(false);
+    
     const { data: vehicles = [], isLoading: loadingVehicles } = useQuery({
       queryKey: ['vehicles-list'],
       queryFn: async () => {
@@ -140,7 +145,22 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
         >
           {vu?.found ? 'Trouvé' : 'Non-Trouvé'}
         </Button>
+        <Button
+          variant="outlined"
+          color="primary"
+          sx={{ fontWeight: 700, fontSize: 16, px: 3, borderRadius: 2, ml: 2 }}
+          onClick={() => setOpenTransaction(true)}
+          disabled={!vu?.vehicle?.id}
+        >
+          Transaction
+        </Button>
       </CardActions>
+      <CreateVehicleTransactionModal
+        id={`create-vehicle-transaction-modal-${vu?.id}`}
+        open={openTransaction}
+        onClose={() => setOpenTransaction(false)}
+        vehicleId={vu?.vehicle?.id || ''}
+      />
     </Card>
   );
 };

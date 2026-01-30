@@ -33,3 +33,18 @@ export interface User {
   updatedAt: string;
   data?: UserData;
 }
+
+
+export interface VehicleUser {
+  id: string;
+  found: boolean;
+  vehicle?: Vehicle;
+  user?: User;
+}
+
+export interface Vehicle {
+  id: string;
+  name: string;
+  front: string;
+  back: string;
+}

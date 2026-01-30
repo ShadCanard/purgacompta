@@ -1,0 +1,14 @@
+[
+  { "name": "Vagos", "color1": "#ffff00", "color2": "#ffff00", "isActive": true },
+  { "name": "Ballas", "color1": "#400080", "color2": "#400080", "isActive": true },
+  { "name": "Madz", "color1": "#ff80c0", "color2": "#ff80c0", "isActive": true },
+  { "name": "Locura", "color1": "#004000", "color2": "#004000", "isActive": true },
+  { "name": "Lost", "color1": "#351b00", "color2": "#000000", "isActive": true },
+  { "name": "Aztecas", "color1": "#80ffff", "color2": "#80ffff", "isActive": true },
+  { "name": "Grey Shadow", "color1": "#c0c0c0", "color2": "#c0c0c0", "isActive": true },
+  { "name": "Ghost", "color1": "#ffffff", "color2": "#000000", "isActive": true },
+  { "name": "H141", "color1": "#ff8000", "color2": "#ff8000", "isActive": true },
+  { "name": "Forsaken", "color1": "#008000", "color2": "#000000", "isActive": true },
+  { "name": "Silly Goose MC", "color1": "#400000", "color2": "#000000", "isActive": true },
+  { "name": "Corvus", "color1": "#ffffff", "color2": "#000000", "isActive": true }
+]

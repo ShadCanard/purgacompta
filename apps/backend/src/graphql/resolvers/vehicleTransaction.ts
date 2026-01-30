@@ -1,17 +1,14 @@
-import { PrismaClient } from '../../lib/prisma';
+import prisma from '../../lib/prisma';
 
-const prisma = new PrismaClient();
-
-export const vehicleTransactionResolvers = {
-  Query: {
+export const Query = {
     vehicleTransactions: async () => {
       return prisma.vehicleTransaction.findMany({ include: { vehicle: true, item: true } });
     },
     vehicleTransaction: async (_: any, { id }: { id: string }) => {
       return prisma.vehicleTransaction.findUnique({ where: { id }, include: { vehicle: true, item: true } });
     },
-  },
-  Mutation: {
+  };
+export const Mutation = {
     createVehicleTransaction: async (_: any, { input }: any) => {
       return prisma.vehicleTransaction.create({ data: input });
     },
@@ -22,9 +19,9 @@ export const vehicleTransactionResolvers = {
       await prisma.vehicleTransaction.delete({ where: { id } });
       return true;
     },
-  },
-  VehicleTransaction: {
+  };
+
+export const VehicleTransaction = {
     vehicle: (parent: any) => prisma.vehicle.findUnique({ where: { id: parent.vehicleId } }),
     item: (parent: any) => parent.itemId ? prisma.item.findUnique({ where: { id: parent.itemId } }) : null,
-  },
 };

@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
 
 const prisma = new PrismaClient();
 
@@ -41,45 +43,31 @@ async function main() {
   });
   console.log('✅ Created admin user:', adminUser2);
 
-  await prisma.group.upsert({
-    where: { name: 'Purgatory' },
-    update: {},
-    create: {
-      name: 'Purgatory',
-    },
-  });
+
+  await prisma.group.upsert({ where: { name: 'Purgatory' }, update: {}, create: { name: 'Purgatory' } });
   console.log('✅ Created group Purgatory');
 
-  const peyote = await prisma.vehicle.findFirst({
-    where: { name: 'Peyote' },
-  });
-
-  if(!peyote)
-  {
-    await prisma.vehicle.create({
-    data: {
-      name: 'Peyote',
-      front: 'https://static.wikia.nocookie.net/gtawiki/images/4/4b/Peyote-GTAV-FrontQuarter.png/revision/latest/scale-to-width-down/1000?cb=20160323190724',
-      back: 'https://static.wikia.nocookie.net/gtawiki/images/d/d3/Peyote-GTAV-RearQuarter.png/revision/latest/scale-to-width-down/1000?cb=20160323190818',
-    },
-  });
-  console.log('✅ Created vehicle Peyote');
+  // Lecture du JSON groups
+  const groupsPath = path.join(__dirname, 'groups.json');
+  const groups = JSON.parse(fs.readFileSync(groupsPath, 'utf-8'));
+  for (const group of groups) {
+    await prisma.group.upsert({
+      where: { name: group.name },
+      update: {},
+      create: group,
+    });
+    console.log('✅ Created group', group.name);
   }
 
-  const tornado = await prisma.vehicle.findFirst({
-    where: { name: 'Tornado' },
-  });
-
-  if(!tornado)
-  {
-    await prisma.vehicle.create({
-    data: {
-      name: 'Tornado',
-      front: 'https://static.wikia.nocookie.net/gtawiki/images/e/ee/Tornado-GTAV-FrontQuarter.png/revision/latest/scale-to-width-down/1000?cb=20180512140313',
-      back: 'https://static.wikia.nocookie.net/gtawiki/images/d/d3/Tornado-GTAV-RearQuarter.png/revision/latest/scale-to-width-down/1000?cb=20180512140314',
-    },
-  });
-  console.log('✅ Created vehicle Tornado');
+  // Lecture du JSON vehicles
+  const vehiclesPath = path.join(__dirname, 'vehicles.json');
+  const vehicles = JSON.parse(fs.readFileSync(vehiclesPath, 'utf-8'));
+  for (const v of vehicles) {
+    const exists = await prisma.vehicle.findFirst({ where: { name: v.name } });
+    if (!exists) {
+      await prisma.vehicle.create({ data: v });
+      console.log('✅ Created vehicle', v.name);
+    }
   }
 
   console.log('🎉 Seeding completed!');
