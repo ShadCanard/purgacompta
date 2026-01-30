@@ -8,5 +8,10 @@
     "name": "Tornado",
     "front": "https://static.wikia.nocookie.net/gtawiki/images/e/ee/Tornado-GTAV-FrontQuarter.png/revision/latest/scale-to-width-down/1000?cb=20180512140313",
     "back": "https://static.wikia.nocookie.net/gtawiki/images/d/d3/Tornado-GTAV-RearQuarter.png/revision/latest/scale-to-width-down/1000?cb=20180512140314"
+  },
+  {
+    "name":"Rebel Rouillé",
+    "front":"",
+    "back":"",
   }
 ]
