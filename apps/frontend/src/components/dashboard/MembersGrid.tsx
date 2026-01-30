@@ -21,10 +21,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/providers/UserProvider';
 import { formatDisplayName, formatDollar, formatFullName } from '@/lib/utils';
 import { User } from '@/purgacompta/common';
-import { GET_MEMBERS } from '@/lib/queries';
-import { USER_UPDATED } from '@/lib/subscriptions';
 import { useSubscription } from '@/lib/useSubscription';
 import { Edit } from '@mui/icons-material';
+import { USER_UPDATED } from '@/lib/subscriptions/user';
+import { GET_MEMBERS } from '@/lib/queries/users';
 
 const MembersGrid: React.FC<{ refresh?: number }> = ({ refresh = 0 }) => {
   const { user: currentUser } = useUser();

@@ -62,7 +62,6 @@ const menuItems: MenuItem[] = [
     children: [
       { text: 'Prix Groupes', icon: <CurrencyExchange />, path: '/prices/groups', requiredRole: 'MEMBER' },
       { text: 'Prix Purgatory', icon: <CurrencyExchange />, path: '/prices/purgatory', requiredRole: 'MEMBER' },
-      { text: 'Membres', icon: <PeopleIcon />, path: '/members', requiredRole: 'MANAGER' },
     ],
   },
   { text: 'Paramètres', icon: <SettingsIcon />, path: '/settings', requiredRole: 'MANAGER', children: [

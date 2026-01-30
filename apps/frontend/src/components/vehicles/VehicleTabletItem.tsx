@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { SET_VEHICLE_USER } from '@/lib/mutations';
+import { SET_VEHICLE_USER } from '@/lib/mutations/vehicles';
 import { getApolloClient } from '@/lib/apolloClient';
 import { Card, CardHeader, CardContent, CardActions, Typography, Stack, Button } from '@mui/material';
 import ConfirmModal from '@/components/layout/ConfirmModal';

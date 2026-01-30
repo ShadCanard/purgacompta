@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, Box, Switch } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { CREATE_GROUP, UPDATE_GROUP } from '@/lib/mutations';
+import { CREATE_GROUP, UPDATE_GROUP } from '@/lib/mutations/groups';
 import { getApolloClient } from '@/lib/apolloClient';
 
 interface CreateUpdateGroupModalProps {

@@ -1,15 +1,13 @@
-import { GET_MEMBERS } from '@/lib/queries';
+import { GET_CURRENT_USER, GET_MEMBERS } from '@/lib/queries/users';
 // Hook pour récupérer la liste des membres (users)
-import { useQuery as useRQ } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import { getApolloClient } from '@/lib/apolloClient';
-import { UPDATE_USER } from '@/lib/mutations';
-import { GET_CURRENT_USER } from '@/lib/queries';
+import { UPDATE_USER } from '@/lib/mutations/users';
 import { User, UserRole, UserData } from '@purgacompta/common';
-import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery as useRQ, useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
-import { ReactNode, useContext, createContext } from 'react';
-import { USER_UPDATED } from '@/lib/subscriptions';
+import { useEffect, ReactNode, useContext, createContext } from 'react';
+import { USER_UPDATED } from '@/lib/subscriptions/user';
+
 export function useMembers() {
   return useRQ<User[]>({
     queryKey: ['members-list'],

@@ -1,8 +1,7 @@
 import { getApolloClient } from '@/lib/apolloClient';
-import { useEffect } from 'react';
-import { USER_UPDATED } from '@/lib/subscriptions';
+import React, { useEffect } from 'react';
+import { USER_UPDATED } from '@/lib/subscriptions/user';
 import { useQueryClient, useQuery as useTanstackQuery } from '@tanstack/react-query';
-import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import { Box, Typography, Card, Grid, Stack, Button } from '@mui/material';
@@ -18,7 +17,7 @@ import {
 import MembersGrid from '@/components/dashboard/MembersGrid';
 import CurrentUserCard from '@/components/dashboard/CurrentUserCard';
 import StatCard from '@/components/layout/StatCard';
-import { GET_MEMBERS } from '@/lib/queries';
+import { GET_MEMBERS } from '@/lib/queries/users';
 
 const HomePage: React.FC = () => {
   const apolloClient = getApolloClient();

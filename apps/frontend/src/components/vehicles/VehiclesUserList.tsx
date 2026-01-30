@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import VehiclesUserItem from './VehiclesUserItem';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { GET_MEMBERS } from '@/lib/queries';
+import { GET_MEMBERS } from '@/lib/queries/users';
 import { getApolloClient } from '@/lib/apolloClient';
 import { useSubscription } from '@/lib/useSubscription';
-import { USER_UPDATED } from '@/lib/subscriptions';
+import { USER_UPDATED } from '@/lib/subscriptions/user';
 
 const VehiclesUserList: React.FC = () => {
     const apolloClient = getApolloClient();

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Button, ButtonGroup } from '@mui/material';
 import { MainLayout } from '@/components';
 import { useSnackbar } from '@/providers';
@@ -6,11 +6,11 @@ import { Launch } from '@mui/icons-material';
 import VehiclesUserList from '@/components/vehicles/VehiclesUserList';
 import { useUser, useUpdateUser } from '@/providers/UserProvider';
 import TextField from '@mui/material/TextField';
-import { useState } from 'react';
+
 const VehiclesPage: React.FC = () => {
   const { notify} = useSnackbar()!;
 
-  const { user } = useUser()!;
+  const { user } = useUser();
   const updateUser = useUpdateUser();
   const [tabletUserName, setTabletUserName] = useState<string>(user?.data?.tabletUsername || '');
 

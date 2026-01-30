@@ -6,12 +6,12 @@ import { Add, Delete } from '@mui/icons-material';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useSnackbar } from '@/providers';
 import { formatDollar } from '@/lib/utils';
-import { CREATE_TRANSACTION } from '@/lib/mutations';
+import { CREATE_TRANSACTION } from '@/lib/mutations/transactions';
 import {
-  GET_GROUPS,
-  GET_ITEM_PRICES,
-  GET_ITEMS, GET_PURGATORY
-} from '@/lib/queries';
+  GET_GROUPS, GET_PURGATORY
+} from '@/lib/queries/groups';
+import { GET_ITEM_PRICES } from '@/lib/queries/transactions';
+import { GET_ITEMS } from '@/lib/queries/items';
 import { getApolloClient } from '@/lib/apolloClient';
 
 const TransactionOutgoing: React.FC = () => {

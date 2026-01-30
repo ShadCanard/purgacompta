@@ -7,7 +7,7 @@ import { getApolloClient } from '@/lib/apolloClient';
 import { User, UserData } from '@/purgacompta/common';
 import { useMembers } from '@/providers/UserProvider';
 import { useSubscription } from '@/lib/useSubscription';
-import { USER_UPDATED } from '@/lib/subscriptions';
+import { USER_UPDATED } from '@/lib/subscriptions/user';
 
 const VehicleTablet: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);

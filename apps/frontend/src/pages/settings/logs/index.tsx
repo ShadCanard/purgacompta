@@ -4,7 +4,8 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@/providers/UserProvider';
 import MainLayout from '@/components/layout/MainLayout';
-import { GET_LOGS, GET_MEMBERS } from '@/lib/queries';
+import { GET_LOGS } from '@/lib/queries/logs';
+import { GET_MEMBERS } from '@/lib/queries/users';
 import { getApolloClient } from '@/lib/apolloClient';
 
 

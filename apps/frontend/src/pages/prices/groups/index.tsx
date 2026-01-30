@@ -8,8 +8,10 @@ import MainLayout from '@/components/layout/MainLayout';
 import ConfirmModal from '@/components/layout/ConfirmModal';
 import { formatDollar } from '@/lib/utils';
 import ActionsMenu from '@/components/layout/ActionsMenu';
-import { CREATE_ITEM_PRICE, UPDATE_ITEM_PRICE, DELETE_ITEM_PRICE } from '@/lib/mutations';
-import { GET_GROUPS, GET_ITEM_PRICES, GET_ITEMS } from '@/lib/queries';
+import { CREATE_ITEM_PRICE, UPDATE_ITEM_PRICE, DELETE_ITEM_PRICE } from '@/lib/mutations/transactions';
+import { GET_GROUPS } from '@/lib/queries/groups';
+import { GET_ITEM_PRICES } from '@/lib/queries/transactions';
+import { GET_ITEMS } from '@/lib/queries/items';
 import { ItemPrice } from '@/lib/types';
 import { getApolloClient } from '@/lib/apolloClient';
 

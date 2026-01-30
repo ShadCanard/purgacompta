@@ -23,10 +23,11 @@ import { formatDollar } from '@/lib/utils';
 import CreateUpdateContactModal from '@/components/contacts/CreateUpdateContactModal';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useSnackbar } from '@/providers';
-import { CREATE_TRANSACTION } from '@/lib/mutations';
+import { CREATE_TRANSACTION } from '@/lib/mutations/transactions';
 import {
-  GET_CONTACTS_OR_GROUPS_TRANSACTION, GET_ITEM_PRICES_BY_TARGET, GET_PURGATORY
-} from '@/lib/queries';
+  GET_CONTACTS_OR_GROUPS_TRANSACTION, GET_ITEM_PRICES_BY_TARGET
+} from '@/lib/queries/transactions';
+import { GET_PURGATORY } from '@/lib/queries/groups';
 import { getApolloClient } from '@/lib/apolloClient';
 
 const IncomingTransaction: React.FC = () => {
@@ -41,6 +42,8 @@ const IncomingTransaction: React.FC = () => {
     const [blanchimentPercent, setBlanchimentPercent] = React.useState<number>(60);
     const [extraBlanchiment, setExtraBlanchiment] = React.useState(0);
     const [reductionIn, setReductionIn] = React.useState<number>(0);
+    const { notify } = useSnackbar()!;
+
 
   // Queries
   const { data: contactsOrGroups = { groups: [], contactsWithoutGroup: [] }, refetch: refetchContactsOrGroups } = useQuery({
@@ -73,7 +76,7 @@ const IncomingTransaction: React.FC = () => {
   });
 
   React.useEffect(() => {
-    apolloClient.query({ query: GET_PURGATORY }).then(result => {
+    apolloClient.query({ query: GET_PURGATORY }).then((result: { data: any; }) => {
       const myGroup = (result.data as any).myGroup;
       setPurgatoryId(myGroup.id);
     });
@@ -102,9 +105,6 @@ const IncomingTransaction: React.FC = () => {
       }
     }));
   };
-
-  // Snackbar
-  const { notify } = useSnackbar();
 
   // Mutation pour enregistrer la transaction (exemple, à adapter selon besoin)
   const { mutate: saveTransaction, status: savingTransactionStatus } = useMutation({

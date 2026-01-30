@@ -10,8 +10,8 @@ import ConfirmModal from '@/components/layout/ConfirmModal';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useSnackbar } from '@/lib/useSnackbar';
 import ActionsMenu from '@/components/layout/ActionsMenu';
-import { DELETE_CONTACT, IMPORT_CONTACTS } from '@/lib/mutations';
-import { GET_CONTACTS } from '@/lib/queries';
+import { DELETE_CONTACT, IMPORT_CONTACTS } from '@/lib/mutations/contacts';
+import { GET_CONTACTS } from '@/lib/queries/contacts';
 import { Contact } from '@/lib/types';
 import { getApolloClient } from '@/lib/apolloClient';
 

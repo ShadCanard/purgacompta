@@ -3,8 +3,8 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } 
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { GET_VEHICLE } from '@/lib/queries';
-import { CREATE_VEHICLE, UPDATE_VEHICLE } from '@/lib/mutations';
+import { GET_VEHICLE } from '@/lib/queries/vehicles';
+import { CREATE_VEHICLE, UPDATE_VEHICLE } from '@/lib/mutations/vehicles';
 import { getApolloClient } from '@/lib/apolloClient';
 
 

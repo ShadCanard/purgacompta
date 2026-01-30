@@ -4,14 +4,13 @@ import ConfirmModal from '@/components/layout/ConfirmModal';
 import CreateUpdateGroupModal from '../../../components/groups/CreateUpdateGroupModal';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { useQuery } from '@tanstack/react-query';
 import MainLayout from '@/components/layout/MainLayout';
 import { useUser } from '@/providers/UserProvider';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/providers';
 import ActionsMenu from '@/components/layout/ActionsMenu';
-import { DELETE_GROUP, UPDATE_GROUP_IS_ACTIVE } from '@/lib/mutations';
-import { GET_GROUPS } from '@/lib/queries';
+import { DELETE_GROUP, UPDATE_GROUP_IS_ACTIVE } from '@/lib/mutations/groups';
+import { GET_GROUPS } from '@/lib/queries/groups';
 import { Group } from '@/lib/types';
 import { getApolloClient } from '@/lib/apolloClient';
 
@@ -19,7 +18,6 @@ const GroupsPage: React.FC = () => {
   
   const [open, setOpen] = useState(false);
   const [editGroup, setEditGroup] = useState<any | null>(null);
-  const [editLoading, setEditLoading] = useState(false);
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; group: any | null }>({ open: false, group: null });
   const handleOpen = () => setOpen(true);

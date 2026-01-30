@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Button, Stack, Switch } from '@mui/material';
+import { IconButton, Menu, MenuItem, Box, Typography, Paper, Button, Stack, Switch } from '@mui/material';
 import ConfirmModal from '@/components/layout/ConfirmModal';
 import AddIcon from '@mui/icons-material/Add';
 import CreateUpdateItemModal from '@/components/items/CreateUpdateItemModal';
@@ -7,10 +7,9 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useSnackbar } from '@/providers';
 import MainLayout from '@/components/layout/MainLayout';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { CREATE_ITEM, UPDATE_ITEM, DELETE_ITEM } from '@/lib/mutations';
-import { GET_ITEMS } from '@/lib/queries';
+import { CREATE_ITEM, UPDATE_ITEM, DELETE_ITEM } from '@/lib/mutations/items';
+import { GET_ITEMS } from '@/lib/queries/items';
 import { getApolloClient } from '@/lib/apolloClient';
 
 const ActionsCell: React.FC<{ row: any; onEdit: (row: any) => void; onDelete: (row: any) => void }> = ({ row, onEdit, onDelete }) => {

@@ -1,6 +1,6 @@
 
 import { getApolloClient } from '@/lib/apolloClient';
-import { GET_TRANSACTIONS_BY_ENTITY, GET_TRANSACTIONS, GET_CONTACTS_OR_GROUPS_TRANSACTION } from "@/lib/queries";
+import { GET_TRANSACTIONS_BY_ENTITY, GET_TRANSACTIONS, GET_CONTACTS_OR_GROUPS_TRANSACTION } from "@/lib/queries/transactions";
 import { Typography, Box, Autocomplete, Paper, TextField } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import HistoryCard from "./HistoryCard";

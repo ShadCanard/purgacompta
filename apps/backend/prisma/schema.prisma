@@ -38,23 +38,7 @@ model Log {
 
   user      User     @relation(fields: [userId], references: [id])
   @@map("logs")
-}
 
-model Item {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  weight    Float    // Poids en kilo, décimal possible
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  sellable  Boolean  @default(true)
-  weapon    Boolean  @default(false)
-
-  itemPrices ItemPrice[]
-  transactionLines TransactionLine[]
-
-  storageItems StorageItem[]
-
-  @@map("items")
 }
 
 model Group {
@@ -87,6 +71,24 @@ model Contact {
   group     Group? @relation(fields: [groupid], references: [id])
 
   @@map("contacts")
+}
+
+
+model Item {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  weight    Float    // Poids en kilo, décimal possible
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sellable  Boolean  @default(true)
+  weapon    Boolean  @default(false)
+
+  itemPrices ItemPrice[]
+  transactionLines TransactionLine[]
+  storageItems StorageItem[]
+  vehicleTransactions VehicleTransaction[]
+
+  @@map("items")
 }
 
 model ItemPrice {
@@ -141,6 +143,7 @@ model Vehicle {
   front String
   back  String
   vehicleUsers VehicleUser[]
+  vehicleTransactions VehicleTransaction[]
   @@map("vehicles")
 }
 
@@ -171,6 +174,7 @@ model Storage {
   items       StorageItem[]
 
   @@map("storages")
+
 }
 
 model StorageItem {
@@ -184,4 +188,21 @@ model StorageItem {
 
   @@unique([storageId, itemId])
   @@map("storage_items")
+}
+
+
+model VehicleTransaction {
+  id            String   @id @default(cuid())
+  vehicleId     String
+  targetId      String // Peut référencer un contact ou un groupe
+  rewardAmount  Float
+  isMoney       Boolean // true = argent, false = objet
+  isDirtyMoney  Boolean // true = sale, false = propre (si isMoney)
+  itemId        String? // null si argent
+  createdAt     DateTime @default(now())
+
+  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id])
+  item          Item?    @relation(fields: [itemId], references: [id])
+
+  @@map("vehicle_transactions")
 }

@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Chip, Autocomplete, TextField } from '@mui/material';
-import { Card, CardHeader, CardContent, CardActions, Button } from '@mui/material';
+import { Card, CardHeader, CardContent, CardActions, Button, Typography, Chip, Autocomplete, TextField } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { GET_VEHICLE_USERS, GET_VEHICLES } from '@/lib/queries';
+import { GET_VEHICLE_USERS, GET_VEHICLES } from '@/lib/queries/vehicles';
 import { getApolloClient } from '@/lib/apolloClient';
-import { SET_VEHICLE_USER } from '@/lib/mutations';
+import { SET_VEHICLE_USER } from '@/lib/mutations/vehicles';
 import { useSnackbar } from '@/providers';
-import { TABLET_UPDATED } from '@/lib/subscriptions';
+import { TABLET_UPDATED } from '@/lib/subscriptions/vehicles';
 import Switch from '@mui/material/Switch';
 import { useUpdateUser } from '@/providers/UserProvider';
 import { User } from '@purgacompta/common';

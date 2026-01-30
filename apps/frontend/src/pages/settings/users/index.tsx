@@ -5,7 +5,7 @@ import { Box, Typography, Paper, Avatar, CircularProgress, Button } from '@mui/m
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import UpdateUserInfoModal from '@/components/users/UpdateUserInfoModal';
 import { useQuery } from '@tanstack/react-query';
-import { GET_MEMBERS } from '@/lib/queries';
+import { GET_MEMBERS } from '@/lib/queries/users';
 import { getApolloClient } from '@/lib/apolloClient';
 import { formatDisplayName } from '@/lib/utils';
 import { Edit } from '@mui/icons-material';

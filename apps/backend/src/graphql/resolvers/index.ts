@@ -7,6 +7,7 @@ import * as itemResolvers from './item';
 import * as vehicleResolvers from './vehicle';
 import * as logsResolvers from './logs';
 import * as subscriptionResolvers from '../subscriptions';
+import * as vehicleTransactionResolvers from './vehicleTransaction';
 import { mergeResolvers } from '@graphql-tools/merge';
 
 export const resolvers: Record<string, any> = mergeResolvers([
@@ -19,4 +20,5 @@ export const resolvers: Record<string, any> = mergeResolvers([
   vehicleResolvers,
   logsResolvers,
   subscriptionResolvers,
+  vehicleTransactionResolvers,
 ]);

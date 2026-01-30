@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { GET_STORAGES, GET_STORAGE_BY_ID } from '../queries';
-import { CREATE_STORAGE, UPDATE_STORAGE } from '../mutations';
 import { getApolloClient } from '../apolloClient';
+import { GET_STORAGE_BY_ID, GET_STORAGES } from '../queries/storages';
+import { CREATE_STORAGE, UPDATE_STORAGE } from '../mutations/storages';
 
 // Hook pour la gestion complète de l'inventaire (stockages)
 export function useStoragesInventory() {

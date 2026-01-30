@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Accordion, AccordionSummary, AccordionDetails, Typography, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ConfirmModal from '../layout/ConfirmModal';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/lib/useSnackbar';
-import { DELETE_TRANSACTION } from '@/lib/mutations';
-import { useQueryClient } from '@tanstack/react-query';
+import { DELETE_TRANSACTION } from '@/lib/mutations/transactions';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { formatDollar } from '@/lib/utils';
+import { getApolloClient } from '@/lib/apolloClient';
 
 export interface TransactionLine {
   id: string;
@@ -36,8 +36,9 @@ interface HistoryCardProps {
 
 const HistoryCard: React.FC<HistoryCardProps> = ({ transaction }) => {
   const [openConfirm, setOpenConfirm] = useState(false);
-  const { notify } = useSnackbar();
+  const { notify } = useSnackbar()!;
   const queryClient = useQueryClient();
+  const apolloClient = getApolloClient();
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {

@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    Button,
-    Typography,
-    Box,
-    Autocomplete,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Autocomplete,
 } from '@mui/material';
 import { getApolloClient } from '@/lib/apolloClient';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/lib/useSnackbar';
-import { CREATE_CONTACT, UPDATE_CONTACT } from '@/lib/mutations';
-import { GET_GROUPS } from '@/lib/queries';
+import { CREATE_CONTACT, UPDATE_CONTACT } from '@/lib/mutations/contacts';
+import { GET_GROUPS } from '@/lib/queries/groups';
+
 
 interface CreateUpdateContactModalProps {
   open: boolean;
