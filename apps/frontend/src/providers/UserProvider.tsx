@@ -1,3 +1,4 @@
+import { GET_USER_BY_ID } from '@/lib/queries/users';
 import { GET_CURRENT_USER, GET_MEMBERS } from '@/lib/queries/users';
 // Hook pour récupérer la liste des membres (users)
 import { getApolloClient } from '@/lib/apolloClient';
@@ -7,6 +8,19 @@ import { useQuery as useRQ, useQueryClient, useQuery, useMutation } from '@tanst
 import { useSession } from 'next-auth/react';
 import { useEffect, ReactNode, useContext, createContext } from 'react';
 import { USER_UPDATED } from '@/lib/subscriptions/user';
+
+export function useUserById(userId: string | undefined) {
+  return useRQ<User>({
+    queryKey: ['user-by-id', userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (!userId) throw new Error('userId is undefined');
+      const apolloClient = getApolloClient();
+      const { data } = await apolloClient.query({ query: GET_USER_BY_ID, variables: { id: userId }, fetchPolicy: 'network-only' });
+      return (data as any).userById;
+    }
+  });
+}
 
 export function useMembers() {
   return useRQ<User[]>({

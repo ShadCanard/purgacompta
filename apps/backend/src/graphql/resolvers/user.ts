@@ -83,15 +83,7 @@ export const Mutation = {
   deleteUser: async (_: any, { discordId }: { discordId: string }, context: any) => {
     const before = await prisma.user.findUnique({ where: { discordId } });
     const deleted = await prisma.user.delete({ where: { discordId } });
-    await prisma.log.create({
-      data: {
-        action: 'DELETE',
-        entity: 'User',
-        entityId: deleted.id,
-        userId: context.user?.id || deleted.id,
-        diff: JSON.stringify({ before }),
-      },
-    });
+    // Log supprimé : prisma.log n'existe plus
     return true;
   },
   updateUser: async (_: any, { id, input }: { id: string; input: any }, context: any) => {

@@ -1,0 +1,1 @@
+{"version":3,"file":"vehicleTransactions.d.ts","sourceRoot":"","sources":["vehicleTransactions.ts"],"names":[],"mappings":"AACA,MAAM,MAAM,uBAAuB,GAAG;IAClC,aAAa,EAAE,MAAM,CAAC;IACtB,QAAQ,EAAE,MAAM,CAAC;IACjB,YAAY,EAAE,MAAM,CAAC;IACrB,OAAO,EAAE,OAAO,CAAC;IACjB,YAAY,EAAE,OAAO,CAAC;IACtB,MAAM,EAAE,MAAM,GAAG,IAAI,CAAC;CACvB,CAAA"}

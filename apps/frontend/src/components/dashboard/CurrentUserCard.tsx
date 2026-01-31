@@ -12,12 +12,17 @@ import {
 import { useUser, useUpdateUser } from '@/providers/UserProvider';
 import { useSnackbar } from '@/lib/useSnackbar';
 import { formatDollar, formatFullName } from '@/lib/utils';
+import { useAccountHistoriesByUser } from '@/lib/hooks/useUserAccountHistory';
 
 
 const CurrentUserCard: React.FC = () => {
   const { user, loading, refetch } = useUser();
   const { notify } = useSnackbar()!;
   const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
+  const {data: userHistories } = useAccountHistoriesByUser(user?.id || '');
+
+
+  const currentBalance = userHistories?.[0]?.amount || 0;
 
   if (loading || !user) return null;
 
@@ -64,7 +69,7 @@ const CurrentUserCard: React.FC = () => {
             sx={{ fontWeight: 600, mx: 5 }}
           />
           <Typography variant="h6" fontWeight={700} gutterBottom sx={{ mx: 5 }}>
-            Solde : {formatDollar(user.data?.balance)}
+            Solde : {formatDollar(currentBalance)}
           </Typography>
           <FormControlLabel control={<Switch checked={user.data?.isOnline} />} label="En ligne" />
         </Stack>

@@ -98,6 +98,7 @@ export const rootTypeDefs = `#graphql
     userUpdated: User!
     tabletUpdated: VehicleUser!
     storageUpdated(storageId: ID): StorageUpdatedPayload!
+    accountUpdated: UserAccountHistory!
   }
 
   type StorageUpdatedPayload {

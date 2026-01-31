@@ -8,6 +8,8 @@ import { groupTypeDefs } from './group';
 import { transactionTypeDefs } from './transaction';
 import { itemPriceTypeDefs } from './itemPrice';
 import { vehicleTransactionTypeDefs } from './vehicleTransaction';
+import { userAccountHistoryTypeDefs } from './userAccountHistory';
+import { dashboardTypeDefs } from './dashboard';
 
 export const typeDefs = [
   rootTypeDefs,
@@ -20,4 +22,6 @@ export const typeDefs = [
   transactionTypeDefs,
   itemPriceTypeDefs,
   vehicleTransactionTypeDefs,
+  userAccountHistoryTypeDefs,
+  dashboardTypeDefs,
 ].join('\n');

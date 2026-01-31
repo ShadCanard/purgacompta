@@ -4,25 +4,26 @@ import { USER_UPDATED } from '@/lib/subscriptions/user';
 import { useQueryClient, useQuery as useTanstackQuery } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { Box, Typography, Card, Grid, Stack, Button } from '@mui/material';
+import { Box, Typography, Card, Stack, Button } from '@mui/material';
 import { UpdateUserInfoModal } from '@/components/users';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import UserAccountUpdateModal from '@/components/accounts/UserAccountUpdateModal';
 import { MainLayout } from '@/components/layout';
 import { useUser } from '@/providers/UserProvider';
 import {
-  AccountBalance as AccountBalanceIcon,
-  Edit,
-  Receipt as ReceiptIcon,
-  TrendingUp as TrendingUpIcon,
+  Edit
 } from '@mui/icons-material';
 import MembersGrid from '@/components/dashboard/MembersGrid';
 import CurrentUserCard from '@/components/dashboard/CurrentUserCard';
-import StatCard from '@/components/layout/StatCard';
+import DashboardStats from '@/components/dashboard/DashboardStats';
 import { GET_MEMBERS } from '@/lib/queries/users';
 
 const HomePage: React.FC = () => {
   const apolloClient = getApolloClient();
   const queryClient = useQueryClient();
   const { user, loading } = useUser();
+  const [openEditModal, setOpenEditModal] = React.useState(false);
+  const [openAccountModal, setOpenAccountModal] = React.useState(false);
 
   // Souscription USER_UPDATED (effet visuel simple)
   // Ajout d'un état local pour forcer le refresh
@@ -36,11 +37,10 @@ const HomePage: React.FC = () => {
           apolloClient.cache.evict({ id: 'ROOT_QUERY', fieldName: 'users' });
           apolloClient.cache.gc();
           setRefresh((r) => r + 1); // Incrémente pour forcer le refetch
-        } else {
         }
       },
       error: (err: any) => {
-        if (err && err.message) {
+        if (err?.message) {
           alert('Erreur subscription USER_UPDATED : ' + err.message);
         }
       },
@@ -62,7 +62,6 @@ const HomePage: React.FC = () => {
   const onlineCount = (membersData || []).filter((u: any) => u.data.isOnline).length;
 
 
-  const [openEditModal, setOpenEditModal] = React.useState(false);
 
   if(loading) {
     return (
@@ -75,63 +74,40 @@ const HomePage: React.FC = () => {
   return (
     <MainLayout>
       <Box sx={{ mb: 4 }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="h4" fontWeight={700} gutterBottom>
-            Dashboard
-          </Typography>
-          <Box>
-            <Button 
-              variant="contained" 
-              color="primary"
-              startIcon={<Edit />}
-              onClick={() => setOpenEditModal(true)}
-            >
-              Éditer
-            </Button>
-            <UpdateUserInfoModal open={openEditModal} onClose={() => setOpenEditModal(false)} />
-          </Box>
-        </Stack>
+        <Typography variant="h4" fontWeight={700} gutterBottom>
+          Dashboard
+        </Typography>
       </Box>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Solde Total"
-            value="$0"
-            icon={<AccountBalanceIcon sx={{ fontSize: 32 }} />}
-            color="#9c27b0"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Transactions"
-            value="0"
-            icon={<ReceiptIcon sx={{ fontSize: 32 }} />}
-            color="#ff5722"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Revenus"
-            value="$0"
-            icon={<TrendingUpIcon sx={{ fontSize: 32 }} />}
-            color="#4caf50"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Caisse Noire"
-            value="0"
-            icon={<AccountBalanceIcon sx={{ fontSize: 32 }} />}
-            color="#2196f3"
-          />
-        </Grid>
-      </Grid>
+      <DashboardStats />
+
 
       {/* Carte utilisateur courant */}
       <Box>
         {/* @ts-ignore */}
         {user && <CurrentUserCard />}
+      </Box>
+
+      {/* Boutons actions utilisateur */}
+      <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
+        <Button 
+          variant="outlined" 
+          color="primary"
+          startIcon={<Edit />}
+          onClick={() => setOpenEditModal(true)}
+        >
+          Éditer
+        </Button>
+        <Button
+          variant="outlined"
+          color="success"
+          startIcon={<AttachMoneyIcon />}
+          onClick={() => setOpenAccountModal(true)}
+        >
+          Mettre à jour mon compte
+        </Button>
+        <UpdateUserInfoModal open={openEditModal} onClose={() => setOpenEditModal(false)} />
+        <UserAccountUpdateModal open={openAccountModal} onClose={() => setOpenAccountModal(false)} />
       </Box>
 
       <Card

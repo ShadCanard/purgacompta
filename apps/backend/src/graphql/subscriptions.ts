@@ -19,6 +19,12 @@ export const Subscription = {
       console.log('[BACKEND] Nouvelle souscription STORAGE_UPDATED');
       return pubsub.asyncIterator(['STORAGE_UPDATED']);
     }
+  },
+  accountUpdated: {
+    subscribe : () => {
+      console.log('[BACKEND] Nouvelle souscription ACCOUNT_UPDATED');
+      return pubsub.asyncIterator(['ACCOUNT_UPDATED']);
+    }
   }
 };
 

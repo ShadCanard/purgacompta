@@ -30,6 +30,7 @@ import {
   Contacts as ContactsIcon,
   CurrencyExchange,
   DirectionsCar as DirectionsCarIcon,
+  Inventory2 as Inventory2Icon,
 } from '@mui/icons-material';
 import { signOut, useSession } from 'next-auth/react';
 import { useUser } from '@/providers/UserProvider';
@@ -52,6 +53,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { text: 'Annuaire', icon: <ContactsIcon />, path: '/contacts' },
+  { text: 'Stockage', icon: <Inventory2Icon />, path: '/storage', requiredRole: 'MEMBER' },
   { text: 'Transactions', icon: <ReceiptIcon />, path: '/transactions', requiredRole: 'MEMBER' },
   { text: 'Comptes', icon: <AccountBalanceIcon />, path: '/accounts', requiredRole: 'MEMBER' },
   { text: 'Tablette Véhicules', icon: <DirectionsCarIcon />, path: '/vehicles', requiredRole: 'MEMBER' },
@@ -70,6 +72,7 @@ const menuItems: MenuItem[] = [
     { text: 'Groupes', icon: <AccountBalanceIcon />, path: '/settings/groups', requiredRole: 'MANAGER' },
     { text: 'Objets', icon: <AssessmentIcon />, path: '/settings/items', requiredRole: 'MANAGER' },
     { text: 'Véhicules', icon: <AccountBalanceIcon />, path: '/settings/vehicles', requiredRole: 'MANAGER' },
+    { text: 'Stockages', icon: <Inventory2Icon />, path: '/settings/storages', requiredRole: 'MANAGER' },
   ] },
 ];
 
