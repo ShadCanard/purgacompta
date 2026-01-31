@@ -39,18 +39,17 @@ export const rootTypeDefs = `#graphql
     users: [User!]!
     # Récupérer le nombre d'utilisateurs
     usersCount: Int!
-    # Récupérer les logs (admin only)
-    logs(filter: LogFilterInput, skip: Int, take: Int): [Log!]!
     # Récupérer la liste des groupes criminels
     groups: [Group!]!
     # Récupérer un groupe criminel par son ID
-    groupById(id: ID!): Group!
+    groupById(id: ID!): Group
     # Récupérer le nombre de groupes criminels
     groupsCount: Int!
     # Transactions
     transactions: [Transaction!]!
     transactionById(id: ID!): Transaction
     transactionsByEntity(entityId: ID!): [Transaction!]!
+    transactionDetailsList: [TransactionDetailsListItem!]!
   }
 
   type Mutation {

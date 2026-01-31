@@ -9,6 +9,7 @@ export const groupTypeDefs = `#graphql
     isActive: Boolean!
     createdAt: String!
     updatedAt: String!
+    contacts: [Contact!]
   }
 
   input UpdateGroupInput {

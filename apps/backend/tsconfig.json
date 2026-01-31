@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@prisma/*": ["prisma/*"]
+      "@prisma/*": ["prisma/*"],
+      "@purgacompta/common/*": ["../../packages/common/*"]
     }
   },
   "include": ["src/**/*"],

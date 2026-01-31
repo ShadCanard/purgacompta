@@ -1,3 +1,19 @@
+// Formatage date ISO ou timestamp (ms) en JJ/MM/YYYY HH:mm
+export function formatDateTime(date: string | number | null | undefined): string {
+  if (date === null || date === undefined) return '';
+  let d: Date;
+  if (typeof date === 'number') {
+    d = new Date(date);
+  } else if (/^\d+$/.test(date)) {
+    // chaîne numérique (timestamp)
+    d = new Date(Number(date));
+  } else {
+    d = new Date(date);
+  }
+  if (isNaN(d.getTime())) return '';
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 import { User, UserRole } from '@purgacompta/common';
 
 /**

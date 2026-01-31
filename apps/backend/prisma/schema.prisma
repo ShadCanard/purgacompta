@@ -20,26 +20,11 @@ model User {
 
   data        String?  // JSON sérialisé pour stocker des infos dynamiques
 
-  logs      Log[]
   vehicleUsers VehicleUser[]
 
   @@map("users")
 }
 
-
-model Log {
-  id        String   @id @default(cuid())
-  entity    String   // ex: User, Transaction, etc.
-  entityId  String   // id de l'entité modifiée
-  userId    String   // id de l'utilisateur ayant fait l'action
-  diff      String?  // JSON des changements
-  createdAt DateTime @default(now())
-  action    String   // ex: CREATE, UPDATE, DELETE
-
-  user      User     @relation(fields: [userId], references: [id])
-  @@map("logs")
-
-}
 
 model Group {
   id        String   @id @default(cuid())

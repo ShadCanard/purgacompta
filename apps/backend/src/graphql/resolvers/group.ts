@@ -14,14 +14,20 @@ function formatDate(date: string | Date | null | undefined): string {
 }
 
 export const Query = {
-  groupById: async (_: any, { id }: { id: string }) => {
-    return prisma.group.findUnique({ where: { id } });
-  },
+  
   groups: async () => {
     return prisma.group.findMany({
       orderBy: { createdAt: 'desc' },
       where: { NOT: { name: 'Purgatory' } },
+      include: { contacts: true },
     });
+  },
+  groupById: async (_: any, { id }: { id: string }) => {
+    const returnGroup = await prisma.group.findUnique({
+      where: { id },
+      include: { contacts: true },
+    });
+    return returnGroup;
   },
   groupsCount: async () => {
     return prisma.group.count({ where: { NOT: { name: 'Purgatory' } } });

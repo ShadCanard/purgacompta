@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getApolloClient } from '../apolloClient';
-import { CREATE_VEHICLE_TRANSACTION, UPDATE_VEHICLE_TRANSACTION, DELETE_VEHICLE_TRANSACTION } from '../mutations/vehicles';
-import { GET_VEHICLE_TRANSACTIONS, GET_VEHICLE_TRANSACTION } from '../queries/vehicles';
+import { CREATE_VEHICLE_TRANSACTION, UPDATE_VEHICLE_TRANSACTION, DELETE_VEHICLE_TRANSACTION } from '../mutations/transactions';
+import { GET_VEHICLE_TRANSACTION_BY_ID, GET_VEHICLE_TRANSACTION } from '../queries/transactions';
 
 const apolloClient = getApolloClient();
 
@@ -10,7 +10,7 @@ export function useVehicleTransactions() {
     queryKey: ['vehicleTransactions'],
     queryFn: async () => {
       const { data } = await apolloClient.query({
-        query: GET_VEHICLE_TRANSACTIONS,
+        query: GET_VEHICLE_TRANSACTION,
         fetchPolicy: 'network-only',
       });
       return (data as any).vehicleTransactions;
@@ -23,7 +23,7 @@ export function useVehicleTransaction(id: string) {
     queryKey: ['vehicleTransaction', id],
     queryFn: async () => {
       const { data } = await apolloClient.query({
-        query: GET_VEHICLE_TRANSACTION,
+        query: GET_VEHICLE_TRANSACTION_BY_ID,
         variables: { id },
       });
       return (data as any).vehicleTransaction;

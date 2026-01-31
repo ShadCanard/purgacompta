@@ -55,6 +55,7 @@ const menuItems: MenuItem[] = [
   { text: 'Transactions', icon: <ReceiptIcon />, path: '/transactions', requiredRole: 'MEMBER' },
   { text: 'Comptes', icon: <AccountBalanceIcon />, path: '/accounts', requiredRole: 'MEMBER' },
   { text: 'Tablette Véhicules', icon: <DirectionsCarIcon />, path: '/vehicles', requiredRole: 'MEMBER' },
+  { text: 'Suivi', icon: <AssessmentIcon />, path: '/details', requiredRole: 'MEMBER' },
   {
     text: 'Gestion',
     icon: <PeopleIcon />,

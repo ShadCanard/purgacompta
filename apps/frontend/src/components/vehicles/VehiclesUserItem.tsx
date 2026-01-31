@@ -150,7 +150,7 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
           color="primary"
           sx={{ fontWeight: 700, fontSize: 16, px: 3, borderRadius: 2, ml: 2 }}
           onClick={() => setOpenTransaction(true)}
-          disabled={!vu?.vehicle?.id}
+          disabled={!(vu?.vehicle?.id && vu?.found)}
         >
           Transaction
         </Button>
@@ -159,7 +159,7 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
         id={`create-vehicle-transaction-modal-${vu?.id}`}
         open={openTransaction}
         onClose={() => setOpenTransaction(false)}
-        vehicleId={vu?.vehicle?.id || ''}
+        vehicleUserId={vu?.id || ''}
       />
     </Card>
   );

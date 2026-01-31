@@ -82,14 +82,8 @@ export interface Log {
   createdAt: string;
 }
 
-export interface LogFilterInput {
-  action?: string;
-  entity?: string;
-  userId?: string;
-  search?: string;
-  from?: string;
-  to?: string;
-}
+ 
+// Log and LogFilterInput interfaces removed
 
 // Utiliser User de la librairie commune
 

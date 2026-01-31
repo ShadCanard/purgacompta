@@ -1,8 +1,8 @@
 export const vehicleTransactionTypeDefs = `#graphql
   type VehicleTransaction {
     id: ID!
-    vehicleId: String!
-    targetId: String!
+    targetGroup: Group
+    targetContact: Contact
     rewardAmount: Float!
     isMoney: Boolean!
     isDirtyMoney: Boolean!
@@ -13,7 +13,7 @@ export const vehicleTransactionTypeDefs = `#graphql
   }
 
   input VehicleTransactionInput {
-    vehicleId: String!
+    vehicleUserId: String!
     targetId: String!
     rewardAmount: Float!
     isMoney: Boolean!

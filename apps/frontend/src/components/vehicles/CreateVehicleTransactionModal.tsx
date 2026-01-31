@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    TextField,
-    Grid,
-    Autocomplete,
-    MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Grid,
+  Autocomplete,
+  MenuItem,
 } from '@mui/material';
 import { useCreateVehicleTransaction } from '../../lib/hooks/vehicleTransaction';
 import { useApolloClient } from '@apollo/client/react';
@@ -19,7 +19,7 @@ import { GET_CONTACTS_OR_GROUPS_TRANSACTION } from '@/lib/queries/transactions';
 interface CreateVehicleTransactionModalProps {
   open: boolean;
   onClose: () => void;
-  vehicleId: string;
+  vehicleUserId: string;
 }
 
 enum RewardType {
@@ -31,12 +31,13 @@ enum RewardType {
 const CreateVehicleTransactionModal: React.FC<CreateVehicleTransactionModalProps> = ({
   open,
   onClose,
-  vehicleId,
+  vehicleUserId,
 }) => {
 
     const [rewardAmount, setRewardAmount] = useState('');
     const [rewardType, setRewardType] = useState<RewardType>(RewardType.MONEY);
     const [itemId, setItemId] = useState('');
+    const [vehicleUserIdState, setVehicleUserIdState] = useState(vehicleUserId);
     const [groupOrContact, setGroupOrContact] = useState<any>(null);
       // Items pour le select objet
       const { data: itemsData = [], isLoading: loadingItems } = useQuery({
@@ -60,11 +61,15 @@ const CreateVehicleTransactionModal: React.FC<CreateVehicleTransactionModalProps
   });
 
   const { mutate: createTransaction, isPending } = useCreateVehicleTransaction();
+  useEffect(() => {
+    console.log('vehicleUserId changed:', vehicleUserId);
+    setVehicleUserIdState(vehicleUserId);
+  }, [vehicleUserId]);
 
   const handleSubmit = () => {
     createTransaction(
       {
-        vehicleId,
+        vehicleUserId: vehicleUserIdState,
         targetId: groupOrContact?.id,
         rewardAmount: parseFloat(rewardAmount),
         isMoney: rewardType === RewardType.MONEY || rewardType === RewardType.DIRTY_MONEY,

@@ -19,6 +19,13 @@ export const transactionTypeDefs = `#graphql
     lines: [TransactionLine!]!
   }
 
+  type TransactionDetailsListItem {
+    id: ID!
+    name: String!
+    totalAmount: Float
+    lastTransactionAt: String
+  }
+
   input TransactionLineInput {
     itemId: ID!
     quantity: Int!

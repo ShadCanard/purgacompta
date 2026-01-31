@@ -1,3 +1,13 @@
+export const GET_TRANSACTION_DETAILS_LIST = gql`
+  query TransactionDetailsList {
+    transactionDetailsList {
+      id
+      name
+      totalAmount
+      lastTransactionAt
+    }
+  }
+`;
 import { gql } from "@apollo/client";
 
 export const GET_TRANSACTIONS_BY_ENTITY = gql`
@@ -96,6 +106,64 @@ export const GET_CONTACTS_OR_GROUPS_TRANSACTION = gql`
     contactsWithoutGroup {
       id
       name
+    }
+  }
+`;
+
+export const GET_VEHICLE_TRANSACTION = gql`
+query VehicleTransactions {
+  vehicleTransactions {
+    id
+    targetGroup {
+      id
+      name
+    }
+    targetContact {
+      id
+      name
+    }
+    rewardAmount
+    isMoney
+    isDirtyMoney
+    itemId
+    createdAt
+    vehicle {
+      id
+      name
+    }
+    item {
+      id
+      name
+    }
+  }
+}
+`;
+
+export const GET_VEHICLE_TRANSACTION_BY_ID = gql`
+  query VehicleTransaction($id: ID!) {
+    vehicleTransaction(id: $id) {
+      id
+      targetGroup {
+        id
+        name
+      }
+      targetContact {
+        id
+        name
+      }
+      rewardAmount
+      isMoney
+      isDirtyMoney
+      itemId
+      createdAt
+      vehicle {
+        id
+        name
+      }
+      item {
+        id
+        name
+      }
     }
   }
 `;

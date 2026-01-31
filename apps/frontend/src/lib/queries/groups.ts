@@ -21,3 +21,24 @@ export const GET_PURGATORY = gql`
     myGroup { id name color1 color2 tag description }
   }
 `;
+
+
+export const GET_GROUP_BY_ID = gql`
+  query GroupById($groupByIdId: ID!) {
+    groupById(id: $groupByIdId) {
+      id
+      name
+      tag
+      description
+      color1
+      color2
+      isActive
+      createdAt
+      updatedAt
+      contacts {
+        name
+        phone
+      }
+    }
+  }
+`;

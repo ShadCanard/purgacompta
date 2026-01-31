@@ -36,6 +36,9 @@
       ],
       "@styles/*": [
         "src/styles/*"
+      ],
+      "@purgacompta/common": [
+        "../../packages/common/*"
       ]
     }
   },
