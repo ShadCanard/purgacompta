@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { Box, Typography, Paper } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { getApolloClient } from '@/lib/apolloClient';
 import { MainLayout } from '@/components';
 import { formatDollar, formatDateTime } from '@/lib/utils';
@@ -24,7 +24,7 @@ const DetailsPage: React.FC = () => {
   // Filtrer pour n'afficher que ceux ayant un montant total non nul
   const detailsData = detailsDataRaw.filter((row: any) => row.totalAmount && row.totalAmount !== 0);
 
-  const detailsColumns = [
+  const detailsColumns: GridColDef<any>[] = [
     { field: 'name', headerName: 'Nom', width: 300 },
     {
       field: 'totalAmount',
