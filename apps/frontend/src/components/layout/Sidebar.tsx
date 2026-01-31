@@ -70,8 +70,6 @@ const menuItems: MenuItem[] = [
     { text: 'Groupes', icon: <AccountBalanceIcon />, path: '/settings/groups', requiredRole: 'MANAGER' },
     { text: 'Objets', icon: <AssessmentIcon />, path: '/settings/items', requiredRole: 'MANAGER' },
     { text: 'Véhicules', icon: <AccountBalanceIcon />, path: '/settings/vehicles', requiredRole: 'MANAGER' },
-    { text: 'Rôles & Permissions', icon: <SettingsIcon />, path: '/settings/roles', requiredRole: 'ADMIN' },
-    { text: 'Logs', icon: <AssessmentIcon />, path: '/settings/logs', requiredRole: 'ADMIN' },
   ] },
 ];
 

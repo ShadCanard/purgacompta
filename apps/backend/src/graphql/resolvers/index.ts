@@ -1,3 +1,4 @@
+
 import * as storageResolvers from './storage';
 import * as contactResolvers from './contact';
 import * as userResolvers from './user';
@@ -14,10 +15,7 @@ export const resolvers: Record<string, any> = mergeResolvers([
   userResolvers,
   transactionResolvers,
   groupResolvers,
-  itemResolvers,
   vehicleResolvers,
   subscriptionResolvers,
   vehicleTransactionResolvers,
-]);
-
 ]);

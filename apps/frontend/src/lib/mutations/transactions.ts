@@ -64,33 +64,29 @@ export const DELETE_ITEM_PRICE = gql`
 
 
 export const CREATE_VEHICLE_TRANSACTION = gql`
-  mutation CreateVehicleTransaction($input: VehicleTransactionInput!) {
-    createVehicleTransaction(input: $input) {
-      id
-      vehicleUserId
-      targetId
-      rewardAmount
-      isMoney
-      isDirtyMoney
-      itemId
-      createdAt
-    }
-  }
+	mutation CreateVehicleTransaction($input: VehicleTransactionInput!) {
+		createVehicleTransaction(input: $input) {
+			id
+			rewardAmount
+			isMoney
+			isDirtyMoney
+			itemId
+			createdAt
+		}
+	}
 `;
 
 export const UPDATE_VEHICLE_TRANSACTION = gql`
-  mutation UpdateVehicleTransaction($id: ID!, $input: VehicleTransactionInput!) {
-    updateVehicleTransaction(id: $id, input: $input) {
-      id
-      vehicleId
-      targetId
-      rewardAmount
-      isMoney
-      isDirtyMoney
-      itemId
-      createdAt
-    }
-  }
+	mutation UpdateVehicleTransaction($id: ID!, $input: VehicleTransactionInput!) {
+		updateVehicleTransaction(id: $id, input: $input) {
+			id
+			rewardAmount
+			isMoney
+			isDirtyMoney
+			itemId
+			createdAt
+		}
+	}
 `;
 
 export const DELETE_VEHICLE_TRANSACTION = gql`

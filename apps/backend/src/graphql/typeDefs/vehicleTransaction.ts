@@ -24,6 +24,7 @@ export const vehicleTransactionTypeDefs = `#graphql
   type Query {
     vehicleTransactions: [VehicleTransaction!]!
     vehicleTransaction(id: ID!): VehicleTransaction
+    vehicleTransactionsByTarget(targetId: ID!): [VehicleTransaction!]!
   }
 
   type Mutation {

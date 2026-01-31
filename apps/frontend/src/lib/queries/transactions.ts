@@ -1,3 +1,19 @@
+export const GET_VEHICLE_TRANSACTIONS_BY_TARGET = gql`
+  query VehicleTransactionsByTarget($targetId: ID!) {
+    vehicleTransactionsByTarget(targetId: $targetId) {
+      id
+      targetGroup { id name }
+      targetContact { id name }
+      rewardAmount
+      isMoney
+      isDirtyMoney
+      itemId
+      createdAt
+      vehicle { id name }
+      item { id name }
+    }
+  }
+`;
 export const GET_TRANSACTION_DETAILS_LIST = gql`
   query TransactionDetailsList {
     transactionDetailsList {

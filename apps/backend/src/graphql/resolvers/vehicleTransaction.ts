@@ -9,6 +9,12 @@ export const Query = {
     vehicleTransaction: async (_: any, { id }: { id: string }) => {
       return prisma.vehicleTransaction.findUnique({ where: { id }, include: { vehicle: true, item: true } });
     },
+    vehicleTransactionsByTarget: async (_: any, { targetId }: { targetId: string }) => {
+      return prisma.vehicleTransaction.findMany({
+        where: { targetId },
+        include: { vehicle: true, item: true },
+      });
+    },
   };
 export const Mutation = {
     createVehicleTransaction: async (_: any, { input }: { input: VehicleTransactionInput }) => {
@@ -33,6 +39,7 @@ export const Mutation = {
           where: { id: input.vehicleUserId },
           data: {
             vehicleId: null,
+            found: false,
           },
           });
         await pubsub.publish("TABLET_UPDATED", { tabletUpdated: update });
