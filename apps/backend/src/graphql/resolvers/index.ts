@@ -11,6 +11,7 @@ import * as userAccountHistoryResolvers from './userAccountHistory';
 
 import * as dashboardResolvers from './dashboard';
 import { mergeResolvers } from '@graphql-tools/merge';
+import * as storageLocationResolvers from './storageLocation';
 
 export const resolvers: Record<string, any> = mergeResolvers([
   storageResolvers,
@@ -23,4 +24,6 @@ export const resolvers: Record<string, any> = mergeResolvers([
   vehicleTransactionResolvers,
   userAccountHistoryResolvers,
   dashboardResolvers,
+  storageLocationResolvers,
 ]);
+

@@ -1,18 +1,23 @@
 export const storageTypeDefs = `#graphql
   enum StorageType {
-    ARMURERIE
-    STOCKAGE
+    ARMORY
+    STORAGE
+    FRIDGE
   }
 
+  input UpdateStorageItemInput {
+    storageItemId: ID!
+    quantity: Int
+  }
   type Storage {
     id: ID!
     name: String!
     type: StorageType!
-    location: String!
     maxWeight: Float
     createdAt: String!
     updatedAt: String!
     items: [StorageItem!]!
+    storageLocation: StorageLocation
   }
 
   type StorageItem {
@@ -25,11 +30,19 @@ export const storageTypeDefs = `#graphql
   input CreateStorageInput {
     name: String!
     type: StorageType!
-    location: String!
     maxWeight: Float
+    storageLocationId: ID
   }
 
   input UpdateStorageInput {
+    storageId: ID!
+    name: String
+    type: StorageType
+    maxWeight: Float
+    storageLocationId: ID
+  }
+
+  input UpdateStorageContentInput {
     storageId: ID!
     itemId: ID!
     quantity: Int!

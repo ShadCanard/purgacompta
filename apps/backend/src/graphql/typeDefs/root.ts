@@ -1,5 +1,10 @@
 export const rootTypeDefs = `#graphql
   type Query {
+    # StorageLocation
+    storageLocations: [StorageLocation!]!
+    storageLocationById(id: ID!): StorageLocation
+    storagesByStorageLocationId(storageLocationId: ID!): [Storage!]!
+
     # Storage
     storages: [Storage!]!
     storageById(id: ID!): Storage
@@ -53,8 +58,16 @@ export const rootTypeDefs = `#graphql
   }
 
   type Mutation {
+    # StorageLocation
+    createStorageLocation(input: CreateStorageLocationInput!): StorageLocation!
+    updateStorageLocation(id: ID!, input: UpdateStorageLocationInput!): StorageLocation!
+    deleteStorageLocation(id: ID!): Boolean!
+    # Storage
     createStorage(input: CreateStorageInput!): Storage!
-    updateStorage(input: UpdateStorageInput!): StorageItem!
+    updateStorage(input: UpdateStorageInput!): Storage!
+
+    updateStorageItem(input: UpdateStorageItemInput!): StorageItem!
+    
     # VehicleUser
     setVehicleUser(input: SetVehicleUserInput!): VehicleUser
     setVehicleUserFound(input: SetVehiculeUserFoundInput!): VehicleUser!

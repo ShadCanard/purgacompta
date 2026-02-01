@@ -1,6 +1,13 @@
+
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
+
+// Correction pour __dirname en ESM, compatible Windows
+let __dirname = path.dirname(new URL(import.meta.url).pathname);
+if (process.platform === 'win32' && __dirname.startsWith('/')) {
+  __dirname = __dirname.slice(1);
+}
 
 const prisma = new PrismaClient();
 

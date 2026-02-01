@@ -2,6 +2,7 @@ import { rootTypeDefs } from './root';
 import { storageTypeDefs } from './storage';
 import { userTypeDefs } from './user';
 import { vehicleTypeDefs } from './vehicle';
+import { storageLocationTypeDefs } from './storageLocation';
 import { itemTypeDefs } from './item';
 import { contactTypeDefs } from './contact';
 import { groupTypeDefs } from './group';
@@ -14,6 +15,7 @@ import { dashboardTypeDefs } from './dashboard';
 export const typeDefs = [
   rootTypeDefs,
   storageTypeDefs,
+  storageLocationTypeDefs,
   userTypeDefs,
   vehicleTypeDefs,
   itemTypeDefs,

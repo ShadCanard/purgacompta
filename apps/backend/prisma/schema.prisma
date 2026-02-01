@@ -160,19 +160,31 @@ model VehicleUser {
 }
 
 
+
+model StorageLocation {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  storages  Storage[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("storage_locations")
+}
+
 model Storage {
   id          String   @id @default(cuid())
-  name        String   @unique
+  name        String
   type        String   // "armurerie" ou "stockage"
-  location    String   // Emplacement du stockage (QG, B-Jax, ...)
   maxWeight   Float?   // en kg, null = illimité
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  storageLocationId String? 
+  storageLocation   StorageLocation? @relation(fields: [storageLocationId], references: [id])
+
   items       StorageItem[]
 
   @@map("storages")
-
 }
 
 model StorageItem {
