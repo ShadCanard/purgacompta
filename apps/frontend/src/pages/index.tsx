@@ -4,7 +4,7 @@ import { USER_UPDATED } from '@/lib/subscriptions/user';
 import { useQueryClient, useQuery as useTanstackQuery } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { Box, Typography, Card, Stack, Button } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { UpdateUserInfoModal } from '@/components/users';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import UserAccountUpdateModal from '@/components/accounts/UserAccountUpdateModal';
@@ -13,7 +13,7 @@ import { useUser } from '@/providers/UserProvider';
 import {
   Edit
 } from '@mui/icons-material';
-import MembersGrid from '@/components/dashboard/MembersGrid';
+import MembersCard from '@/components/dashboard/MembersCard';
 import CurrentUserCard from '@/components/dashboard/CurrentUserCard';
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import { GET_MEMBERS } from '@/lib/queries/users';
@@ -107,24 +107,13 @@ const HomePage: React.FC = () => {
           Mettre à jour mon compte
         </Button>
         <UpdateUserInfoModal open={openEditModal} onClose={() => setOpenEditModal(false)} />
-        <UserAccountUpdateModal open={openAccountModal} onClose={() => setOpenAccountModal(false)} />
+
+        {user && (<UserAccountUpdateModal userId={user?.id} open={openAccountModal} onClose={() => setOpenAccountModal(false)} />)}
+        
       </Box>
 
-      <Card
-        sx={{
-          background: 'rgba(30, 30, 46, 0.8)',
-          border: '1px solid rgba(156, 39, 176, 0.2)',
-          borderRadius: 3,
-          p: 3,
-        }}
-      >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography variant="h6" fontWeight={600} gutterBottom>
-            Membres ({onlineCount} en ligne)
-          </Typography>
-        </Stack>
-        <MembersGrid refresh={refresh} />
-      </Card>
+        <MembersCard refresh={refresh} online={true} sx={{ mb: 3, p: 2 }} />
+        <MembersCard refresh={refresh} online={false} sx={{ mb: 3, p: 2 }} />
     </MainLayout>
   );
 };

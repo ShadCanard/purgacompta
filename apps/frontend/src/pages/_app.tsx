@@ -22,7 +22,26 @@ const queryClient = new QueryClient({
   },
 });
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Gestion globale des erreurs d'import de .css (ex: DataGrid)
+    const errorHandler = (event: ErrorEvent) => {
+      if (
+        event.message?.includes('Unknown file extension ".css"') ||
+        event.message?.includes('Failed to load external module') && event.message?.includes('.css')
+      ) {
+        router.replace('/');
+      }
+    };
+    window.addEventListener('error', errorHandler);
+    return () => window.removeEventListener('error', errorHandler);
+  }, [router]);
+
   return (
     <SessionProvider session={session}>
       <ApolloProvider client={getApolloClient()}>

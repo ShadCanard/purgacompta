@@ -1,4 +1,5 @@
 import prisma from '../../lib/prisma';
+import { pubsub } from './_pubsub';
 
 export const Storage = {
   storageLocation: (parent: any) => {
@@ -8,6 +9,25 @@ export const Storage = {
 };
 
 export const Query = {
+    storageItemsByStorageLocationIds: async (_: any, { storageLocationIds }: { storageLocationIds: string[] }) => {
+      // Si storageLocationIds est vide, retourne tous les StorageItems
+      if (!storageLocationIds || storageLocationIds.length === 0) {
+        return prisma.storageItem.findMany({
+          include: { item: true, storage: true }
+        });
+      }
+      // Sinon, filtre par storageLocationIds
+      const storages = await prisma.storage.findMany({
+        where: { storageLocationId: { in: storageLocationIds } },
+        select: { id: true }
+      });
+      const storageIds = storages.map(s => s.id);
+      if (storageIds.length === 0) return [];
+      return prisma.storageItem.findMany({
+        where: { storageId: { in: storageIds } },
+        include: { item: true, storage: true }
+      });
+    },
   storages: async () => {
     return prisma.storage.findMany({ orderBy: { createdAt: 'desc' }, include: { items: { include: { item: true } } } });
   },
@@ -67,14 +87,28 @@ export const Mutation = {
     return updated;
   },
 
-  updateStorageItem: async (_: any, { input }: { input: { storageItemId: string; quantity?: number } }) => {
-    const storageItem = await prisma.storageItem.update({
-      where: { id: input.storageItemId },
-      data: {
-        ...(input.quantity !== undefined ? { quantity: input.quantity } : {}),
+  updateStorageItem: async (_: any, { input }: { input: { storageId: string; itemId: string; quantity: number; minQuantity?: number } }) => {
+    // Upsert : crée ou met à jour le StorageItem
+    const upserted = await prisma.storageItem.upsert({
+      where: {
+        storageId_itemId: {
+          storageId: input.storageId,
+          itemId: input.itemId
+        }
+      },
+      update: {
+        quantity: input.quantity,
+        ...(input.minQuantity !== undefined ? { minQuantity: input.minQuantity } : {}),
+      },
+      create: {
+        storageId: input.storageId,
+        itemId: input.itemId,
+        quantity: input.quantity,
+        minQuantity: input.minQuantity ?? 0,
       },
       include: { item: true, storage: true },
     });
-    return storageItem;
+    await pubsub.publish('STORAGE_UPDATED', { storageUpdated: { storageId: upserted.storageId } });
+    return upserted;
   },
 };

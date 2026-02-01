@@ -6,8 +6,10 @@ export const storageTypeDefs = `#graphql
   }
 
   input UpdateStorageItemInput {
-    storageItemId: ID!
-    quantity: Int
+    storageId: ID!
+    itemId: ID!
+    quantity: Int!
+    minQuantity: Int
   }
   type Storage {
     id: ID!
@@ -25,6 +27,7 @@ export const storageTypeDefs = `#graphql
     storage: Storage!
     item: Item!
     quantity: Int!
+    minQuantity: Int!
   }
 
   input CreateStorageInput {

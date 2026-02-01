@@ -1,3 +1,27 @@
+export const GET_STORAGE_ITEMS_BY_LOCATION_IDS = gql`
+  query StorageItemsByStorageLocationIds($storageLocationIds: [ID!]!) {
+    storageItemsByStorageLocationIds(storageLocationIds: $storageLocationIds) {
+      id
+      quantity
+      minQuantity
+      storage {
+        id
+        name
+        storageLocation {
+          name
+        }
+        storageLocation {
+          name
+        }
+      }
+      item {
+        id
+        name
+        weight
+      }
+    }
+  }
+`;
 import { gql } from "@apollo/client";
 
 export const GET_STORAGE_LOCATIONS = gql`

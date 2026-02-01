@@ -1,3 +1,4 @@
+import { Vehicle } from "./vehicles";
 
 export type VehicleTransactionInput = {
     vehicleUserId: string;
@@ -6,4 +7,9 @@ export type VehicleTransactionInput = {
     isMoney: boolean;
     isDirtyMoney: boolean;
     itemId: string | null;
-  }
+}
+
+export interface VehicleTransaction {
+    id: string;
+    vehicle: Vehicle;
+}

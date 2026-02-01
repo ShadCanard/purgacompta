@@ -1,4 +1,4 @@
-import { User } from "@purgacompta/common";
+import { User } from "./user";
 
 export interface AccountHistory {
   id: string;

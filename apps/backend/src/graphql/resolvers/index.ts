@@ -1,4 +1,9 @@
 
+
+import * as itemResolvers from './item';
+import * as dashboardResolvers from './dashboard';
+import { mergeResolvers } from '@graphql-tools/merge';
+import * as storageLocationResolvers from './storageLocation';
 import * as storageResolvers from './storage';
 import * as contactResolvers from './contact';
 import * as userResolvers from './user';
@@ -9,9 +14,6 @@ import * as subscriptionResolvers from '../subscriptions';
 import * as vehicleTransactionResolvers from './vehicleTransaction';
 import * as userAccountHistoryResolvers from './userAccountHistory';
 
-import * as dashboardResolvers from './dashboard';
-import { mergeResolvers } from '@graphql-tools/merge';
-import * as storageLocationResolvers from './storageLocation';
 
 export const resolvers: Record<string, any> = mergeResolvers([
   storageResolvers,
@@ -25,5 +27,6 @@ export const resolvers: Record<string, any> = mergeResolvers([
   userAccountHistoryResolvers,
   dashboardResolvers,
   storageLocationResolvers,
+  itemResolvers,
 ]);
 

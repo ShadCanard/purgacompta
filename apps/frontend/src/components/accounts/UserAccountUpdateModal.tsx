@@ -2,23 +2,24 @@ import React from 'react';
 import { formatDollar } from '@/lib/utils';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { useCreateAccountHistory } from '@/lib/hooks/useUserAccountHistory';
-import { useUser } from '@/providers';
 
 
 export interface UserAccountUpdateModalProps {
   open: boolean;
   onClose: () => void;
+  userId: string;
 }
+
 
 const UserAccountUpdateModal: React.FC<UserAccountUpdateModalProps> = ({
   open,
-  onClose
+  onClose,
+  userId
 }) => {
     const [amount, setAmount] = React.useState<string>('');
     const [notes, setNotes] = React.useState<string>('');
     const [type, setType] = React.useState<string>('Mise à jour du compte');
     const createAccountHistory = useCreateAccountHistory();
-    const { user } = useUser();
 
   React.useEffect(() => {
     setAmount('');
@@ -28,11 +29,11 @@ const UserAccountUpdateModal: React.FC<UserAccountUpdateModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if(!user) return;
+    if(!userId) return;
     const parsedAmount = parseFloat(amount.replace(/\s/g, '').replace(',', '.'));
     if (isNaN(parsedAmount)) return;
     await createAccountHistory.mutateAsync({
-        userId: user.id,
+        userId,
         amount: parsedAmount,
         notes: type + (notes ? ' - ' + notes : ''),
     });

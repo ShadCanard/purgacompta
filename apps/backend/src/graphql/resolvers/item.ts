@@ -29,6 +29,7 @@ export const ItemPrice = {
 };
 
 export const Query = {
+
   items: async () => prisma.item.findMany({ orderBy: { createdAt: 'desc' } }),
   itemById: async (_: any, { id }: { id: string }) => prisma.item.findUnique({ where: { id } }),
   sellableItems: async () => prisma.item.findMany({ where: { sellable: true }, orderBy: { createdAt: 'desc' } }),

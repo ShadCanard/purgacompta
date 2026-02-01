@@ -4,6 +4,7 @@ export const rootTypeDefs = `#graphql
     storageLocations: [StorageLocation!]!
     storageLocationById(id: ID!): StorageLocation
     storagesByStorageLocationId(storageLocationId: ID!): [Storage!]!
+    storageItemsByStorageLocationIds(storageLocationIds: [ID!]!): [StorageItem!]!
 
     # Storage
     storages: [Storage!]!

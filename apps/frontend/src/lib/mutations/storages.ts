@@ -5,6 +5,7 @@ export const UPDATE_STORAGE_ITEM = gql`
     updateStorageItem(input: $input) {
       id
       quantity
+      minQuantity
       item {
         id
         name

@@ -1,16 +1,18 @@
-import { Card, CardContent, Box, Typography } from "@mui/material";
+import { TrendingDown, TrendingFlat, TrendingUp } from "@mui/icons-material";
+import { Card, CardContent, Box, Typography, CardProps } from "@mui/material";
 
 
-interface StatCardProps {
+interface StatCardProps extends CardProps {
   title: string;
   value: string;
   previousValue?: string;
   icon: React.ReactNode;
   color: string;
+  cursor: string;
 }
 
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, previousValue, icon, color }) => {
+const StatCard: React.FC<StatCardProps> = ({ title, value, previousValue, icon, color, ...cardProps }) => {
   // Détection de variation (supporte $ ou % en début)
   let diff = 0;
   let isNumber = false;
@@ -27,6 +29,9 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, previousValue, icon, 
   if (isNumber && diff > 0) diffColor = 'success.main';
   if (isNumber && diff < 0) diffColor = 'error.main';
 
+  let trendingIcon = <TrendingFlat fontSize="small" sx={{ verticalAlign: 'middle', m: 0.5 }} />
+  if (isNumber && diff > 0) trendingIcon = <TrendingUp color="success" fontSize="small" sx={{ verticalAlign: 'middle', m: 0.5 }} />;
+  if (isNumber && diff < 0) trendingIcon = <TrendingDown color="error" fontSize="small" sx={{ verticalAlign: 'middle', m: 0.5 }} />;
   return (
     <Card
       sx={{
@@ -38,7 +43,9 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, previousValue, icon, 
           transform: 'translateY(-4px)',
           boxShadow: `0 8px 24px ${color}33`,
         },
+        cursor: cardProps.cursor,
       }}
+      {...cardProps}
     >
       <CardContent sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -51,6 +58,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, previousValue, icon, 
             </Typography>
             {previousValue !== undefined && (
               <Typography variant="body2" sx={{ mt: 0.5 }} color={diffColor}>
+                {trendingIcon}
                 {isNumber && diff !== 0 ? (
                   <>
                     {diff > 0 ? '+' : ''}{diff}

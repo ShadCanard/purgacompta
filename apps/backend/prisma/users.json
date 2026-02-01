@@ -1,0 +1,137 @@
+[
+    {
+        "discordId": "234330175775571969",
+        "username": "shadcanard",
+        "email": "admin@purgatory.com",
+        "role": "OWNER",
+        "data": {
+            "firstName": "Jackson",
+            "lastName": "Johnson",
+            "alias": "Jax",
+            "phone": "555-6181"
+        }
+    },
+    {
+        "discordId": "931609861526016060",
+        "username": "mikekette",
+        "email": "admin2@purgatory.com",
+        "role": "OWNER",
+        "data": {
+            "firstName": "Miky",
+            "lastName": "Quest",
+            "phone": "555-2438"
+        }
+    },
+    {
+        "discordId": "357873875754811393",
+        "username": "Icant1",
+        "email": "user1@purgatory.com",
+        "role": "MEMBER",
+        "data": {
+            "firstName": "Eirick",
+            "lastName": "Sigurdsen",
+            "phone": "555-3145"
+        }
+    },
+    {
+        "discordId": "176806667902517249",
+        "username": "lesaonar",
+        "email": "user2@purgatory.com",
+        "role": "MEMBER",
+        "data": {
+            "firstName": "Elijah",
+            "lastName": "Bradstone",
+            "phone": "555-4784"
+        }
+    },
+    {
+        "discordId": "178950585368707072",
+        "username": "Lyslene",
+        "email": "user3@purgatory.com",
+        "role": "MEMBER",
+        "data": {
+            "firstName": "Elya",
+            "lastName": "Biel",
+            "phone": "555-1170"
+        }
+    },
+    {
+        "discordId": "334467930769632768",
+        "username": "firecraft3",
+        "email": "user4@purgatory.com",
+        "role": "MEMBER",
+        "data": {
+            "firstName": "Mathieu",
+            "lastName": "Voss",
+            "phone": "555-6446"
+        }
+    },
+    {
+        "discordId": "719178157726498846",
+        "username": "fabyrob85",
+        "email": "user5@purgatory.com",
+        "role": "MEMBER",
+        "data": {
+            "firstName": "Julia",
+            "lastName": "Jaouen",
+            "phone": "555-2388"
+        }
+    },
+    {
+        "discordId": "156176035573006336",
+        "username": "akio8457",
+        "email": "user6@purgatory.com",
+        "role": "MEMBER",
+        "data": {
+            "firstName": "Lens",
+            "lastName": "Daval",
+            "phone": "555-0524"
+        }
+    },
+    {
+        "discordId": "250331311217303680",
+        "username": "immka_",
+        "email": "user7@purgatory.com",
+        "role": "MANAGER",
+        "data": {
+            "firstName": "Andreï",
+            "lastName": "Akyna",
+            "alias": "Barka",
+            "phone": "555-0068"
+        }
+    },
+    {
+        "discordId": "379217966853521409",
+        "username": "dylan8158",
+        "email":"user8@purgatory.com",
+        "role": "ADMIN",
+        "data": {
+            "firstName": "Brandon",
+            "lastName": "Jaouen",
+            "alias": "🐒",
+            "phone": "555-1288"
+        }
+    },
+    {
+        "discordId":"434425499238924288",
+        "username": "feiver69",
+        "email":"user9@purgatory.com",
+        "role": "MEMBER",
+        "data": {
+            "firstName": "Rico",
+            "lastName": "Marlos",
+            "phone": "555-0156"
+        }
+    },
+    {
+        "discordId":"119857089509195786",
+        "username": "freesio",
+        "email":"user10@purgatory.com",
+        "role": "MEMBER",
+        "data": {
+            "firstName": "Ronan",
+            "lastName": "Holloway",
+            "phone": "555-4493"
+        }
+    }
+]

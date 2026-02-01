@@ -15,22 +15,37 @@ export const Query = {
     const startOfLastWeek = subDays(startOfWeek, 7);
     const endOfLastWeek = subDays(startOfWeek, 1);
 
-    const weekHistories = await prisma.userAccountHistory.findMany({
+    const weekHistoriesRaw = await prisma.userAccountHistory.findMany({
       where: {
         createdAt: {
           gte: startOfWeek,
           lte: now,
         },
       },
+      orderBy: { createdAt: 'desc' },
     });
-    const lastWeekHistories = await prisma.userAccountHistory.findMany({
+    const lastWeekHistoriesRaw = await prisma.userAccountHistory.findMany({
       where: {
         createdAt: {
           gte: startOfLastWeek,
           lte: endOfLastWeek,
         },
       },
+      orderBy: { createdAt: 'desc' },
     });
+
+
+    // Ne garder que l'élément le plus récent par userId
+    const filterLatestByUser = (arr: any[]) => {
+      const seen = new Set();
+      return arr.filter(h => {
+        if (seen.has(h.userId)) return false;
+        seen.add(h.userId);
+        return true;
+      });
+    };
+    const weekHistories = filterLatestByUser(weekHistoriesRaw);
+    const lastWeekHistories = filterLatestByUser(lastWeekHistoriesRaw);
 
     const weekTransactions = await prisma.transaction.findMany({
       where: {
@@ -48,7 +63,7 @@ export const Query = {
         },
         },
     });
-
+    
     const transactionsCount = weekTransactions.length;
     const transactionsCountLastWeek = lastWeekTransactions.length;
     
@@ -63,8 +78,8 @@ export const Query = {
     const totalIncomingLastWeek = lastWeekTransactions.filter(t => t.sourceId === purgatoryId).reduce((sum, t) => sum + (t.totalFinal || 0), 0);
     const totalOutgoingLastWeek = lastWeekTransactions.filter(t => t.targetId === purgatoryId).reduce((sum, t) => sum + (t.totalFinal || 0), 0);
 
-    const totalBalance = weekHistories.length > 0 ? weekHistories[weekHistories.length - 1].amount : 0;
-    const totalBalanceLastWeek = lastWeekHistories.length > 0 ? lastWeekHistories[lastWeekHistories.length - 1].amount : 0;
+    const totalBalance = weekHistories.reduce((sum, h) => sum + (h.amount || 0), 0);
+    const totalBalanceLastWeek = lastWeekHistories.reduce((sum, h) => sum + (h.amount || 0), 0);
 
     // VehicleTransactions (comptage)
     const vehicleTransactionsCount = await prisma.vehicleTransaction.count({

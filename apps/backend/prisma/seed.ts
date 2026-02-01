@@ -14,42 +14,23 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // Créer un utilisateur admin par défaut (à remplacer par votre Discord ID)
-  const adminUser = await prisma.user.upsert({
-    where: { discordId: '234330175775571969' },
-    update: {},
-    create: {
-      discordId: '234330175775571969',
-      username: 'shadcanard',
-      email: 'admin@purgatory.com',
-      role: 'OWNER',
-      data: JSON.stringify({
-        firstName: 'Jackson',
-        lastName: 'Johnson',
-        alias: 'Jax',
-        phone: '555-6181',
-      }),
-    },
-  });
-  console.log('✅ Created admin user:', adminUser);
 
-  const adminUser2 = await prisma.user.upsert({
-    where: { discordId: '931609861526016060' },
-    update: {},
-    create: {
-      discordId: '931609861526016060',
-      username: 'mikekette',
-      email: 'admin2@purgatory.com',
-      role: 'OWNER',
-      data: JSON.stringify({
-        firstName: 'Miky',
-        lastName: 'Quest',
-        phone: '555-2438',
-      }),
-    },
-  });
-  console.log('✅ Created admin user:', adminUser2);
+  // Lecture du JSON users
+  const usersPath = path.join(__dirname, 'users.json');
+  const users = JSON.parse(fs.readFileSync(usersPath, 'utf-8'));
+  for (const user of users) {
+    const created = await prisma.user.upsert({
+      where: { discordId: user.discordId },
+      update: {},
+      create: {
+        ...user,
+        data: JSON.stringify(user.data),
+      },
+    });
+    console.log('✅ Created user:', created);
+  }
 
+  console.log("✅ Users created !");
 
   await prisma.group.upsert({ where: { name: 'Purgatory' }, update: {}, create: { name: 'Purgatory' } });
   console.log('✅ Created group Purgatory');
@@ -65,6 +46,8 @@ async function main() {
     });
     console.log('✅ Created group', group.name);
   }
+  console.log('✅ Groups created !');
+
 
   // Lecture du JSON vehicles
   const vehiclesPath = path.join(__dirname, 'vehicles.json');
@@ -76,10 +59,30 @@ async function main() {
       console.log('✅ Created vehicle', v.name);
     }
   }
+  console.log('✅ Vehicles created !');
 
+
+  const itemsPath = path.join(__dirname, 'items.json');
+  const items = JSON.parse(fs.readFileSync(itemsPath, 'utf-8'));
+
+  for (const item of items) {
+    const exists = await prisma.item.findFirst({ 
+      where: { 
+        name: item.name, 
+        weight: item.weight, 
+        sellable: item.sellable, 
+        weapon: item.weapon 
+      } 
+    });
+    if (!exists) {
+      await prisma.item.create({ data: item });
+      console.log('✅ Created item', item.name);
+    }
+  }
+  console.log('✅ Items created !');
+    
   console.log('🎉 Seeding completed!');
 }
-
 main()
   .catch((e) => {
     console.error('❌ Seeding failed:', e);

@@ -192,6 +192,7 @@ model StorageItem {
   storageId  String
   itemId     String
   quantity   Int      @default(1)
+  minQuantity Int     @default(0)
 
   storage    Storage  @relation(fields: [storageId], references: [id])
   item       Item     @relation(fields: [itemId], references: [id])

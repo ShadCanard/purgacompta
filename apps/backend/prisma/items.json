@@ -1,0 +1,92 @@
+[
+    {
+        "name": "Liasse",
+        "weight": 0.10,
+        "weapon": false,
+        "sellable": true
+    },
+    {
+        "name": "Petit sac",
+        "weight": 0.15,
+        "weapon": false,
+        "sellable": true
+    },
+    {
+        "name": "Marchandise volée",
+        "weight": 0.15,
+        "weapon": false,
+        "sellable": true
+    },
+    {
+        "name": "Paquet de champignons (qualité basse)",
+        "weight": 3,
+        "weapon": false,
+        "sellable": true
+    },
+    {
+        "name": "Paquet de champignons (qualité moyenne)",
+        "weight": 3,
+        "weapon": false,
+        "sellable": true
+    },
+    {
+        "name": "Paquet de champignons (qualité haute)",
+        "weight": 3,
+        "weapon": false,
+        "sellable": true
+    },
+    {
+        "name": "Champignon (qualité basse)",
+        "weight": 0.15,
+        "weapon": false,
+        "sellable": false
+    },
+    {
+        "name": "Champignon (qualité moyenne)",
+        "weight": 0.15,
+        "weapon": false,
+        "sellable": false
+    },
+    {
+        "name": "Champignon (qualité haute)",
+        "weight": 0.15,
+        "weapon": false,
+        "sellable": false
+    },
+    {
+        "name": "Boite de champignons (qualité basse)",
+        "weight": 0.3,
+        "weapon": false,
+        "sellable": true
+    },
+    {
+        "name": "Boite de champignons (qualité moyenne)",
+        "weight": 0.3,
+        "weapon": false,
+        "sellable": true
+    },
+    {
+        "name": "Boite de champignons (qualité haute)",
+        "weight": 0.3,
+        "weapon": false,
+        "sellable": true
+    },
+    {
+        "name": "Pistolet de combat",
+        "weight": 1,
+        "weapon": true,
+        "sellable": true
+    },
+    {
+        "name": "AK-47",
+        "weight": 10,
+        "weapon": true,
+        "sellable": true
+    },
+    {
+        "name": "Uzi",
+        "weight": 5,
+        "weapon": true,
+        "sellable": true
+    }
+]
