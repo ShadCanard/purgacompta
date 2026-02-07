@@ -1,6 +1,6 @@
 import prisma from '../../lib/prisma';
 
-import { UserData } from '@purgacompta/common';
+import { UserData } from '@purgacompta/common/types/user';
 import { pubsub } from './_pubsub';
 
 export const Query = {

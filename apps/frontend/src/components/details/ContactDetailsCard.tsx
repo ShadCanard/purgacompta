@@ -2,16 +2,7 @@ import React from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { getApolloClient } from '@/lib/apolloClient';
-
-const GET_CONTACT = `
-  query ContactById($id: ID!) {
-    contactById(id: $id) {
-      id
-      name
-      phone
-    }
-  }
-`;
+import { GET_CONTACT_BY_ID } from '@/lib/queries/contacts';
 
 interface ContactDetailsCardProps {
   contactId: string;
@@ -23,7 +14,7 @@ const ContactDetailsCard: React.FC<ContactDetailsCardProps> = ({ contactId }) =>
     queryKey: ['contact-by-id', contactId],
     enabled: !!contactId,
     queryFn: async () => {
-      const { data } = await apolloClient.query({ query: GET_CONTACT, variables: { id: contactId } });
+      const { data } = await apolloClient.query({ query: GET_CONTACT_BY_ID, variables: { id: contactId } });
       return (data as any).contactById;
     },
   });

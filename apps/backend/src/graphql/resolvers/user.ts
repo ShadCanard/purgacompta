@@ -1,6 +1,6 @@
 import prisma from '../../lib/prisma';
 import { pubsub } from './_pubsub';
-import { UserData } from '@purgacompta/common';
+import { UserData } from '@purgacompta/common/types/user';
 
 export const User = {
   vehicleUsers: (parent: any) => prisma.vehicleUser.findMany({ where: { userId: parent.id } }),

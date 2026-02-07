@@ -6,7 +6,7 @@ import { createClient } from 'graphql-ws';
 import { getMainDefinition } from '@apollo/client/utilities';
 
 
-let apolloClient: ApolloClient<any> | null = null;
+let apolloClient: ApolloClient | null = null;
 
 export function getApolloClient() {
   if (apolloClient) return apolloClient;
@@ -20,7 +20,7 @@ export function getApolloClient() {
     let token = null;
     if (typeof window !== 'undefined') {
       const session = await getSession();
-      token = session?.user?.purgatoryJwt || null;
+      token = (session?.user as any)?.purgatoryJwt || null;
     }
     return {
       headers: {
@@ -37,7 +37,7 @@ export function getApolloClient() {
       connectionParams: async () => {
         let token = null;
         const session = await getSession();
-        token = session?.user?.purgatoryJwt || null;
+        token = (session?.user as any)?.purgatoryJwt || null;
         return {
           headers: {
             authorization: token ? `Bearer ${token}` : '',

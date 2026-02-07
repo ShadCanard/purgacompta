@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Autocomplete } from '@mui/material';
 import { useUser, useUpdateUser } from '@/providers/UserProvider';
-import { User } from '@purgacompta/common';
+import { User } from '@purgacompta/common/types/user';
 import { hasMinimumRole } from '@/lib/utils';
 
 interface UpdateUserInfoModalProps {
@@ -94,7 +94,7 @@ const UpdateUserInfoModal: React.FC<UpdateUserInfoModalProps> = ({ open, onClose
             onChange={e => setTabletUsername(e.target.value)}
             fullWidth
           />
-        {(hasMinimumRole(currentUser, UserRole.ADMIN) && currentUser.id !== user?.id) && (
+        {(hasMinimumRole(currentUser, UserRole.ADMIN) && currentUser?.id !== user?.id) && (
           <Autocomplete
             options={Object.values(UserRole).filter(r => {
               if (!currentUser) return false;

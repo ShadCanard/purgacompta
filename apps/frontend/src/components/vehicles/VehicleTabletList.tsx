@@ -1,5 +1,5 @@
+import { GridLegacy as Grid } from '@mui/material';
 import React, { useEffect } from 'react';
-import { Grid } from '@mui/material';
 import VehicleTabletItem from './VehicleTabletItem';
 import { GET_VEHICLE_USERS } from '@/lib/queries/vehicles';
 import { TABLET_UPDATED } from '@/lib/subscriptions/vehicles';

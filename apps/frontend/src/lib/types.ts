@@ -1,4 +1,4 @@
-import { User, UserData } from '@purgacompta/common';
+import { User, UserData } from '@purgacompta/common/types/user';
 
 export interface Item {
   id: string;

@@ -1,6 +1,6 @@
 import { getApolloClient } from '@/lib/apolloClient';
 import { GET_MEMBERS, GET_USER_BY_ID } from '@/lib/queries/users';
-import { User } from '@purgacompta/common';
+import { User } from '@purgacompta/common/types/user';
 import { useQuery } from '@tanstack/react-query';
 
 // Hook pour récupérer la liste des membres (users)

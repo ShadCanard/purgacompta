@@ -158,14 +158,13 @@ const StoragesSettingsPage: React.FC = () => {
                     />
               </Box>
               <DataGrid
+                autoHeight
                 rows={storageRows}
                 columns={columns}
-                autoHeight
-                pageSize={20}
-                rowsPerPageOptions={[20]}
-                disableSelectionOnClick
+                pageSizeOptions={[10, 25, 50, 100]}
+                initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
                 getRowId={(row) => row.id}
-                sx={{ background: 'rgba(30,30,46,0.95)', borderRadius: 2 }}
+                sx={{ background: 'rgba(34, 34, 49, 0.95)', borderRadius: 2 }}
               />
             </CardContent>
           </Card>

@@ -53,9 +53,9 @@ const StorageTable: React.FC = () => {
         rows={STORAGE_DATA}
         columns={columns}
         autoHeight
-        pageSize={20}
-        rowsPerPageOptions={[20]}
-        disableSelectionOnClick
+        paginationModel={{ page: 0, pageSize: 20 }}
+        pageSizeOptions={[20]}
+        disableRowSelectionOnClick
         sx={{ background: 'rgba(30,30,46,0.95)', borderRadius: 2 }}
       />
     </Box>

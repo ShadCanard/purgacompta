@@ -14,24 +14,20 @@ export function useSubscription<T = any>(query: DocumentNode, onData?: (data: T)
   const subRef = useRef<any>(null);
 
   useEffect(() => {
-    console.log('[WS][SUB] Ouverture subscription', query?.definitions?.[0]?.name?.value || '');
     subRef.current = apolloClient.subscribe({ query }).subscribe({
       next: (result: any) => {
         const payload = result?.data ? Object.values(result.data)[0] : undefined;
-        console.log('[WS][SUB] Data reçue', payload);
-        setLastValue(payload ?? null);
-        if (onData && payload) onData(payload);
+        setLastValue((payload ?? null) as T | null);
+        if (onData && payload) onData(payload as T);
       },
       error: (err: any) => {
         console.error('[WS][SUB] Erreur subscription', err);
       },
       complete: () => {
-        console.log('[WS][SUB] Subscription terminée', query?.definitions?.[0]?.name?.value || '');
       },
     });
     return () => {
       if (subRef.current) {
-        console.log('[WS][SUB] Fermeture subscription', query?.definitions?.[0]?.name?.value || '');
         subRef.current.unsubscribe();
       }
     };

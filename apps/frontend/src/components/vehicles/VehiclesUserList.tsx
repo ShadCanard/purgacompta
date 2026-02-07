@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Typography, Paper, Grid } from '@mui/material';
+import { Box, Typography, Paper, GridLegacy as Grid } from '@mui/material';
 import VehiclesUserItem from './VehiclesUserItem';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { GET_MEMBERS } from '@/lib/queries/users';

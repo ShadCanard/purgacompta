@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import ViewImageModal from '../layout/ViewImageModal';
 import { useQueryClient } from '@tanstack/react-query';
 import { getApolloClient } from '@/lib/apolloClient';
-import { User, UserData } from '@/purgacompta/common';
+import { User } from '@purgacompta/common/types/user';
 import { useMembers } from '@/providers/UserProvider';
 import { useSubscription } from '@/lib/useSubscription';
 import { USER_UPDATED } from '@/lib/subscriptions/user';
@@ -45,7 +45,7 @@ const VehicleTablet: React.FC = () => {
   // Récupère le premier TabletUserName trouvé (ou null)
   let tabletUserName: string | null = null;
   for (const u of managingTabletMembers || []) {
-    let userData : UserData = u.data;
+    let userData = u.data;
     if (typeof userData === 'string') {
       try { userData = JSON.parse(userData); } catch { userData = { manageTablet: false }; }
     }

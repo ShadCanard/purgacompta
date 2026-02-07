@@ -8,7 +8,7 @@ interface StatCardProps extends CardProps {
   previousValue?: string;
   icon: React.ReactNode;
   color: string;
-  cursor: string;
+  cursor?: string;
 }
 
 

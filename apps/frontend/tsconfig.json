@@ -19,27 +19,13 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@components/*": [
-        "src/components/*"
-      ],
-      "@providers/*": [
-        "src/providers/*"
-      ],
-      "@hooks/*": [
-        "src/hooks/*"
-      ],
-      "@lib/*": [
-        "src/lib/*"
-      ],
-      "@styles/*": [
-        "src/styles/*"
-      ],
-      "@purgacompta/common": [
-        "../../packages/common/*"
-      ]
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@providers/*": ["src/providers/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@lib/*": ["src/lib/*"],
+      "@styles/*": ["src/styles/*"],
+      "@purgacompta/common/*": ["../../packages/common/*"]
     }
   },
   "include": [

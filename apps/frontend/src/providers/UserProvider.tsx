@@ -3,7 +3,7 @@ import { GET_CURRENT_USER, GET_MEMBERS } from '@/lib/queries/users';
 // Hook pour récupérer la liste des membres (users)
 import { getApolloClient } from '@/lib/apolloClient';
 import { UPDATE_USER } from '@/lib/mutations/users';
-import { User, UserRole, UserData } from '@purgacompta/common';
+import { User, UserRole, UserData } from '@purgacompta/common/types/user';
 import { useQuery as useRQ, useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { useEffect, ReactNode, useContext, createContext } from 'react';

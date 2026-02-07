@@ -1,5 +1,5 @@
 import prisma from '../../lib/prisma';
-import { UserData } from '@purgacompta/common';
+import { UserData } from '@purgacompta/common/types/user';
 
 export const Contact = {
   group: async (parent: any) => {

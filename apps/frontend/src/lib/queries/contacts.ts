@@ -23,3 +23,13 @@ export const GET_CONTACTS_WITHOUT_GROUP = gql`
     }
   }
 `;
+
+export const GET_CONTACT_BY_ID = gql`
+  query ContactById($id: ID!) {
+    contactById(id: $id) {
+      id
+      name
+      phone
+    }
+  }
+`;

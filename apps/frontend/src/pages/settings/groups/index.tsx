@@ -13,6 +13,7 @@ import { DELETE_GROUP, UPDATE_GROUP_IS_ACTIVE } from '@/lib/mutations/groups';
 import { GET_GROUPS } from '@/lib/queries/groups';
 import { Group } from '@/lib/types';
 import { getApolloClient } from '@/lib/apolloClient';
+import { UserRole } from '@purgacompta/common/types/user';
 
 const GroupsPage: React.FC = () => {
   
@@ -161,7 +162,7 @@ const GroupsPage: React.FC = () => {
 
   return (
     <MainLayout>
-      {!hasPermission('MANAGER') ? (
+      {!hasPermission(UserRole.MANAGER) ? (
         <Typography color="error">Accès réservé aux managers et plus.</Typography>
       ) : (
         <Box>

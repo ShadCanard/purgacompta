@@ -8,7 +8,8 @@ import { useSnackbar } from '@/providers';
 import { TABLET_UPDATED } from '@/lib/subscriptions/vehicles';
 import Switch from '@mui/material/Switch';
 import { useUpdateUser } from '@/providers/UserProvider';
-import { User, VehicleUser } from '@purgacompta/common';
+import { User } from '@purgacompta/common/types/user';
+import { VehicleUser } from '@purgacompta/common/types/vehicles';
 import { formatDisplayName } from '@/lib/utils';
 
 import CreateVehicleTransactionModal from './CreateVehicleTransactionModal';
@@ -18,7 +19,7 @@ export interface VehiclesUserItemProps {
 }
 const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
       const updateUser = useUpdateUser();
-      const manageTablet = !!member.data?.manageTablet;
+      const manageTablet = !!member?.data?.manageTablet;
       const [switchValue, setSwitchValue] = useState(manageTablet);
 
       useEffect(() => {
@@ -94,7 +95,7 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
             <Typography variant="h6" sx={{ color: 'white', fontWeight: 700, display: 'inline-block', mr: 1 }}>
               {formatDisplayName(member)}
             </Typography>
-            <Chip label={member.data.tabletUsername || ''} size="small" sx={{ ml: 1 }} />
+            <Chip label={member?.data?.tabletUsername || ''} size="small" sx={{ ml: 1 }} />
             <Switch
               checked={!!switchValue}
               onChange={(_, checked) => {
@@ -118,7 +119,7 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
           getOptionLabel={(option: any) => option?.name || ''}
           value={
             vu?.vehicle?.id
-              ? vehicles.find((v: any) => v.id === vu.vehicle.id) || { id: '', name: 'Aucun' }
+              ? vehicles.find((v: any) => v.id === vu?.vehicle?.id) || { id: '', name: 'Aucun' }
               : { id: '', name: 'Aucun' }
           }
           isOptionEqualToValue={(option: any, value: any) => option?.id === value?.id}
@@ -155,8 +156,7 @@ const VehiclesUserItem: React.FC<VehiclesUserItemProps> = ({ member }) => {
           Transaction
         </Button>
       </CardActions>
-      <CreateVehicleTransactionModal
-        id={`create-vehicle-transaction-modal-${vu?.id}`}
+      <CreateVehicleTransactionModal 
         open={openTransaction}
         onClose={() => setOpenTransaction(false)}
         vehicleUserId={vu?.id || ''}

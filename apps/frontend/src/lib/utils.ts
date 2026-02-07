@@ -1,3 +1,5 @@
+import { User, UserRole } from '@purgacompta/common/types/user';
+
 // Formatage date ISO ou timestamp (ms) en JJ/MM/YYYY HH:mm
 export function formatDateTime(date: string | number | null | undefined): string {
   if (date === null || date === undefined) return '';
@@ -14,8 +16,6 @@ export function formatDateTime(date: string | number | null | undefined): string
   const pad = (n: number) => n.toString().padStart(2, '0');
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-import { User, UserRole } from '@purgacompta/common';
-
 /**
  * Vérifie si un utilisateur a au moins le rôle requis (hiérarchie UserRole).
  * @param user Utilisateur à tester

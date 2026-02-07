@@ -14,7 +14,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.7",
-    "@mui/x-data-grid": "^8.25.0",
+    "@mui/x-data-grid": "^7.7.0",
     "@purgacompta/common": "workspace:*",
     "@tanstack/react-query": "^5.90.19",
     "@tanstack/react-query-devtools": "^5.91.2",
@@ -29,6 +29,7 @@
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.9",
     "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",

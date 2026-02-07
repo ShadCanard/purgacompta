@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 
 const AddItemToStorage : React.FC = () => {
 
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedItem, setSelectedItem] = useState<any | null>(null);
     const [selectedStorage, setSelectedStorage] = useState<any | null>(null);
     const [minQuantity, setMinQuantity] = useState<number | null>(null);
 

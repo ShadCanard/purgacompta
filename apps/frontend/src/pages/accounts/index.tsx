@@ -101,6 +101,7 @@ const AccountsPage: React.FC = () => {
         <UserAccountUpdateModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
+          userId={user?.id ?? ''}
         />
       </Box>
     </MainLayout>

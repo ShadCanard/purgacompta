@@ -22,7 +22,7 @@ import { getApolloClient } from '@/lib/apolloClient';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/providers/UserProvider';
 import { formatDisplayName, formatDollar, formatFullName } from '@/lib/utils';
-import { User } from '@/purgacompta/common';
+import { User } from '@purgacompta/common/types/user';
 import { useSubscription } from '@/lib/useSubscription';
 import { AttachMoney, Edit } from '@mui/icons-material';
 import { USER_UPDATED } from '@/lib/subscriptions/user';

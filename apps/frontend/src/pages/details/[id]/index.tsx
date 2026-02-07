@@ -11,16 +11,7 @@ import { MainLayout } from '@/components';
 import { useQuery } from '@tanstack/react-query';
 import { GET_TRANSACTIONS_BY_ENTITY, GET_VEHICLE_TRANSACTIONS_BY_TARGET } from '@/lib/queries/transactions';
 import { formatDollar, formatDateTime } from '@/lib/utils';
-
-const GET_CONTACT = `
-  query ContactById($id: ID!) {
-    contactById(id: $id) {
-      id
-      name
-      phone
-    }
-  }
-`;
+import { GET_CONTACT_BY_ID } from '@/lib/queries/contacts';
 
 const DetailsEntityPage: React.FC = () => {
   const router = useRouter();
@@ -59,7 +50,7 @@ const DetailsEntityPage: React.FC = () => {
     queryKey: ['contact-by-id', id],
     enabled: !!id,
     queryFn: async () => {
-      const { data } = await apolloClient.query({ query: GET_CONTACT, variables: { id } });
+      const { data } = await apolloClient.query({ query: GET_CONTACT_BY_ID, variables: { id } });
       return (data as any).contactById;
     },
     retry: false,
