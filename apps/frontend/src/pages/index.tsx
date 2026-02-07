@@ -1,5 +1,5 @@
 import { getApolloClient } from '@/lib/apolloClient';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { USER_UPDATED } from '@/lib/subscriptions/user';
 import { useQueryClient, useQuery as useTanstackQuery } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
@@ -10,6 +10,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import UserAccountUpdateModal from '@/components/accounts/UserAccountUpdateModal';
 import { MainLayout } from '@/components/layout';
 import { useUser } from '@/providers/UserProvider';
+import BlogPage from '@/components/BlogPage';
 import {
   Edit
 } from '@mui/icons-material';
@@ -17,18 +18,21 @@ import MembersCard from '@/components/dashboard/MembersCard';
 import CurrentUserCard from '@/components/dashboard/CurrentUserCard';
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import { GET_MEMBERS } from '@/lib/queries/users';
+import { UserRole } from '@purgacompta/common/types/user';
 
 const HomePage: React.FC = () => {
   const apolloClient = getApolloClient();
   const queryClient = useQueryClient();
   const { user, loading } = useUser();
-  const [openEditModal, setOpenEditModal] = React.useState(false);
-  const [openAccountModal, setOpenAccountModal] = React.useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [openAccountModal, setOpenAccountModal] = useState(false);
+  const [showBlog, setShowBlog] = useState(true);
 
   // Souscription USER_UPDATED (effet visuel simple)
   // Ajout d'un état local pour forcer le refresh
-  const [refresh, setRefresh] = React.useState(0);
+  const [refresh, setRefresh] = useState(0);
   useEffect(() => {
+  const roleHierarchy = { GUEST: 0, MEMBER: 1, MANAGER: 2, ADMIN: 3, OWNER: 4 };
     const sub = apolloClient.subscribe({ query: USER_UPDATED }).subscribe({
       next: async (result: any) => {
         const { data } = result;
@@ -61,6 +65,11 @@ const HomePage: React.FC = () => {
   });
   const onlineCount = (membersData || []).filter((u: any) => u.data.isOnline).length;
 
+  useEffect(() => {
+    if (user && user.role !== UserRole.GUEST) {
+      setShowBlog(false)
+    }
+  }, [user]);
 
 
   if(loading) {
@@ -68,6 +77,12 @@ const HomePage: React.FC = () => {
       <MainLayout>
         <Typography>Chargement...</Typography>
       </MainLayout>
+    );
+  }
+
+  if (showBlog) {
+    return (
+        <BlogPage />
     );
   }
 
@@ -121,14 +136,14 @@ const HomePage: React.FC = () => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
 
-  if (!session) {
-    return {
-      redirect: {
-        destination: '/auth/login',
-        permanent: false,
-      },
-    };
-  }
+  // if (!session) {
+  //   return {
+  //     redirect: {
+  //       destination: '/auth/login',
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   return {
     props: {},

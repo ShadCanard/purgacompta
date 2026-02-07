@@ -61,30 +61,20 @@ const LoginPage: React.FC = () => {
                   mb: 1,
                 }}
               >
-                🔥 Purgatory
-              </Typography>
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 600,
-                  color: 'text.secondary',
-                  mb: 2,
-                }}
-              >
-                Compta
+                Dignity Village
               </Typography>
               <Typography
                 variant="body1"
                 color="text.secondary"
                 sx={{ mb: 4 }}
               >
-                Système de comptabilité pour organisation criminelle
+                Administration du blog de Dignity Village
               </Typography>
             </Box>
 
             <Stack spacing={3}>
               <Typography variant="body2" color="text.secondary">
-                Connectez-vous avec votre compte Discord pour accéder au système.
+                Connectez-vous avec votre compte Discord pour accéder à l'administration du blog.
               </Typography>
 
               <Button
@@ -112,7 +102,7 @@ const LoginPage: React.FC = () => {
               </Button>
 
               <Typography variant="caption" color="text.secondary" sx={{ mt: 4 }}>
-                En vous connectant, vous acceptez les conditions d'utilisation de Purgatory Compta.
+                En vous connectant, vous acceptez les conditions d'utilisation de Dignity Village.
               </Typography>
             </Stack>
           </CardContent>
@@ -123,7 +113,7 @@ const LoginPage: React.FC = () => {
           color="text.secondary"
           sx={{ display: 'block', textAlign: 'center', mt: 4 }}
         >
-          © 2026 Purgatory Organization - GTA RP
+          © 2026 Dignity Village - Blaine County
         </Typography>
       </Container>
     </Box>
