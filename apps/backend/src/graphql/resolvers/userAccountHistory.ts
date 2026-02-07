@@ -1,7 +1,7 @@
-import prisma from '../../lib/prisma';
+import prisma from '../../lib/prisma.js';
 
 import { UserData } from '@purgacompta/common/types/user';
-import { pubsub } from './_pubsub';
+import { pubsub } from './_pubsub.js';
 
 export const Query = {
   userAccountHistories: async () => {

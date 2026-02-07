@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { USER_UPDATED } from '@/lib/subscriptions/user';
 import { useQueryClient, useQuery as useTanstackQuery } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
-import { getSession } from 'next-auth/react';
 import { Box, Typography, Button } from '@mui/material';
 import { UpdateUserInfoModal } from '@/components/users';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -134,17 +133,6 @@ const HomePage: React.FC = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context);
-
-  // if (!session) {
-  //   return {
-  //     redirect: {
-  //       destination: '/auth/login',
-  //       permanent: false,
-  //     },
-  //   };
-  // }
-
   return {
     props: {},
   };

@@ -1,5 +1,5 @@
-import prisma from '../../lib/prisma';
-import { pubsub } from './_pubsub';
+import prisma from '../../lib/prisma.js';
+import { pubsub } from './_pubsub.js';
 
 export const Vehicle = {
   vehicleUsers: (parent: any) => prisma.vehicleUser.findMany({ where: { vehicleId: parent.id } }),

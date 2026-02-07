@@ -1,6 +1,6 @@
-import prisma from '../../lib/prisma';
+import prisma from '../../lib/prisma.js';
 import { VehicleTransactionInput } from '@purgacompta/common/types/vehicleTransactions';
-import { pubsub } from './_pubsub';
+import { pubsub } from './_pubsub.js';
 
 export const Query = {
     vehicleTransactions: async () => {

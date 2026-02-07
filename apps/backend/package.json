@@ -5,8 +5,9 @@
   "private": true,
   "scripts": {
     "dev": "nodemon",
+    "test": "nodemon",
     "dev:hot": "nodemon",
-    "build": "tsc",
+    "build": "tsc --module ESNext --outDir ./dist",
     "start": "node dist/index.js",
     "studio": "prisma studio --browser none",
     "db:migrate": "prisma migrate dev",

@@ -1,16 +1,16 @@
-import { rootTypeDefs } from './root';
-import { storageTypeDefs } from './storage';
-import { userTypeDefs } from './user';
-import { vehicleTypeDefs } from './vehicle';
-import { storageLocationTypeDefs } from './storageLocation';
-import { itemTypeDefs } from './item';
-import { contactTypeDefs } from './contact';
-import { groupTypeDefs } from './group';
-import { transactionTypeDefs } from './transaction';
-import { itemPriceTypeDefs } from './itemPrice';
-import { vehicleTransactionTypeDefs } from './vehicleTransaction';
-import { userAccountHistoryTypeDefs } from './userAccountHistory';
-import { dashboardTypeDefs } from './dashboard';
+import { rootTypeDefs } from './root.js';
+import { storageTypeDefs } from './storage.js';
+import { userTypeDefs } from './user.js';
+import { vehicleTypeDefs } from './vehicle.js';
+import { storageLocationTypeDefs } from './storageLocation.js';
+import { itemTypeDefs } from './item.js';
+import { contactTypeDefs } from './contact.js';
+import { groupTypeDefs } from './group.js';
+import { transactionTypeDefs } from './transaction.js';
+import { itemPriceTypeDefs } from './itemPrice.js';
+import { vehicleTransactionTypeDefs } from './vehicleTransaction.js';
+import { userAccountHistoryTypeDefs } from './userAccountHistory.js';
+import { dashboardTypeDefs } from './dashboard.js';
 
 export const typeDefs = [
   rootTypeDefs,

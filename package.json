@@ -5,6 +5,8 @@
   "description": "🔥 PurgatoryCompta - Comptabilité pour organisation criminelle GTA RP",
   "scripts": {
     "dev": "pnpm run --parallel dev",
+    "test": "pnpm run --parallel test",
+    "prod": "pnpm run --parallel start",
     "dev:frontend": "pnpm --filter frontend dev",
     "dev:backend": "pnpm --filter backend dev",
     "build": "pnpm run --parallel build",

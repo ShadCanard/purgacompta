@@ -1,4 +1,4 @@
-import { pubsub } from "./resolvers/_pubsub";
+import { pubsub } from "./resolvers/_pubsub.js";
 
 // Affichage dynamique des subscriptions actives basé sur l'objet Subscription
 export const Subscription = {

@@ -24,6 +24,7 @@ const queryClient = new QueryClient({
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import EnvBanner from '@/components/EnvBanner';
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const router = useRouter();
@@ -42,6 +43,14 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
     return () => window.removeEventListener('error', errorHandler);
   }, [router]);
 
+  let env: 'DEV' | 'RECETTE' | undefined = undefined;
+  if (process.env.NODE_PUBLIC_ENV === 'development') env = 'DEV';
+  if (
+    process.env.NODE_PUBLIC_ENV === 'test'
+  ) env = 'RECETTE';
+
+  console.dir({ env, NODE_ENV: process.env.NODE_PUBLIC_ENV });
+
   return (
     <SessionProvider session={session}>
       <ApolloProvider client={getApolloClient()}>
@@ -51,7 +60,8 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
             <UserProvider>
               <SnackbarProvider>
                 <Component {...pageProps} />
-                {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+                <EnvBanner env={env} />
+                {process.env.NODE_PUBLIC_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
               </SnackbarProvider>
             </UserProvider>
           </ThemeProvider>

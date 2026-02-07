@@ -1,18 +1,18 @@
 
 
-import * as itemResolvers from './item';
-import * as dashboardResolvers from './dashboard';
+import * as itemResolvers from './item.js';
+import * as dashboardResolvers from './dashboard.js';
 import { mergeResolvers } from '@graphql-tools/merge';
-import * as storageLocationResolvers from './storageLocation';
-import * as storageResolvers from './storage';
-import * as contactResolvers from './contact';
-import * as userResolvers from './user';
-import * as transactionResolvers from './transaction';
-import * as groupResolvers from './group';
-import * as vehicleResolvers from './vehicle';
-import * as subscriptionResolvers from '../subscriptions';
-import * as vehicleTransactionResolvers from './vehicleTransaction';
-import * as userAccountHistoryResolvers from './userAccountHistory';
+import * as storageLocationResolvers from './storageLocation.js';
+import * as storageResolvers from './storage.js';
+import * as contactResolvers from './contact.js';
+import * as userResolvers from './user.js';
+import * as transactionResolvers from './transaction.js';
+import * as groupResolvers from './group.js';
+import * as vehicleResolvers from './vehicle.js';
+import * as subscriptionResolvers from '../subscriptions.js';
+import * as vehicleTransactionResolvers from './vehicleTransaction.js';
+import * as userAccountHistoryResolvers from './userAccountHistory.js';
 
 
 export const resolvers: Record<string, any> = mergeResolvers([

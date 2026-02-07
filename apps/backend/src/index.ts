@@ -1,5 +1,5 @@
 import { ApolloServer, HeaderMap } from '@apollo/server';
-import { typeDefs, resolvers } from './graphql/index';
+import { typeDefs, resolvers } from './graphql/index.js';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';

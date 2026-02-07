@@ -1,14 +1,16 @@
+
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "commonjs",
+    "module": "ESNext",
     "lib": ["ES2020"],
     "outDir": "./dist",
-    "rootDir": "../..",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
@@ -20,6 +22,11 @@
       "@purgacompta/common/*": ["../../packages/common/*"]
     }
   },
-  "include": ["src/**/*"],
+  "references": [
+    { "path": "../../packages/common" }
+  ],
+  "include": [
+    "src/**/*"
+  ],
   "exclude": ["node_modules", "dist"]
 }

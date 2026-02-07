@@ -1,4 +1,4 @@
-import prisma from '../../lib/prisma';
+import prisma from '../../lib/prisma.js';
 import { UserData } from '@purgacompta/common/types/user';
 
 export const Contact = {
