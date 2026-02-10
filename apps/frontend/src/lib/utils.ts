@@ -1,3 +1,45 @@
+/**
+ * Retourne la couleur de texte optimale (#fff ou #000) selon la couleur de fond passée en paramètre (hex).
+ * @param bgColor Couleur de fond (ex: #f35050)
+ * @returns '#fff' ou '#000'
+ */
+export function getContrastTextColor(bgColor: string): '#fff' | '#000' {
+  // Nettoie le code couleur
+  let color = bgColor.replace('#', '');
+  if (color.length === 3) {
+    color = color.split('').map((c) => c + c).join('');
+  }
+  if (color.length !== 6) return '#000';
+  const r = parseInt(color.substring(0, 2), 16);
+  const g = parseInt(color.substring(2, 4), 16);
+  const b = parseInt(color.substring(4, 6), 16);
+  // Calcul de la luminance relative (formule WCAG)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000' : '#fff';
+}
+/**
+ * Retourne le statut d'une date par rapport à la date actuelle :
+ * - 'upcoming' : la date est dans le futur
+ * - 'ongoing' : la date est aujourd'hui mais pas encore terminée
+ * - 'past' : la date est dépassée et on est un jour différent
+ * @param date Date à tester (string, number ou Date)
+ * @returns 'upcoming' | 'ongoing' | 'past'
+ */
+export function getDateStatus(date: string | number | Date): 'upcoming' | 'ongoing' | 'past' {
+  const now = new Date();
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  if (isNaN(d.getTime())) return 'past';
+  // Si la date est dans le futur
+  if (d.getTime() > now.getTime()) return 'upcoming';
+  // Si la date est aujourd'hui
+  const isSameDay =
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate();
+  if (isSameDay) return 'ongoing';
+  // Sinon, la date est dépassée
+  return 'past';
+}
 // Parse une date (timestamp string/number ou ISO) en timestamp (ms) ou retourne NaN
 export function parseDateTime(date: string | number | null | undefined): number {
   if (date === null || date === undefined) return NaN;

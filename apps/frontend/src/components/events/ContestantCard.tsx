@@ -1,3 +1,4 @@
+import { getContrastTextColor } from "@/lib/utils";
 import { Card, CardContent, Box, Typography, CardProps, Divider, Button, Grid, Tooltip } from "@mui/material";
 
 
@@ -8,7 +9,6 @@ interface ContestantCardProps extends CardProps {
 		color: string;
 	};
 }
-
 
 const ContestantCard: React.FC<ContestantCardProps> = ({ contestant, ...cardProps }) => {
 
@@ -47,7 +47,7 @@ const ContestantCard: React.FC<ContestantCardProps> = ({ contestant, ...cardProp
 			</Grid>
 			</Grid>
 			<Typography variant="caption" color="text.secondary">Part du pool</Typography>
-			<Button fullWidth variant="contained" sx={{ mt: 2, bgcolor: contestant.color, color: '#fff', fontWeight: 700 }}>
+			<Button fullWidth variant="contained" sx={{ mt: 2, bgcolor: contestant.color, color: getContrastTextColor(contestant.color), fontWeight: 700 }}>
 			🔥 PARIER SUR CETTE ÉQUIPE
 			</Button>
 	  </CardContent>

@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { getApolloClient } from "@/lib/apolloClient";
 import { GET_BETS_BY_EVENT } from "@/lib/queries/bets";
-import { formatDollar } from "@/lib/utils";
+import { formatDollar, getDateStatus } from "@/lib/utils";
 import ContestantCard from "@/components/events/ContestantCard";
 
 const EventPage: React.FC = () => {
@@ -62,15 +62,24 @@ const EventPage: React.FC = () => {
   return (
 	<Box>
 		<AppBar position="static" sx={{ mb: 3, bgcolor: '#221313' }}>
-		<Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-			<Typography variant="h4" fontWeight={700}>
-			🔥 {data.name}
-			</Typography>
-			<Chip label="Paris ouverts" color="success" size="medium" sx={{ fontWeight: 700 }} />
-		</Box>
+			<Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+				<Typography variant="h4" fontWeight={700}>
+				🔥 {data.name}
+				</Typography>
+				{getDateStatus(data.startDate) === 'upcoming' && (
+					<Chip label="A venir" color="info" size="medium" sx={{ fontWeight: 700 }} />
+				)}
+				{getDateStatus(data.startDate) === 'ongoing' && (
+							<Chip label="En cours" color="success" size="medium" sx={{ fontWeight: 700 }} />
+				)}
+				{getDateStatus(data.startDate) === 'past' && (
+							<Chip label="Terminé" color="error" size="medium" sx={{ fontWeight: 700 }} />
+				)}
+
+				<Chip label="Paris ouverts" color="success" size="medium" sx={{ fontWeight: 700 }} />
+			</Box>
 		</AppBar>
 		
-
 		<Box sx={{ p: { xs: 1, md: 4 }, maxWidth: 1200, mx: 'auto' }}>
 			
 			{/* Système Pari Mutuel */}
