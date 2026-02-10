@@ -1,3 +1,14 @@
+// Parse une date (timestamp string/number ou ISO) en timestamp (ms) ou retourne NaN
+export function parseDateTime(date: string | number | null | undefined): number {
+  if (date === null || date === undefined) return NaN;
+  if (typeof date === 'number') return date;
+  if (typeof date === 'string') {
+    if (/^\d+$/.test(date)) return Number(date);
+    const parsed = Date.parse(date);
+    if (!isNaN(parsed)) return parsed;
+  }
+  return NaN;
+}
 import { User, UserRole } from '@purgacompta/common/types/user';
 
 // Formatage date ISO ou timestamp (ms) en JJ/MM/YYYY HH:mm
@@ -48,7 +59,6 @@ export function formatDisplayName(user: { username: string; data?: { alias?: str
   const lastName = user.data?.lastName;
   if (alias && alias.trim().length > 0) return alias;
   if (firstName && lastName) return `${firstName} ${lastName}`;
-  console.dir(user);
   return user.username;
 }
 

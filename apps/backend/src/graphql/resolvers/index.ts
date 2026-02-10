@@ -9,11 +9,11 @@ import * as contactResolvers from './contact.js';
 import * as userResolvers from './user.js';
 import * as transactionResolvers from './transaction.js';
 import * as groupResolvers from './group.js';
+import * as eventResolvers from './event.js';
 import * as vehicleResolvers from './vehicle.js';
 import * as subscriptionResolvers from '../subscriptions.js';
 import * as vehicleTransactionResolvers from './vehicleTransaction.js';
 import * as userAccountHistoryResolvers from './userAccountHistory.js';
-
 
 export const resolvers: Record<string, any> = mergeResolvers([
   storageResolvers,
@@ -28,5 +28,5 @@ export const resolvers: Record<string, any> = mergeResolvers([
   dashboardResolvers,
   storageLocationResolvers,
   itemResolvers,
+  eventResolvers,
 ]);
-

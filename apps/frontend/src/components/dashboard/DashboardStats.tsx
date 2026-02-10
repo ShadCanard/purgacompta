@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, GridLegacy as Grid } from '@mui/material';
+import { Card, CardContent, Grid } from '@mui/material';
 import StatCard from '@/components/layout/StatCard';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -71,7 +71,7 @@ const fetchDashboardStats = async () => {
 
   return (
     <Grid container spacing={2} sx={{ mb: 2 }}>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Transactions"
           value={`${data.transactionsCount}`}
@@ -80,7 +80,7 @@ const fetchDashboardStats = async () => {
           color="#7c3aed"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Solde"
           value={formatDollar(data.totalBalance)}
@@ -89,7 +89,7 @@ const fetchDashboardStats = async () => {
           color="#00b894"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Transactions (montant)"
           value={formatDollar(data.totalAmount)}
@@ -98,7 +98,7 @@ const fetchDashboardStats = async () => {
           color="#ff9800"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Entrées"
           value={formatDollar(data.totalIncoming)}
@@ -107,7 +107,7 @@ const fetchDashboardStats = async () => {
           color="#4caf50"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Sorties"
           value={formatDollar(Math.abs(data.totalOutgoing))}
@@ -116,7 +116,7 @@ const fetchDashboardStats = async () => {
           color="#e53935"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Véhicules"
           value={`${data.vehicleTransactionsCount}`}

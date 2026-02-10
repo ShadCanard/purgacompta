@@ -1,3 +1,18 @@
+export const GET_CONTESTANTS = gql`
+  query GetContestants {
+    contestants {
+      id
+      name
+      color
+      car
+      pilot
+      createdAt
+      updatedAt
+    }
+  }
+`;
+import { gql } from "@apollo/client";
+
 export const GET_STORAGE_ITEMS_BY_LOCATION_IDS = gql`
   query StorageItemsByStorageLocationIds($storageLocationIds: [ID!]!) {
     storageItemsByStorageLocationIds(storageLocationIds: $storageLocationIds) {
@@ -22,7 +37,6 @@ export const GET_STORAGE_ITEMS_BY_LOCATION_IDS = gql`
     }
   }
 `;
-import { gql } from "@apollo/client";
 
 export const GET_STORAGE_LOCATIONS = gql`
   query GetStorageLocations {

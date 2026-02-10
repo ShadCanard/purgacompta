@@ -1,5 +1,19 @@
 import { gql } from "@apollo/client";
 
+export const GROUP_FRAGMENT = gql`
+  fragment GroupFields on Group {
+    id
+    name
+    tag
+    description
+    color1
+    color2
+    isActive
+    createdAt
+    updatedAt
+  }
+`;
+
 export const GET_GROUPS = gql`
     query Groups {
       groups {

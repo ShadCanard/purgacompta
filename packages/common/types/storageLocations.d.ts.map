@@ -1,0 +1,1 @@
+{"version":3,"file":"storageLocations.d.ts","sourceRoot":"","sources":["storageLocations.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,WAAW,CAAC;AAEpC,MAAM,WAAW,eAAe;IAC9B,EAAE,EAAE,MAAM,CAAC;IACX,IAAI,EAAE,MAAM,CAAC;IACb,QAAQ,EAAE,OAAO,EAAE,CAAC;IACpB,SAAS,EAAE,MAAM,CAAC;IAClB,SAAS,EAAE,MAAM,CAAC;CACnB"}

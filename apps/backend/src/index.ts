@@ -120,6 +120,7 @@ async function main() {
     console.log(`📊 GraphQL Playground: http://localhost:${PORT}/graphql`);
     console.log(`💾 Run 'pnpm studio' to open Prisma Studio`);
     console.log(`🟢 Subscriptions WebSocket ready at ws://localhost:${PORT}/graphql`);
+    console.log(`⚙️  Environment: ${process.env.NODE_PUBLIC_ENV}`);
   });
 }
 

@@ -11,6 +11,7 @@ import { itemPriceTypeDefs } from './itemPrice.js';
 import { vehicleTransactionTypeDefs } from './vehicleTransaction.js';
 import { userAccountHistoryTypeDefs } from './userAccountHistory.js';
 import { dashboardTypeDefs } from './dashboard.js';
+import { eventTypeDefs } from './event.js';
 
 export const typeDefs = [
   rootTypeDefs,
@@ -26,4 +27,5 @@ export const typeDefs = [
   vehicleTransactionTypeDefs,
   userAccountHistoryTypeDefs,
   dashboardTypeDefs,
+  eventTypeDefs,
 ].join('\n');

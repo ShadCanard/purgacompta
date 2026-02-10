@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Typography, Paper, GridLegacy as Grid } from '@mui/material';
+import { Box, Typography, Paper, Grid } from '@mui/material';
 import VehiclesUserItem from './VehiclesUserItem';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { GET_MEMBERS } from '@/lib/queries/users';
@@ -41,7 +41,7 @@ const VehiclesUserList: React.FC = () => {
           {/* Liste des membres et véhicules */}
           <Grid container spacing={3}>
             {members.map((member: any) => (
-              <Grid item xs={12} sm={6} md={3} key={member.id}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={member.id}>
                 <VehiclesUserItem
                   member={member}
                 />

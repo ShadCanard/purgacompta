@@ -1,4 +1,4 @@
-import { GridLegacy as Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 import React, { useEffect } from 'react';
 import VehicleTabletItem from './VehicleTabletItem';
 import { GET_VEHICLE_USERS } from '@/lib/queries/vehicles';
@@ -44,7 +44,7 @@ const VehicleTabletList: React.FC<TabletVehicleListProps> = ({ onImageClick }) =
     <Grid container spacing={3}>
       {vehicles?.map((vehicle: any) => <>
         {vehicle.vehicle && 
-          <Grid item xs={12} sm={6} md={3} key={vehicle.vehicle.name}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={vehicle.vehicle.name}>
             <VehicleTabletItem
               vehicle={vehicle}
               onImageClick={onImageClick}

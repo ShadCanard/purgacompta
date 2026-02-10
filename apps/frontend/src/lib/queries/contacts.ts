@@ -1,5 +1,18 @@
 import { gql } from "@apollo/client";
 
+export const CONTACT_FRAGMENT = gql`
+  fragment ContactFields on Contact {
+    id
+    name
+    phone
+    groupid
+    group {
+      id
+      name
+    }
+  }
+`;
+
 export const GET_CONTACTS = gql`
   query Contacts {
     contacts {

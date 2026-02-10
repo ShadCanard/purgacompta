@@ -6,7 +6,7 @@ import {
   DialogActions,
   Button,
   TextField,
-  GridLegacy as Grid,
+  Grid,
   Autocomplete,
   MenuItem,
 } from '@mui/material';
@@ -89,7 +89,7 @@ const CreateVehicleTransactionModal: React.FC<CreateVehicleTransactionModalProps
       <DialogTitle>Nouvelle transaction véhicule</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} direction="column">
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Autocomplete
               options={[
                 ...contactsOrGroups.groups,
@@ -103,7 +103,7 @@ const CreateVehicleTransactionModal: React.FC<CreateVehicleTransactionModalProps
               loading={loadingGroupsOrContacts}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <TextField
               select
               label="Type de récompense"
@@ -117,7 +117,7 @@ const CreateVehicleTransactionModal: React.FC<CreateVehicleTransactionModalProps
             </TextField>
           </Grid>
           {rewardType === RewardType.ITEM && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField
                 select
                 label="Objet"
@@ -132,7 +132,7 @@ const CreateVehicleTransactionModal: React.FC<CreateVehicleTransactionModalProps
               </TextField>
             </Grid>
           )}
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <TextField
               label="Montant ou quantité"
               type="number"

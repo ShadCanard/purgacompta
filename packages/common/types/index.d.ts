@@ -2,4 +2,13 @@ export * from './accountHistory';
 export * from './user';
 export * from './vehicles';
 export * from './vehicleTransactions';
+export * from './storage';
+export * from './storageLocations';
+export * from './items';
+export * from './contacts';
+export * from './groups';
+export * from './transactions';
+export * from './itemPrices';
+export * from './events';
+export * from './dashboard';
 //# sourceMappingURL=index.d.ts.map

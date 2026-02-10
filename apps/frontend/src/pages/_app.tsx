@@ -43,13 +43,11 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
     return () => window.removeEventListener('error', errorHandler);
   }, [router]);
 
-  let env: 'DEV' | 'RECETTE' | undefined = undefined;
-  if (process.env.NODE_PUBLIC_ENV === 'development') env = 'DEV';
-  if (
-    process.env.NODE_PUBLIC_ENV === 'test'
-  ) env = 'RECETTE';
 
-  console.dir({ env, NODE_ENV: process.env.NODE_PUBLIC_ENV });
+  // Utilisation de la variable NEXT_PUBLIC_NODE_PUBLIC_ENV côté client
+  let env: 'DEV' | 'RECETTE' | undefined = undefined;
+  if (process.env.NEXT_PUBLIC_NODE_PUBLIC_ENV === 'development') env = 'DEV';
+  if (process.env.NEXT_PUBLIC_NODE_PUBLIC_ENV === 'test') env = 'RECETTE';
 
   return (
     <SessionProvider session={session}>
@@ -61,7 +59,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
               <SnackbarProvider>
                 <Component {...pageProps} />
                 <EnvBanner env={env} />
-                {process.env.NODE_PUBLIC_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+                {process.env.NEXT_PUBLIC_NODE_PUBLIC_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
               </SnackbarProvider>
             </UserProvider>
           </ThemeProvider>

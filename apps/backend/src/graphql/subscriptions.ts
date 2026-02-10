@@ -25,7 +25,24 @@ export const Subscription = {
       console.log('[BACKEND] Nouvelle souscription ACCOUNT_UPDATED');
       return pubsub.asyncIterator(['ACCOUNT_UPDATED']);
     }
-  }
+  },
+  eventUpdated: {
+    subscribe : () => {
+      console.log('[BACKEND] Nouvelle souscription EVENT_UPDATED');
+      return pubsub.asyncIterator(['EVENT_UPDATED']);
+    }
+  },
+  betUpdated: {
+    subscribe : () => {
+      console.log('[BACKEND] Nouvelle souscription BET_UPDATED');
+      return pubsub.asyncIterator(['BET_UPDATED']);
+    }
+  },
+  contestantUpdated: {
+	subscribe: () => {
+      console.log('[BACKEND] Nouvelle souscription CONTESTANT_UPDATED');
+	  return pubsub.asyncIterator(['CONTESTANT_UPDATED']);},
+  },
 };
 
 console.log('[BACKEND] Subscriptions actives :', Object.keys(Subscription).join(', '));

@@ -217,3 +217,41 @@ model VehicleTransaction {
 
   @@map("vehicle_transactions")
 }
+
+model Event {
+  id        String   @id @default(cuid())
+  name      String
+  startDate DateTime
+  notes     String?
+  bets      Bet[]
+  eventContestants EventContestant[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("events")
+}
+
+model EventContestant {
+	id           String   @id @default(cuid())
+  	eventId      String
+  	contestantId String
+  	notes        String?
+  	event        Event      @relation(fields: [eventId], references: [id])
+
+  @@map("event_contestants")
+}
+
+model Bet {
+  id           String   @id @default(cuid())
+  eventId      String
+  contestantId String
+  gamblerId    String
+  amount       Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  event        Event      @relation(fields: [eventId], references: [id])
+
+
+  @@map("bets")
+}
