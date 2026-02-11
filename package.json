@@ -35,4 +35,6 @@
     "@graphql-tools/merge": "^9.1.7",
     "graphql-ws": "^6.0.7"
   }
+  ,
+  "packageManager": "pnpm@10.28.0"
 }
