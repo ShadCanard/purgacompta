@@ -49,7 +49,7 @@ export const Query = {
     const eventGroups = await prisma.eventGroup.findMany({ where: { groupId } });
     const eventIds = eventGroups.map(eg => eg.eventId);
     // Récupère tous les events correspondants
-    const events = await prisma.event.findMany({ where: { id: { in: eventIds } } });
+    const events = await prisma.event.findMany({ where: { id: { in: eventIds } }, include: { bets: true } });
     // Ajoute le champ participating à true pour ce groupe
 
 	const participatingEventIds = await prisma.eventContestant.findMany({ where: { contestantId: groupId }, select: { eventId: true } }).then(res => res.map(ec => ec.eventId));
@@ -100,6 +100,21 @@ export const Event = {
     const link = await prisma.eventGroup.findFirst({ where: { eventId: parent.id, groupId: context.groupId } });
     return !!link;
   },
+  winner: async (parent: any) => {
+	if (!parent.winnerContestantId) return null;
+	const contestantId = parent.winnerContestantId;
+	const [contact, group] = await Promise.all([
+	  prisma.contact.findFirst({ where: { id: contestantId }, select: { id: true, name: true } }),
+	  prisma.group.findFirst({ where: { id: contestantId }, select: { id: true, name: true, color1: true } }),
+	]);
+	if (contact) {
+	  return { ...contact, color: '#f35050' };
+	} else if (group) {
+	  return { ...group, color: group.color1 || null };
+	} else {
+	  return null;
+	}
+  }
 };
 
 export const Mutation = {
@@ -112,13 +127,14 @@ export const Mutation = {
 	}
 	return event;
   },
-  updateEvent: async (_: any, { id, name, startDate, notes }: { id: string; name?: string; startDate?: string; notes?: string }) => {
+  updateEvent: async (_: any, { id, name, startDate, notes, winnerId }: { id: string; name?: string; startDate?: string; notes?: string; winnerId?: string }) => {
     const value = await prisma.event.update({
       where: { id },
       data: {
         ...(name && { name }),
         ...(startDate && { startDate: new Date(startDate) }),
         ...(notes !== undefined && { notes }),
+        ...(winnerId !== undefined && { winnerContestantId: winnerId }),
       },
     });
 	// Publish eventUpdated pour les abonnés
@@ -134,29 +150,67 @@ export const Mutation = {
 	return toDelete;
   },
   createBet: async (_: any, { eventId, contestantId, gamblerId, amount }: { eventId: string; contestantId: string; gamblerId: string; amount: number }) => {
-
-    const value = await prisma.bet.create({ data: { eventId, contestantId, gamblerId, amount, status: "PENDING" } });
-	pubsub.publish('BET_UPDATED', { betUpdated: value }); // Notifie les abonnés de la création
-	return value;
+    // Cherche un pari existant pour ce gamblerId et contestantId sur cet event
+    const existingBet = await prisma.bet.findFirst({
+      where: { eventId, contestantId, gamblerId },
+      orderBy: { createdAt: 'desc' },
+    });
+    let value;
+    if (existingBet) {
+      if (existingBet.status === 'PENDING') {
+        // Si le pari est en attente, on met à jour le montant
+        value = await prisma.bet.update({ where: { id: existingBet.id }, data: { amount } });
+      } else {
+        // Si le pari est déjà validé ou refusé, on crée un nouveau pari en PENDING
+        value = await prisma.bet.create({ data: { eventId, contestantId, gamblerId, amount, status: 'PENDING' } });
+      }
+    } else {
+      // Aucun pari existant, on crée un nouveau pari en PENDING
+      value = await prisma.bet.create({ data: { eventId, contestantId, gamblerId, amount, status: 'PENDING' } });
+    }
+    pubsub.publish('BET_UPDATED', { betUpdated: value }); // Notifie les abonnés
+    return value;
   },
-  updateBet: async (_: any, { id, amount }: { id: string; amount?: number }) => {
+  updateBet: async (_: any, { id, amount, status }: { id: string; amount?: number, status?: 'PENDING' | 'APPROVED' | 'DENIED' }) => {
+    const data: any = {};
+    if (amount !== undefined) data.amount = amount;
+    if (status !== undefined) data.status = status;
     const value = await prisma.bet.update({
       where: { id },
-      data: {
-        ...(amount !== undefined && { amount }),
-      },
+      data,
     });
-	pubsub.publish('BET_UPDATED', { betUpdated: value }); // Notifie les abonnés de la mise à jour
-	return value;
+    pubsub.publish('BET_UPDATED', { betUpdated: value }); // Notifie les abonnés de la mise à jour
+    return value;
   },
+  
   deleteBet: async (_: any, { id }: { id: string }) => {
     const value = await prisma.bet.delete({ where: { id } });
 	pubsub.publish('BET_UPDATED', { betUpdated: value }); // Notifie les abonnés de la suppression
 	return value;
   },
+  
+  toggleBets: async (_: any, { eventId }: { eventId: string }) => {
+	const event = await prisma.event.findUnique({ where: { id: eventId } });
+	if (!event) {
+		throw new Error('Événement non trouvé');
+	}
+	const newStatus = !event.betsOpened;
+	const value = await prisma.event.update({
+		where: { id: eventId },
+		data: { betsOpened: newStatus },
+	});
+	pubsub.publish('EVENT_UPDATED', { eventUpdated: value });
+	return value;
+  },
+
   createContestant: async (_: any, { contestantId, eventId }: { contestantId: string, eventId: string }) => {
     // Crée le lien EventContestant
     const contestantLink = await prisma.eventContestant.create({ data: { contestantId, eventId } });
+    // Ajoute dans eventGroup si pas déjà présent
+    const groupExists = await prisma.eventGroup.findFirst({ where: { eventId, groupId: contestantId } });
+    if (!groupExists) {
+      await prisma.eventGroup.create({ data: { eventId, groupId: contestantId } });
+    }
     // Cherche le participant (Contact ou Group)
     let participant = await prisma.contact.findUnique({ where: { id: contestantId }, select: { id: true, name: true } });
     let color = null;
@@ -182,7 +236,7 @@ export const Mutation = {
   updateContestant: async (_: any, { eventId, contestantId, notes }: { eventId: string, contestantId: string, notes?: string }) => {
     // Met à jour la note du participant pour cet event
     const updated = await prisma.eventContestant.update({
-      where: { eventId, contestantId },
+      where: { AND: [{ eventId: eventId }, {  contestantId: contestantId }] },
       data: { notes },
     });
     // Cherche d'abord dans Contact
@@ -248,45 +302,3 @@ export const Bet = {
 		return contact || group || null;
 	},
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

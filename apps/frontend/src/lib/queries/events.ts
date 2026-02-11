@@ -9,6 +9,7 @@ export const GET_EVENTS = gql`
       startDate
       createdAt
       updatedAt
+	  betsOpened
       bets {
         id
         gamblerId
@@ -18,6 +19,11 @@ export const GET_EVENTS = gql`
           name
         }
       }
+	  winner {
+		id
+		name
+		color
+	  }
     }
   }
 `;
@@ -31,12 +37,18 @@ export const GET_EVENT = gql`
       notes
       createdAt
       updatedAt
+	  betsOpened
       participants {
         id
         name
         notes
         color
       }
+	  winner {
+		id
+		name
+		color
+	  }
       bets {
         id
         gamblerId
@@ -78,6 +90,16 @@ export const GET_EVENTS_BY_GROUP = gql`
 	  name
 	  startDate
 	  participating
+	  winner {
+		id
+		name
+		color
+	  }
+	  bets {
+		id
+		gamblerId
+		amount
+	  }
 	}
 }
 `;

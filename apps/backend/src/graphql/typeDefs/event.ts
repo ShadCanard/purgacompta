@@ -23,10 +23,12 @@ export const eventTypeDefs = `#graphql
     startDate: String!
     notes: String
     bets: [Bet!]!
+	betsOpened: Boolean!
     participants: [Contestant!]!
     createdAt: String!
     updatedAt: String!
     participating: Boolean
+	winner: Contestant
   }
 
   type Bet {
@@ -56,11 +58,12 @@ export const eventTypeDefs = `#graphql
 
   type Mutation {
     createEvent(name: String!, startDate: String!): Event!
-    updateEvent(id: ID!, name: String, startDate: String, notes: String): Event!
+    updateEvent(id: ID!, name: String, startDate: String, notes: String, winnerId: ID): Event!
     deleteEvent(id: ID!): Event!
     createBet(eventId: String!, contestantId: String!, gamblerId: String!, amount: Float!): Bet!
     updateBet(id: ID!, amount: Float, status: BetStatus): Bet!
     deleteBet(id: ID!): Bet!
+	toggleBets(eventId: ID!): Event!
     createContestant(contestantId: ID!, eventId: ID!): Contestant!
     updateContestant(eventId: ID!, contestantId: ID!, notes: String): Contestant!
 	addGroupToEvent(eventId: ID!, groupId: ID!): Event!

@@ -13,7 +13,11 @@ export interface Bet {
   event?: Event;
 }
 
-export type Participant = Contact | Group;
+export interface Participant {
+	id: string;
+	name: string;
+	color: string;
+};
 
 export interface Event {
   id: string;
@@ -24,4 +28,6 @@ export interface Event {
   participants: Participant[];
   createdAt: string;
   updatedAt: string;
+  betsOpened: boolean;
+  winner?: Participant;
 }

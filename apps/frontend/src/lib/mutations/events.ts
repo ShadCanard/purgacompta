@@ -45,14 +45,19 @@ export const CREATE_EVENT = gql`
 `;
 
 export const UPDATE_EVENT = gql`
-  mutation UpdateEvent($id: ID!, $name: String, $startDate: String, $notes: String) {
-    updateEvent(id: $id, name: $name, startDate: $startDate, notes: $notes) {
+  mutation UpdateEvent($id: ID!, $name: String, $startDate: String, $notes: String, $winnerId: ID) {
+    updateEvent(id: $id, name: $name, startDate: $startDate, notes: $notes, winnerId: $winnerId) {
       id
       name
       startDate
       notes
       createdAt
       updatedAt
+	  winner {
+		id
+		name
+		color
+	  }
     }
   }
 `;
@@ -98,6 +103,15 @@ export const DELETE_BET = gql`
     deleteBet(id: $id) {
       id
     }
+  }
+`;
+
+export const TOGGLE_BETS= gql`
+  mutation ToggleBets($eventId: ID!) {
+	toggleBets(eventId: $eventId) {
+	  id
+	  betsOpened
+	}
   }
 `;
 

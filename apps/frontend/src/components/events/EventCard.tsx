@@ -1,6 +1,7 @@
-import { formatDateTime, getDateStatus } from "@/lib/utils";
-import { Card, CardContent, Box, Typography, CardProps, Divider, Button, Grid, Tooltip } from "@mui/material";
+import { formatDateTime, getContrastTextColor, getDateStatus, formatDollar } from "@/lib/utils";
+import { Box, Typography, CardProps, Divider, Button, Grid, Tooltip } from "@mui/material";
 import { useRouter } from "next/router";
+import ContentCard from "../cards/ContentCard";
 
 
 interface EventCardProps extends CardProps {
@@ -9,29 +10,21 @@ interface EventCardProps extends CardProps {
 		name: string; 
 		startDate: string;
 		participating: boolean;
+		winner: { id: string; name: string; color: string } | null;
+		bets: { id: string; amount: number; status: "PENDING"|"APPROVED"|"DENIED" }[];
 	};
 	groupId?: string;
+	groupColor?: string;
 }
 
-const EventCard: React.FC<EventCardProps> = ({ event, groupId, ...cardProps }) => {
+const EventCard: React.FC<EventCardProps> = ({ event, groupId, groupColor = "primary.main", ...cardProps }) => {
 	const dateStatus = getDateStatus(event.startDate);
 	const router = useRouter();
 
+	const totalPool = event.bets.reduce((sum, bet) => sum + (bet.status !== "DENIED" ? bet.amount : 0), 0);
+
   return (
-	<Card
-	  sx={{
-		background: 'rgba(30, 30, 46, 0.8)',
-		border: `1px solid ${(dateStatus === "upcoming" ? "info.main" : dateStatus === "ongoing" ? "success.main" : "error.main")}`,
-		borderRadius: 3,
-		transition: 'transform 0.2s, box-shadow 0.2s',
-		'&:hover': {
-		  transform: 'translateY(-4px)',
-		  boxShadow: `0 8px 24px ${(dateStatus === "upcoming" ? "info.main" : dateStatus === "ongoing" ? "success.main" : "error.main")}`,
-		},
-	  }}
-	  {...cardProps}
-	>
-	  <CardContent sx={{ p: 3 }}>
+	<ContentCard {...cardProps} color={groupColor} border borderColor={groupColor}>
 			<Typography variant="h5" fontWeight={700} gutterBottom>
 			{event.name}
 			</Typography>
@@ -47,15 +40,19 @@ const EventCard: React.FC<EventCardProps> = ({ event, groupId, ...cardProps }) =
 			</Grid>
 			<Grid size={{ xs: 4 }}>
 				<Typography variant="caption" color="text.secondary">MISES</Typography>
-				<Typography variant="h6">—</Typography>
+				<Typography variant="h6">{formatDollar(totalPool)}</Typography>
 			</Grid>
+			{event.winner && (
+				<Grid size={{ xs: 4 }}>
+					<Typography variant="caption" color="text.secondary">VAINQUEUR</Typography>
+					<Typography variant="h6">{event.winner.name}</Typography>
+				</Grid>
+			)}
 			</Grid>
-			<Typography variant="caption" color="text.secondary">Part du pool</Typography>
-			<Button fullWidth variant="contained" sx={{ mt: 2, fontWeight: 700 }} onClick={() => router.push(`/events/${groupId}/${event.id}`)}>
-			Voir l'event
+			<Button fullWidth variant="contained" sx={{ mt: 2, fontWeight: 700, backgroundColor: groupColor, color: getContrastTextColor(groupColor) }} onClick={() => router.push(`/events/${groupId}/${event.id}`)}>
+				Voir l'event
 			</Button>
-	  </CardContent>
-	</Card>
+	</ContentCard>
   );
 };
 

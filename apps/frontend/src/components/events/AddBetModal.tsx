@@ -13,19 +13,17 @@ interface AddBetModalProps {
   eventId: string;
   gamblerId?: string;
   contestantId?: string;
+  amount?: number | null;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
-const AddBetModal: React.FC<AddBetModalProps> = ({ open, eventId, gamblerId, contestantId, onClose, onSuccess }) => {
+const AddBetModal: React.FC<AddBetModalProps> = ({ open, eventId, gamblerId, contestantId, amount, onClose, onSuccess }) => {
   	const apolloClient = getApolloClient();
   	const queryClient = useQueryClient();
-  	const [betAmount, setBetAmount] = useState("");
+  	const [betAmount, setBetAmount] = useState(amount !== undefined && amount !== null ? amount.toString() : "");
   	const [betGamblerId, setBetGamblerId] = useState(gamblerId || "");
   	const [betContestantId, setBetContestantId] = useState(contestantId || "");
-
-	console.dir({eventId, gamblerId, contestantId});
-	console.dir({betGamblerId, betContestantId, betAmount});
 
   	const {data: gamblerData, isLoading: gamblerLoading} = useQuery({
 	queryKey: ['gamblers'],
@@ -55,6 +53,7 @@ const AddBetModal: React.FC<AddBetModalProps> = ({ open, eventId, gamblerId, con
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+	  queryClient.invalidateQueries({ queryKey: ['bets', eventId] });
       setBetAmount("");
       setBetGamblerId("");
       setBetContestantId("");
@@ -65,7 +64,8 @@ const AddBetModal: React.FC<AddBetModalProps> = ({ open, eventId, gamblerId, con
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Ajouter un pari</DialogTitle>
+      {amount && (<DialogTitle>Ajouter un pari</DialogTitle>)}
+	  {!amount && (<DialogTitle>Modifier le pari</DialogTitle>)}
       <DialogContent>
         {!betGamblerId && (<Autocomplete
           options={gamblerData ? gamblerData.flat() : []}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, Grid } from '@mui/material';
-import StatCard from '@/components/layout/StatCard';
+import StatCard from '@/components/cards/StatCard';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import PaidIcon from '@mui/icons-material/Paid';

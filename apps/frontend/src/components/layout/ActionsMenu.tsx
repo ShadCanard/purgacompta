@@ -18,6 +18,24 @@ const ActionsMenu: React.FC<ActionsMenuProps> = ({ row, onEdit, onDelete, editLa
   const open = Boolean(anchorEl);
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
+
+  // Surcharge les onClick des MenuItem de moreActions pour fermer le menu
+  const enhancedMoreActions = moreActions?.map((action, idx) => {
+    if (React.isValidElement(action) && typeof (action.props as any).onClick === 'function') {
+      return React.cloneElement(
+        action as React.ReactElement<any>,
+        {
+          onClick: (e: any) => {
+            handleClose();
+            (action.props as any).onClick(e);
+          },
+          key: action.key ?? idx,
+        }
+      );
+    }
+    return action;
+  });
+
   return (
     <>
       <IconButton size="small" onClick={handleOpen}>
@@ -25,8 +43,8 @@ const ActionsMenu: React.FC<ActionsMenuProps> = ({ row, onEdit, onDelete, editLa
       </IconButton>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         {/* More actions en premier */}
-        {moreActions && moreActions.map((action, idx) => (
-          <React.Fragment key={idx}>{action}</React.Fragment>
+        {enhancedMoreActions?.map((action, idx) => (
+          <React.Fragment key={(action as any).key ?? idx}>{action}</React.Fragment>
         ))}
         {/* Diviseur si actions principales */}
         {(!!(canEdit && onEdit) || !!(canDelete && onDelete)) && moreActions && moreActions.length > 0 && <Divider />}

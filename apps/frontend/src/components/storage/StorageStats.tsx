@@ -1,6 +1,6 @@
 import React from 'react';
 import { Stack } from '@mui/material';
-import StatCard from '../layout/StatCard';
+import StatCard from '../cards/StatCard';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import { Error, Warning } from '@mui/icons-material';
 import { useQueryClient } from '@tanstack/react-query';

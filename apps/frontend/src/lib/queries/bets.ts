@@ -49,6 +49,15 @@ export const GET_BETS_BY_EVENT = gql`
 	  gamblerId
 	  contestantId
 	  amount
+	  status
+	  gambler {
+		id
+		name
+	  }
+	  contestant {
+		id
+		name
+	  }
 	}
 }
 `;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Autocomplete, CircularProgress } from "@mui/material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CREATE_CONTESTANT } from "@/lib/mutations/events";
+import { ADD_GROUP_TO_EVENT } from "@/lib/mutations/events";
 import { getApolloClient } from "@/lib/apolloClient";
 import { Group } from "@/lib/types";
 import { GET_CONTACTS_OR_GROUPS_TRANSACTION } from "@/lib/queries/transactions";
@@ -33,17 +33,16 @@ const InviteGroupsModal: React.FC<InviteGroupsModalProps> = ({ open, eventId, gr
 	},
   });
 
-  const createContestantMutation = useMutation({
+  const inviteGroupMutation = useMutation({
 	mutationFn: async () => {
 	  const { data } = await apolloClient.mutate({
-		mutation: CREATE_CONTESTANT,
-		variables: { contestantId: groupOrContact.id, eventId },
+		mutation: ADD_GROUP_TO_EVENT,
+		variables: { groupId: groupOrContact.id, eventId },
 	  });
-	  return (data as any).createContestant;
+	  return (data as any).addGroupToEvent;
 	},
 	onSuccess: () => {
 	  queryClient.invalidateQueries({queryKey: ['groups', eventId]});
-	  queryClient.invalidateQueries({queryKey: ['contestants', eventId]});
 	  setGroupOrContact(null);
 	  onClose();
 	  if (onSuccess) onSuccess();
@@ -52,7 +51,7 @@ const InviteGroupsModal: React.FC<InviteGroupsModalProps> = ({ open, eventId, gr
 
   return (
 	<Dialog open={open} onClose={onClose}>
-	  <DialogTitle>Ajouter un participant</DialogTitle>
+	  <DialogTitle>Inviter un groupe</DialogTitle>
 	  <DialogContent>
 		<Autocomplete
 			options={selectionData || []}
@@ -63,19 +62,19 @@ const InviteGroupsModal: React.FC<InviteGroupsModalProps> = ({ open, eventId, gr
 			sx={{ minWidth: 220, flex: 1 }}
 			loading={groupsLoading}
 				  />
-		{createContestantMutation.isError && (
-		  <div style={{ color: 'red', marginTop: 8 }}>{(createContestantMutation.error as Error)?.message}</div>
+		{inviteGroupMutation.isError && (
+		  <div style={{ color: 'red', marginTop: 8 }}>{inviteGroupMutation.error?.message}</div>
 		)}
 	  </DialogContent>
 	  <DialogActions>
 		<Button onClick={onClose}>Annuler</Button>
 		<Button
-		  onClick={() => createContestantMutation.mutate()}
-		  disabled={!groupOrContact || createContestantMutation.isPending}
+		  onClick={() => inviteGroupMutation.mutate()}
+		  disabled={!groupOrContact || inviteGroupMutation.isPending}
 		  variant="contained"
 		  color="primary"
 		>
-		  {createContestantMutation.isPending ? <CircularProgress size={20} /> : 'Ajouter'}
+		  {inviteGroupMutation.isPending ? <CircularProgress size={20} /> : 'Ajouter'}
 		</Button>
 	  </DialogActions>
 	</Dialog>
