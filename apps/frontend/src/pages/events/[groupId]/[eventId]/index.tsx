@@ -22,32 +22,32 @@ import ContestantCard from "@/components/events/ContestantCard";
 const EventPage: React.FC = () => {
   const apolloClient = getApolloClient();
   const router = useRouter();
-  const { id } = router.query;
+  const { groupId, eventId } = router.query;
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["event", id],
+    queryKey: ["event", eventId],
     queryFn: async () => {
-      if (!id) return null;
+      if (!eventId) return null;
       const { data } = await apolloClient.query({
         query: GET_EVENT,
-        variables: { id },
+        variables: { id: eventId as string },
       });
       return (data as any).event;
     },
-    enabled: !!id,
+    enabled: !!eventId,
   });
 
   const {data: bets, isLoading: betsLoading} = useQuery({
-	queryKey: ['bets', id],
+	queryKey: ['bets', eventId],
 	queryFn: async () => {
-		if (!id) return null;
+		if (!eventId) return null;
 		const { data } = await apolloClient.query({
 			query: GET_BETS_BY_EVENT,
-			variables: { eventId: id },
+			variables: { eventId: eventId },
 		});
 		return (data as any).betsByEvent;
 	},
-	enabled: !!id,
+	enabled: !!eventId,
   });
 
   // Calculs pool et stats (mock pour l'instant)
@@ -117,22 +117,33 @@ const EventPage: React.FC = () => {
 				<Card sx={{ bgcolor: '#221313', textAlign: 'center' }}>
 					<CardContent>
 					<Typography variant="subtitle2" color="text.secondary">MISE MOYENNE</Typography>
-					<Typography variant="h5" fontWeight={700}>{avgBet !== null ? avgBet.toFixed(2) + ' €' : '—'}</Typography>
+					<Typography variant="h5" fontWeight={700}>{formatDollar(avgBet)}</Typography>
 					</CardContent>
 				</Card>
 				</Grid>
 			</Grid>
 
 			{/* Système Pari Mutuel */}
-			<Alert severity="info" sx={{ mb: 3, fontSize: 16 }}>
-				<b>Système Pari Mutuel</b> — Les cotes sont calculées automatiquement en fonction des mises de tous les parieurs. <b>Cote = Pool total + Mises sur l'équipe</b>. Plus une équipe reçoit de paris, plus sa cote diminue. Les cotes évoluent en temps réel !
-			</Alert>
+			<Card variant="outlined" sx={{ mb: 3, fontSize: 16, bgcolor: 'warning.main', color: 'warning.contrastText', borderColor: 'warning.dark' }}>
+				<CardContent>
+				<b>Attention</b> — Les paris seront à régler directement à l'évènement. Les valeurs finales des paris seront automatiquement mises à jour à la fermeture des paris.
+				</CardContent>
+			</Card>
 
 			{/* Équipes */}
 			<Grid container spacing={3}>
+				{data.participants?.length === 0 && (
+				<Grid size={{ xs : 12 }}>
+					<Card>
+						<CardContent>
+							Aucune équipe inscrite.
+						</CardContent>
+					</Card>
+				</Grid>
+				)}
 				{data.participants?.map((p: {name: string, id: string, color: string, notes: string}) => (
 				<Grid size={{ xs: 12, md: 4 }} key={p.id}>
-					<ContestantCard contestant={{ id: p.id, name: p.name, color: p.color }} />
+					<ContestantCard contestant={{ id: p.id, name: p.name, color: p.color }} gamblerId={groupId as string} eventId={eventId as string} />
 				</Grid>
 				))}
 			</Grid>

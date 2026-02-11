@@ -31,6 +31,7 @@ const EventsPage: React.FC = () => {
   // Gestion modale création
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState("");
+  const [eventId, setEventId] = React.useState("");
   const [startDate, setStartDate] = React.useState("");
 
   const createEventMutation = useMutation({

@@ -1,3 +1,8 @@
+enum BetStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
 
 generator client {
   provider = "prisma-client-js"
@@ -225,6 +230,7 @@ model Event {
   notes     String?
   bets      Bet[]
   eventContestants EventContestant[]
+  eventGroups EventGroup[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -241,17 +247,27 @@ model EventContestant {
   @@map("event_contestants")
 }
 
+model EventGroup {
+	id          String   @id @default(cuid())
+  	eventId     String
+  	groupId 	String
+  	notes       String?
+  	event       Event      @relation(fields: [eventId], references: [id])
+
+  @@map("event_groups")
+}
+
 model Bet {
   id           String   @id @default(cuid())
   eventId      String
   contestantId String
   gamblerId    String
   amount       Float
+  status       BetStatus @default(PENDING)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   event        Event      @relation(fields: [eventId], references: [id])
-
 
   @@map("bets")
 }

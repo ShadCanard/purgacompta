@@ -27,17 +27,20 @@ export function getContrastTextColor(bgColor: string): '#fff' | '#000' {
  */
 export function getDateStatus(date: string | number | Date): 'upcoming' | 'ongoing' | 'past' {
   const now = new Date();
-  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  let d: Date;
+  if (typeof date === 'string' || typeof date === 'number') {
+    const timestamp = parseDateTime(date);
+    d = new Date(timestamp);
+  } else {
+    d = date;
+  }
   if (isNaN(d.getTime())) return 'past';
-  // Si la date est dans le futur
   if (d.getTime() > now.getTime()) return 'upcoming';
-  // Si la date est aujourd'hui
   const isSameDay =
     d.getFullYear() === now.getFullYear() &&
     d.getMonth() === now.getMonth() &&
     d.getDate() === now.getDate();
-  if (isSameDay) return 'ongoing';
-  // Sinon, la date est dépassée
+  if (isSameDay && d.getTime() <= now.getTime()) return 'ongoing';
   return 'past';
 }
 // Parse une date (timestamp string/number ou ISO) en timestamp (ms) ou retourne NaN

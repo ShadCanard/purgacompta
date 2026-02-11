@@ -53,6 +53,7 @@ export const GET_EVENT = gql`
         }
         createdAt
         updatedAt
+		status
       }
     }
   }
@@ -68,4 +69,23 @@ export const GET_CONTESTANTS_BY_EVENT = gql`
 	  color
 	}
   }
+`;
+
+export const GET_EVENTS_BY_GROUP = gql`
+  query GetEventsByGroup($groupId: ID!) {
+	eventsByGroup(groupId: $groupId) {
+	  id
+	  name
+	  startDate
+	  participating
+	}
+}
+`;
+export const GET_GROUPS_BY_EVENT = gql`
+	query GroupsByEvent($eventId: ID!) {
+	groupsByEvent(eventId: $eventId) {
+		id
+		name
+	}
+	}
 `;

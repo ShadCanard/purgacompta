@@ -1,5 +1,10 @@
 export const eventTypeDefs = `#graphql
-
+  enum BetStatus {
+    PENDING
+    APPROVED
+    DENIED
+  }
+  
   type GenericIdName {
     id: ID!
     name: String!
@@ -21,6 +26,7 @@ export const eventTypeDefs = `#graphql
     participants: [Contestant!]!
     createdAt: String!
     updatedAt: String!
+    participating: Boolean
   }
 
   type Bet {
@@ -31,6 +37,7 @@ export const eventTypeDefs = `#graphql
     gamblerId: String!
     gambler: GenericIdName!
     amount: Float!
+    status: BetStatus!
     createdAt: String!
     updatedAt: String!
     event: Event!
@@ -42,7 +49,9 @@ export const eventTypeDefs = `#graphql
     bets: [Bet!]!
     bet(id: ID!): Bet
     contestantsByEvent(eventId: ID!): [Contestant!]!
-	betsByEvent(eventId: ID!): [Bet!]!
+    betsByEvent(eventId: ID!): [Bet!]!
+    eventsByGroup(groupId: ID!): [Event!]!
+	groupsByEvent(eventId: ID!): [Group!]!
   }
 
   type Mutation {
@@ -50,10 +59,12 @@ export const eventTypeDefs = `#graphql
     updateEvent(id: ID!, name: String, startDate: String, notes: String): Event!
     deleteEvent(id: ID!): Event!
     createBet(eventId: String!, contestantId: String!, gamblerId: String!, amount: Float!): Bet!
-    updateBet(id: ID!, amount: Float): Bet!
+    updateBet(id: ID!, amount: Float, status: BetStatus): Bet!
     deleteBet(id: ID!): Bet!
     createContestant(contestantId: ID!, eventId: ID!): Contestant!
     updateContestant(eventId: ID!, contestantId: ID!, notes: String): Contestant!
+	addGroupToEvent(eventId: ID!, groupId: ID!): Event!
+	removeGroupFromEvent(eventId: ID!, groupId: ID!): Event!
   }
 
   type Subscription {

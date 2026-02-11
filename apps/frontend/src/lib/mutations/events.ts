@@ -70,51 +70,25 @@ export const DELETE_EVENT = gql`
 `;
 
 export const CREATE_BET = gql`
-  mutation CreateBet($eventId: String!, $gamblerId: String!, $amount: Float!) {
-    createBet(eventId: $eventId, gamblerId: $gamblerId, amount: $amount) {
+  mutation CreateBet($eventId: String!, $gamblerId: String!, $contestantId: String!, $amount: Float!) {
+    createBet(eventId: $eventId, gamblerId: $gamblerId, contestantId: $contestantId, amount: $amount) {
       id
       eventId
       gamblerId
+      contestantId
       amount
-      createdAt
-      updatedAt
-      event {
-        id
-        name
-      }
-      contact {
-        id
-        name
-      }
-      group {
-        id
-        name
-      }
     }
   }
 `;
 
 export const UPDATE_BET = gql`
-  mutation UpdateBet($id: ID!, $amount: Float) {
-    updateBet(id: $id, amount: $amount) {
+  mutation UpdateBet($id: ID!, $amount: Float, $status: BetStatus) {
+    updateBet(id: $id, amount: $amount, status: $status) {
       id
       eventId
       gamblerId
       amount
-      createdAt
-      updatedAt
-      event {
-        id
-        name
-      }
-      contact {
-        id
-        name
-      }
-      group {
-        id
-        name
-      }
+	  status
     }
   }
 `;
@@ -123,23 +97,24 @@ export const DELETE_BET = gql`
   mutation DeleteBet($id: ID!) {
     deleteBet(id: $id) {
       id
-      eventId
-      gamblerId
-      amount
-      createdAt
-      updatedAt
-      event {
-        id
-        name
-      }
-      contact {
-        id
-        name
-      }
-      group {
-        id
-        name
-      }
     }
+  }
+`;
+
+export const ADD_GROUP_TO_EVENT = gql`
+  mutation AddGroupToEvent($eventId: ID!, $groupId: ID!) {
+	addGroupToEvent(eventId: $eventId, groupId: $groupId) {
+	  id
+	  name
+	}
+  }
+`;
+
+export const REMOVE_GROUP_FROM_EVENT = gql`
+  mutation RemoveGroupFromEvent($eventId: ID!, $groupId: ID!) {
+	removeGroupFromEvent(eventId: $eventId, groupId: $groupId) {
+	  id
+	  name
+	}
   }
 `;

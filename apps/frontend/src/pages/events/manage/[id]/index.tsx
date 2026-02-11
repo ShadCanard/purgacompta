@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { Box, Typography, Button, CircularProgress, Card } from "@mui/material";
+import { Box, Typography, Button, CircularProgress, Card, MenuItem, Chip } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef } from "@mui/x-data-grid";
 import { getApolloClient } from "@/lib/apolloClient";
-import { GET_CONTESTANTS_BY_EVENT, GET_EVENT } from "@/lib/queries/events";
-import { UPDATE_CONTESTANT, UPDATE_EVENT } from "@/lib/mutations/events";
+import { GET_CONTESTANTS_BY_EVENT, GET_EVENT, GET_GROUPS_BY_EVENT } from "@/lib/queries/events";
+import { UPDATE_BET, UPDATE_CONTESTANT, UPDATE_EVENT } from "@/lib/mutations/events";
 import AddBetModal from "@/components/events/AddBetModal";
 import AddOrCreateContestantModal from "@/components/events/AddOrCreateContestantModal";
-import { formatDateTime, parseDateTime } from "@/lib/utils";
+import { formatDateTime, formatDollar, parseDateTime } from "@/lib/utils";
 import { Event } from "@purgacompta/common/types/events";
 import { MainLayout } from "@/components";
 import RichTextNotes from "@/components/layout/RichTextNotes";
 import { useSnackbar } from '@/providers';
 import ActionsMenu from "@/components/layout/ActionsMenu";
+import InviteGroupsModal from "@/components/events/InviteGroupModal";
+import { Launch } from "@mui/icons-material";
 
 const ManageEventPage: React.FC = () => {
 	const router = useRouter();
@@ -23,6 +25,8 @@ const ManageEventPage: React.FC = () => {
     const { notify } = useSnackbar()!;
 	const apiRefContestant = useGridApiRef();
 	const apiRefBet = useGridApiRef();
+	const apiRefInviteGroup = useGridApiRef();
+	const [openInviteGroup, setOpenInviteGroup] = useState(false);
 	const [openContestant, setOpenContestant] = useState(false);
 	const [openBet, setOpenBet] = useState(false);
 	const [notes, setNotes] = useState<string>('');
@@ -66,6 +70,17 @@ const ManageEventPage: React.FC = () => {
       return (data as any).event as Event;
     },
   });
+	const { data: invitedGroupsData, refetch: refetchInvited, isLoading: invitedGroupsLoading } = useQuery({
+		queryKey: ['invitedGroups', id],
+		enabled: !!id,
+		queryFn: async () => {
+			const { data } = await apolloClient.query({
+				query: GET_GROUPS_BY_EVENT,
+				variables: { eventId: id },
+			});
+			return (data as any).groupsByEvent;
+		}	
+	});
 
   const updateEventMutation = useMutation({
     mutationFn: async (notes: string) => {
@@ -93,6 +108,16 @@ const ManageEventPage: React.FC = () => {
     },
   });
 
+  const updateBet = useMutation({
+    mutationFn: async ({ betId, status }: { betId: string, status: string }) => {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_BET,
+        variables: { id: betId, status },
+      });
+      return (data as any)?.updateBet;
+    },
+  });
+
 
 
   const handleNotesChange = (newNotes: string) => {
@@ -111,7 +136,10 @@ const ManageEventPage: React.FC = () => {
 
   const handleBetDelete = (betId: string) => {
     notify("Suppression du pari non implémentée", "info");
+  }
 
+  const handleGroupInviteDelete = (groupId: string) => {
+	notify("Suppression de l'invitation du groupe non implémentée", "info");
   }
 
   if (isLoading) return <MainLayout><CircularProgress /></MainLayout>;
@@ -145,7 +173,7 @@ const ManageEventPage: React.FC = () => {
 			);
 		  },
 		},
-    { field: "name", headerName: "Nom", flex: 1 },
+    { field: "name", headerName: "Nom", flex: 1, },
     { field: "notes", headerName: "Notes", flex: 1, editable: true },
     { field: "actions", headerName: "Actions", renderCell: (params) => (
         <ActionsMenu row={params?.row} onDelete={handleContestantDelete} canEdit={false} />
@@ -154,11 +182,36 @@ const ManageEventPage: React.FC = () => {
 
   // Colonnes Bets
   const betsColumns: GridColDef[] = [
-    { field: "gambler", headerName: "Joueur", flex: 1 },
-    { field: "amount", headerName: "Montant", flex: 1 },
-    { field: "contestant", headerName: "Pari sur", flex: 1 },
+    { field: "gambler", headerName: "Joueur", flex: 1, valueFormatter: (params: any) => params.name || '—' },
+    { field: "amount", headerName: "Montant", flex: 1, valueFormatter: (params) => formatDollar(params) },
+    { field: "contestant", headerName: "Pari sur", flex: 1, valueFormatter: (params: any) => params.name || '—' },
+    { field: "status", headerName: "Statut", flex: 1, renderCell: (params) => (
+			<Chip
+				label={params.value === "PENDING" ? "En attente" : params.value === "APPROVED" ? "Validé" : "Rejeté"}
+				color={params.value === "PENDING" ? "info" : params.value === "APPROVED" ? "success" : "error"}
+				size="small"
+				sx={{ fontWeight: 700 }}
+			/>
+		)
+	},
     { field: "actions", headerName: "Actions", renderCell: (params) => (
-        <ActionsMenu row={params?.row} onDelete={handleBetDelete} onEdit={handleBetEdit} />
+        <ActionsMenu row={params?.row} onDelete={handleBetDelete} onEdit={handleBetEdit} 
+		moreActions={ params?.row?.status === "PENDING" ? [
+			<MenuItem key="approve" onClick={() => updateBet.mutate({ betId: params.row.id, status: 'APPROVED' })}>Valider le pari</MenuItem>,
+			<MenuItem key="deny" onClick={() => updateBet.mutate({ betId: params.row.id, status: 'DENIED' })}>Rejeter le pari</MenuItem>,
+		] : []}/>
+    )},
+  ];
+
+  const invitedGroupsColumns: GridColDef[] = [
+	{ field: "name", headerName: "Groupe invité", flex: 1 },
+	{ field: "groupPage", headerName: "Lien", flex: 1, renderCell: (params) => (
+		<Button endIcon={<Launch />} variant="contained" size="small" color="warning" onClick={() => window.open(`/events/${params.row.id}`, '_blank', 'noopener,noreferrer')}>
+			Page d'invitations
+		</Button>
+	) },
+	{ field: "actions", headerName: "Actions", renderCell: (params) => (
+        <ActionsMenu row={params?.row} onDelete={handleGroupInviteDelete} canEdit={false} />
     )},
   ];
 
@@ -187,6 +240,21 @@ const ManageEventPage: React.FC = () => {
             <RichTextNotes value={notes} onChange={handleNotesChange} />
             </Card>
         </Box>
+		  <Box sx={{ flex: 1, minWidth: 350 }}>
+            <Typography variant="h6">Groupes invités</Typography>
+            <Button variant="outlined" onClick={() => setOpenInviteGroup(true)} sx={{ mb: 1 }}>Inviter un groupe</Button>
+            <DataGrid
+              apiRef={apiRefInviteGroup}
+              rows={invitedGroupsData || []}
+              columns={invitedGroupsColumns}
+              getRowId={(row) => row.id}
+              autoHeight
+			  loading={invitedGroupsLoading}
+              pageSizeOptions={[5, 10, 25]}
+              localeText={{ noRowsLabel: 'Aucun groupe invité' }}
+              sx={{ background: '#181a20', borderRadius: 2 }}
+            />
+          </Box>
         <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           <Box sx={{ flex: 1, minWidth: 350 }}>
             <Typography variant="h6">Participants</Typography>
@@ -237,9 +305,16 @@ const ManageEventPage: React.FC = () => {
           onClose={() => setOpenBet(false)}
           onSuccess={() => queryClient.invalidateQueries({ queryKey: ["event", id] })}
         />
-      </Box>
-    </MainLayout>
+		<InviteGroupsModal
+		  open={openInviteGroup}
+		  eventId={id as string}
+		  groups={invitedGroupsData || []}
+		  onClose={() => setOpenInviteGroup(false)}
+		  onSuccess={() => refetchInvited()}
+		/>
+	  </Box>
+	</MainLayout>
   );
-};
+}
 
 export default ManageEventPage;

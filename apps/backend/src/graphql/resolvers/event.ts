@@ -1,6 +1,6 @@
+
 import prisma from '../../lib/prisma.js';
 import { pubsub } from './_pubsub.js';
-
 
 export const Query = {
   events: async () => {
@@ -43,9 +43,29 @@ export const Query = {
   },
   betsByEvent: async (_: any, { eventId }: { eventId: string }) => {
 	return await prisma.bet.findMany({ where: { eventId } });
+  },
+  eventsByGroup: async (_: any, { groupId }: { groupId: string }) => {
+    // Récupère tous les EventGroup pour ce groupe
+    const eventGroups = await prisma.eventGroup.findMany({ where: { groupId } });
+    const eventIds = eventGroups.map(eg => eg.eventId);
+    // Récupère tous les events correspondants
+    const events = await prisma.event.findMany({ where: { id: { in: eventIds } } });
+    // Ajoute le champ participating à true pour ce groupe
+
+	const participatingEventIds = await prisma.eventContestant.findMany({ where: { contestantId: groupId }, select: { eventId: true } }).then(res => res.map(ec => ec.eventId));
+    return events.map(event => ({
+      ...event,
+      participating: participatingEventIds.includes(event.id),
+    }));
+  },
+  groupsByEvent: async (_: any, { eventId }: { eventId: string }) => {
+	// Récupère tous les EventGroup pour cet event
+	const eventGroups = await prisma.eventGroup.findMany({ where: { eventId } });
+	const groupIds = eventGroups.map(eg => eg.groupId);
+	// Récupère tous les groupes correspondants
+	return await prisma.group.findMany({ where: { id: { in: groupIds } }, select: { id: true, name: true, color1: true } });
   }
 };
-
 export const Event = {
   notes: (parent: any) => parent.notes,
   participants: async (parent: any) => {
@@ -74,11 +94,23 @@ export const Event = {
       };
     });
   },
+  participating: async (parent: any, _: any, context: any) => {
+    if (typeof parent.participating !== 'undefined') return parent.participating;
+    if (!context || !context.groupId) return false;
+    const link = await prisma.eventGroup.findFirst({ where: { eventId: parent.id, groupId: context.groupId } });
+    return !!link;
+  },
 };
 
 export const Mutation = {
   createEvent: async (_: any, { name, startDate }: { name: string; startDate: string }) => {
-    return await prisma.event.create({ data: { name, startDate: new Date(startDate) } });
+    const event = await prisma.event.create({ data: { name, startDate: new Date(startDate) } });
+	pubsub.publish('EVENT_UPDATED', { eventUpdated: event }); // Notifie les abonnés de la création
+	const purgatoryId = await prisma.group.findFirst({ where: { name: 'Purgatory' }, select: { id: true } });
+	if (purgatoryId) {
+		await prisma.eventGroup.create({ data: { eventId: event.id, groupId: purgatoryId.id } });
+	}
+	return event;
   },
   updateEvent: async (_: any, { id, name, startDate, notes }: { id: string; name?: string; startDate?: string; notes?: string }) => {
     const value = await prisma.event.update({
@@ -103,7 +135,7 @@ export const Mutation = {
   },
   createBet: async (_: any, { eventId, contestantId, gamblerId, amount }: { eventId: string; contestantId: string; gamblerId: string; amount: number }) => {
 
-    const value = await prisma.bet.create({ data: { eventId, contestantId, gamblerId, amount } });
+    const value = await prisma.bet.create({ data: { eventId, contestantId, gamblerId, amount, status: "PENDING" } });
 	pubsub.publish('BET_UPDATED', { betUpdated: value }); // Notifie les abonnés de la création
 	return value;
   },
@@ -174,29 +206,60 @@ export const Mutation = {
     pubsub.publish('CONTESTANT_UPDATED', { contestantUpdated: result });
     return result;
   },
+  addGroupToEvent: async (_: any, { eventId, groupId }: { eventId: string, groupId: string }) => {
+	// Crée le lien EventGroup
+	const link = await prisma.eventGroup.create({ data: { eventId, groupId } });
+	const value = await prisma.event.findFirst({ where: { id: eventId }, include: { eventContestants: true } });
+	pubsub.publish('EVENT_UPDATED', { eventUpdated: value });
+	return value;
+  },
+  removeGroupFromEvent: async (_: any, { eventId, groupId }: { eventId: string, groupId: string }) => {
+	const inviteId = await prisma.eventGroup.findFirst({ where: { eventId, groupId }, select: { id: true } });
+	if (!inviteId) {
+		throw new Error('Le groupe n\'est pas invité à cet événement');
+	}
+	// Supprime le lien EventGroup
+	await prisma.eventGroup.delete({ where: { id: inviteId.id } });
+	const value = await prisma.event.findFirst({ where: { id: eventId }, include: { eventContestants: true } });
+	pubsub.publish('EVENT_UPDATED', { eventUpdated: value });
+	return value;
+  },
 };
 
 export const Bet = {
-  contestant: async (parent: any) => {    
+	status: (parent: any) => parent.status,
+	contestant: async (parent: any) => {    
     const [contact, group] = await Promise.all([
-      prisma.contact.findFirst({ where: { id: { in: parent.contestantId } }, select: { id: true, name: true } }),
-      prisma.group.findFirst({ where: { id: { in: parent.contestantId } }, select: { id: true, name: true, color1: true } }),
+      prisma.contact.findFirst({ where: { id: parent.contestantId }, select: { id: true, name: true } }),
+      prisma.group.findFirst({ where: { id: parent.contestantId }, select: { id: true, name: true, color1: true } }),
     ]);
-    if (contact) {
-      return { ...contact, color: '#f35050' };
-    } else if (group) {
-      return { ...group, color: group.color1 || null };
-    }
-    return null;
-  },
-  gambler: async (parent: any) => {
-        const [contact, group] = await Promise.all([
-      prisma.contact.findFirst({ where: { id: { in: parent.gamblerId } }, select: { id: true, name: true } }),
-      prisma.group.findFirst({ where: { id: { in: parent.gamblerId } }, select: { id: true, name: true } }),
-    ]);
-    return contact || group || null;
-  },
+		if (contact) {
+		return { ...contact, color: '#f35050' };
+		} else if (group) {
+		return { ...group, color: group.color1 || null };
+		}
+		return null;
+	},
+	gambler: async (parent: any) => {
+		const [contact, group] = await Promise.all([
+			prisma.contact.findFirst({ where: { id: parent.gamblerId }, select: { id: true, name: true } }),
+			prisma.group.findFirst({ where: { id: parent.gamblerId }, select: { id: true, name: true } }),
+		]);
+		return contact || group || null;
+	},
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,5 +1,7 @@
 import { getContrastTextColor } from "@/lib/utils";
 import { Card, CardContent, Box, Typography, CardProps, Divider, Button, Grid, Tooltip } from "@mui/material";
+import AddBetModal from "./AddBetModal";
+import { useState } from "react";
 
 
 interface ContestantCardProps extends CardProps {
@@ -8,11 +10,16 @@ interface ContestantCardProps extends CardProps {
 		name: string; 
 		color: string;
 	};
+	gamblerId?: string;
+	eventId?: string;
 }
 
-const ContestantCard: React.FC<ContestantCardProps> = ({ contestant, ...cardProps }) => {
+const ContestantCard: React.FC<ContestantCardProps> = ({ contestant, gamblerId, eventId, ...cardProps }) => {
 
-  return (
+	const [openBetModal, setOpenBetModal] = useState(false);
+
+	console.dir({contestant, gamblerId, eventId});
+  return <>
 	<Card
 	  sx={{
 		background: 'rgba(30, 30, 46, 0.8)',
@@ -23,7 +30,6 @@ const ContestantCard: React.FC<ContestantCardProps> = ({ contestant, ...cardProp
 		  transform: 'translateY(-4px)',
 		  boxShadow: `0 8px 24px ${contestant.color}33`,
 		},
-		cursor: "pointer",
 	  }}
 	  {...cardProps}
 	>
@@ -47,12 +53,18 @@ const ContestantCard: React.FC<ContestantCardProps> = ({ contestant, ...cardProp
 			</Grid>
 			</Grid>
 			<Typography variant="caption" color="text.secondary">Part du pool</Typography>
-			<Button fullWidth variant="contained" sx={{ mt: 2, bgcolor: contestant.color, color: getContrastTextColor(contestant.color), fontWeight: 700 }}>
-			🔥 PARIER SUR CETTE ÉQUIPE
+			<Button 
+				fullWidth 
+				variant="contained" 
+				sx={{ mt: 2, bgcolor: contestant.color, color: getContrastTextColor(contestant.color), fontWeight: 700 }}
+				onClick={() => setOpenBetModal(true)}
+				>
+			🔥 PARIER
 			</Button>
 	  </CardContent>
 	</Card>
-  );
+	<AddBetModal open={openBetModal} eventId={eventId || ""} gamblerId={gamblerId} contestantId={contestant.id} onClose={() => setOpenBetModal(false)} />
+	</>;
 };
 
 export default ContestantCard;
