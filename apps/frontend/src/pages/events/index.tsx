@@ -11,8 +11,13 @@ import { formatDateTime, parseDateTime } from "@/lib/utils";
 import { Event } from "@purgacompta/common/types/events";
 
 const EventsPage: React.FC = () => {
-    const apolloClient = getApolloClient();
-  const queryClient = useQueryClient();
+  // Gestion modale création
+	const [open, setOpen] = React.useState(false);
+	const [name, setName] = React.useState("");
+	const [startDate, setStartDate] = React.useState("");
+	const router = useRouter();
+	const apolloClient = getApolloClient();
+	const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({
     queryKey: ["events"],
     queryFn: async () => {
@@ -28,11 +33,7 @@ const EventsPage: React.FC = () => {
     },
   });
 
-  // Gestion modale création
-  const [open, setOpen] = React.useState(false);
-  const [name, setName] = React.useState("");
-  const [eventId, setEventId] = React.useState("");
-  const [startDate, setStartDate] = React.useState("");
+
 
   const createEventMutation = useMutation({
     mutationFn: async () => {
@@ -57,11 +58,11 @@ const EventsPage: React.FC = () => {
   const now = Date.now();
   const eventsAVenir = (data || []).filter((event: Event) => {
     const eventTime = parseDateTime(event.startDate);
-    return !isNaN(eventTime) && eventTime > now;
+    return !Number.isNaN(eventTime) && eventTime > now;
   });
   const eventsPasses = (data || []).filter((event: Event) => {
     const eventTime = parseDateTime(event.startDate);
-    return !isNaN(eventTime) && eventTime <= now;
+    return !Number.isNaN(eventTime) && eventTime <= now;
   });
 
       const columns: GridColDef[] = [
@@ -69,8 +70,6 @@ const EventsPage: React.FC = () => {
         { field: 'startDateFormatted', headerName: 'Début', flex: 1, minWidth: 180 },
         { field: 'createdAtFormatted', headerName: 'Créé le', flex: 1, minWidth: 180 },
       ];
-
-    const router = useRouter();
 
     const handleRowClick = (params: any) => {
       router.push(`/events/manage/${params.id}`);
