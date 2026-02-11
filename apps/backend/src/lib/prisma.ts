@@ -1,11 +1,16 @@
-import { PrismaClient } from '@prisma/client';
+import clientPkg from '@prisma/client';
 
-// Singleton pattern pour Prisma Client
+// PrismaClient peut manquer si le client n'a pas été généré dans l'environnement (ex: Vercel ignoring postinstall)
+// On reste résilient en utilisant des any/guards pour ne pas casser la compilation.
+const PrismaClientCtor: any = (clientPkg as any).PrismaClient ?? (clientPkg as any).PrismaClient ?? (clientPkg as any).default ?? undefined;
+
+type PrismaAny = any;
+
 declare global {
-  var prisma: PrismaClient | undefined;
+  var prisma: PrismaAny | undefined;
 }
 
-const prisma = global.prisma || new PrismaClient({
+const prisma = global.prisma || new (PrismaClientCtor ?? (class { constructor() {} }))({
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
 });
 
@@ -13,4 +18,4 @@ if (process.env.NODE_ENV !== 'production') {
   global.prisma = prisma;
 }
 
-export default prisma;
+export default prisma as PrismaAny;

@@ -18,7 +18,7 @@ export const Query = {
   contestantsByEvent: async (_: any, { eventId }: { eventId: string }) => {
     // Récupère tous les EventContestant pour l'event
     const eventContestants = await prisma.eventContestant.findMany({ where: { eventId } });
-    const contestantIds = eventContestants.map(ec => ec.contestantId);
+    const contestantIds = eventContestants.map((ec: any) => ec.contestantId);
     // Récupère tous les contacts et groupes
     const [contacts, groups] = await Promise.all([
       prisma.contact.findMany({ where: { id: { in: contestantIds } }, select: { id: true, name: true } }),
@@ -26,8 +26,8 @@ export const Query = {
     ]);
     // Fusionne et ajoute la note du participant (depuis EventContestant)
     const all = [...contacts, ...groups];
-    return all.map(participant => {
-      const ec = eventContestants.find(ec => ec.contestantId === participant.id);
+    return all.map((participant: any) => {
+      const ec = eventContestants.find((ec: any) => ec.contestantId === participant.id);
       let color = null;
       if ('color1' in participant) {
         color = participant.color1 || null;
@@ -47,13 +47,13 @@ export const Query = {
   eventsByGroup: async (_: any, { groupId }: { groupId: string }) => {
     // Récupère tous les EventGroup pour ce groupe
     const eventGroups = await prisma.eventGroup.findMany({ where: { groupId } });
-    const eventIds = eventGroups.map(eg => eg.eventId);
+    const eventIds = eventGroups.map((eg: any) => eg.eventId);
     // Récupère tous les events correspondants
     const events = await prisma.event.findMany({ where: { id: { in: eventIds } }, include: { bets: true } });
     // Ajoute le champ participating à true pour ce groupe
 
-	const participatingEventIds = await prisma.eventContestant.findMany({ where: { contestantId: groupId }, select: { eventId: true } }).then(res => res.map(ec => ec.eventId));
-    return events.map(event => ({
+	const participatingEventIds = await prisma.eventContestant.findMany({ where: { contestantId: groupId }, select: { eventId: true } }).then((res: any[]) => res.map((ec: any) => ec.eventId));
+    return events.map((event: any) => ({
       ...event,
       participating: participatingEventIds.includes(event.id),
     }));
@@ -61,7 +61,7 @@ export const Query = {
   groupsByEvent: async (_: any, { eventId }: { eventId: string }) => {
 	// Récupère tous les EventGroup pour cet event
 	const eventGroups = await prisma.eventGroup.findMany({ where: { eventId } });
-	const groupIds = eventGroups.map(eg => eg.groupId);
+	const groupIds = eventGroups.map((eg: any) => eg.groupId);
 	// Récupère tous les groupes correspondants
 	return await prisma.group.findMany({ where: { id: { in: groupIds } }, select: { id: true, name: true, color1: true } });
   }
@@ -71,7 +71,7 @@ export const Event = {
   participants: async (parent: any) => {
     // Récupère tous les EventContestant pour l'event
     const eventContestants = await prisma.eventContestant.findMany({ where: { eventId: parent.id } });
-    const contestantIds = eventContestants.map(ec => ec.contestantId);
+    const contestantIds = eventContestants.map((ec: any) => ec.contestantId);
     // Récupère tous les contacts et groupes
     const [contacts, groups] = await Promise.all([
       prisma.contact.findMany({ where: { id: { in: contestantIds } }, select: { id: true, name: true } }),
@@ -79,8 +79,8 @@ export const Event = {
     ]);
     // Fusionne et ajoute la note du participant (depuis EventContestant)
     const all = [...contacts, ...groups];
-    return all.map(participant => {
-      const ec = eventContestants.find(ec => ec.contestantId === participant.id);
+    return all.map((participant: any) => {
+      const ec = eventContestants.find((ec: any) => ec.contestantId === participant.id);
       let color = null;
       if ('color1' in participant) {
         color = participant.color1 || null;

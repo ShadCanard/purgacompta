@@ -13,11 +13,11 @@ export const Query = {
     const filterMembers = await prisma.user.findMany({ select: { data: true } });
     const memberPhones = new Set(
       filterMembers
-        .map(m => m.data ? (JSON.parse(m.data) as UserData).phone : undefined)
-        .filter((p): p is string => !!p)
+        .map((m: any) => m.data ? (JSON.parse(m.data) as UserData).phone : undefined)
+        .filter((p: string | undefined): p is string => !!p)
     );
-    return prisma.contact.findMany({ orderBy: { createdAt: 'desc' }, include: { group: true } }).then(contacts =>
-      contacts.filter(contact => !memberPhones.has(contact.phone))
+    return prisma.contact.findMany({ orderBy: { createdAt: 'desc' }, include: { group: true } }).then((contacts: any[]) =>
+      contacts.filter((contact: any) => !memberPhones.has(contact.phone))
     );
   },
   contactById: async (_: any, { id }: { id: string }) => {
@@ -27,11 +27,11 @@ export const Query = {
     const users = await prisma.user.findMany({ select: { data: true } });
     const userPhones = new Set(
       users
-        .map(u => u.data ? (JSON.parse(u.data) as UserData).phone : undefined)
-        .filter((p): p is string => !!p)
+        .map((u: any) => u.data ? (JSON.parse(u.data) as UserData).phone : undefined)
+        .filter((p: string | undefined): p is string => !!p)
     );
     const contacts = await prisma.contact.findMany({ where: { groupid: null }, orderBy: { createdAt: 'desc' } });
-    return contacts.filter(contact => !userPhones.has(contact.phone));
+    return contacts.filter((contact: any) => !userPhones.has(contact.phone));
   },
 };
 
@@ -82,10 +82,10 @@ export const Mutation = {
   },
   importContacts: async (_: any, { input }: { input: Array<{ display: string; number: string }> }) => {
     const existing = await prisma.contact.findMany({ select: { phone: true } });
-    const existingNumbers = new Set(existing.map(c => c.phone));
-    const toCreate = input.filter(c => !existingNumbers.has(c.number));
+    const existingNumbers = new Set(existing.map((c: any) => c.phone));
+    const toCreate = input.filter((c: any) => !existingNumbers.has(c.number));
     const created = await Promise.all(
-      toCreate.map(c =>
+      toCreate.map((c: any) =>
         prisma.contact.create({
           data: {
             name: c.display,
