@@ -44,7 +44,7 @@ export const Query = {
       orderBy: { createdAt: 'desc' },
     });
     if (!targetId) {
-      return allPrices.filter(p => !p.targetId);
+      return allPrices.filter((p: any) => !p.targetId);
     }
     const result: any[] = [];
     const seenItemIds = new Set();

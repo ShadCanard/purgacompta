@@ -21,7 +21,7 @@ export const Query = {
         where: { storageLocationId: { in: storageLocationIds } },
         select: { id: true }
       });
-      const storageIds = storages.map(s => s.id);
+      const storageIds = storages.map((s: any) => s.id);
       if (storageIds.length === 0) return [];
       return prisma.storageItem.findMany({
         where: { storageId: { in: storageIds } },

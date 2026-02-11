@@ -37,7 +37,7 @@ export const Query = {
   },
   users: async () => {
     const users = await prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
-    return users.map(u => ({ ...u, data: u.data ? (JSON.parse(u.data) as UserData) : undefined }));
+    return users.map((u: any) => ({ ...u, data: u.data ? (JSON.parse(u.data) as UserData) : undefined }));
   },
   usersCount: async () => {
     return prisma.user.count();

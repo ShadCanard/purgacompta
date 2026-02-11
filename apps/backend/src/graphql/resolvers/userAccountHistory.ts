@@ -9,7 +9,7 @@ export const Query = {
       include: { user: true },
       orderBy: { createdAt: 'desc' }
     });
-    return histories.map(h => ({
+    return histories.map((h: any) => ({
       ...h,
       user: h.user ? { ...h.user, data: h.user.data ? JSON.parse(h.user.data) as UserData : undefined } : null
     }));
@@ -28,7 +28,7 @@ export const Query = {
       include: { user: true },
       orderBy: { createdAt: 'desc' }
     });
-    return histories.map(h => ({
+    return histories.map((h: any) => ({
       ...h,
       user: h.user ? { ...h.user, data: h.user.data ? JSON.parse(h.user.data) as UserData : undefined } : null
     }));
