@@ -95,8 +95,8 @@ export const Event = {
     });
   },
   participating: async (parent: any, _: any, context: any) => {
-    if (typeof parent.participating !== 'undefined') return parent.participating;
-    if (!context || !context.groupId) return false;
+    if (parent.participating !== undefined) return parent.participating;
+    if (!context?.groupId) return false;
     const link = await prisma.eventGroup.findFirst({ where: { eventId: parent.id, groupId: context.groupId } });
     return !!link;
   },
@@ -235,8 +235,14 @@ export const Mutation = {
 
   updateContestant: async (_: any, { eventId, contestantId, notes }: { eventId: string, contestantId: string, notes?: string }) => {
     // Met à jour la note du participant pour cet event
+    // On doit d'abord retrouver l'id unique du EventContestant
+    const eventContestant = await prisma.eventContestant.findFirst({
+      where: { eventId, contestantId },
+      select: { id: true }
+    });
+    if (!eventContestant) throw new Error('EventContestant introuvable');
     const updated = await prisma.eventContestant.update({
-      where: { AND: [{ eventId: eventId }, {  contestantId: contestantId }] },
+      where: { id: eventContestant.id },
       data: { notes },
     });
     // Cherche d'abord dans Contact
@@ -262,7 +268,7 @@ export const Mutation = {
   },
   addGroupToEvent: async (_: any, { eventId, groupId }: { eventId: string, groupId: string }) => {
 	// Crée le lien EventGroup
-	const link = await prisma.eventGroup.create({ data: { eventId, groupId } });
+  await prisma.eventGroup.create({ data: { eventId, groupId } });
 	const value = await prisma.event.findFirst({ where: { id: eventId }, include: { eventContestants: true } });
 	pubsub.publish('EVENT_UPDATED', { eventUpdated: value });
 	return value;

@@ -8,25 +8,25 @@ import OrderedList from "@tiptap/extension-ordered-list";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import {
-	MenuButtonAlignCenter,
-	MenuButtonAlignJustify,
-	MenuButtonAlignLeft,
-	MenuButtonAlignRight,
-	MenuButtonBold,
-	MenuButtonBulletedList,
-	MenuButtonHorizontalRule,
-	MenuButtonItalic,
-	MenuButtonOrderedList,
-	MenuButtonRedo,
-	MenuButtonTaskList,
-	MenuButtonUnderline,
-	MenuButtonUndo,
-	MenuControlsContainer,
-	MenuDivider,
-	MenuSelectFontSize,
-	MenuSelectHeading,
-	RichTextEditor,
-	RichTextEditorRef,
+    MenuButtonAlignCenter,
+    MenuButtonAlignJustify,
+    MenuButtonAlignLeft,
+    MenuButtonAlignRight,
+    MenuButtonBold,
+    MenuButtonBulletedList,
+    MenuButtonHorizontalRule,
+    MenuButtonItalic,
+    MenuButtonOrderedList,
+    MenuButtonRedo,
+    MenuButtonTaskList,
+    MenuButtonUnderline,
+    MenuButtonUndo,
+    MenuControlsContainer,
+    MenuDivider,
+    MenuSelectFontSize,
+    MenuSelectHeading,
+    RichTextEditor,
+    RichTextEditorRef,
 } from "mui-tiptap";
 interface RichTextNotesProps {
   value: string;
@@ -45,7 +45,6 @@ const RichTextNotes: React.FC<RichTextNotesProps> = ({ value, onChange }) => {
       content={value}
       immediatelyRender={false}
       onBlur={({ editor }) => onChange(editor.getHTML())}
-      onClick={() => rteRef.current?.focus()}
       renderControls={() => (
         <MenuControlsContainer>
           <MenuButtonUndo />

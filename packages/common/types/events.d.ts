@@ -11,7 +11,11 @@ export interface Bet {
     updatedAt: string;
     event?: Event;
 }
-export type Participant = Contact | Group;
+export interface Participant {
+    id: string;
+    name: string;
+    color: string;
+}
 export interface Event {
     id: string;
     name: string;
@@ -21,5 +25,7 @@ export interface Event {
     participants: Participant[];
     createdAt: string;
     updatedAt: string;
+    betsOpened: boolean;
+    winner?: Participant;
 }
 //# sourceMappingURL=events.d.ts.map
